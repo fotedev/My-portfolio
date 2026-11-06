@@ -1,0 +1,175 @@
+# OPERATIONS.md
+
+Operational runbook for the `fotedev` portfolio (`fotedev/My-portfolio`, live at `https://fotedev.me`).
+Owner/operator: Ahmed Aboalayoun (single admin, see `docs/decisions/ADR-0005-single-admin-no-page-builder.md`).
+
+Status: **M0 draft.** Free-tier numeric limits are intentionally left as placeholders until they are captured live from vendor pages in **Milestone 1** — numbers are never guessed (see §6).
+
+---
+
+## 1. Environment variables
+
+All secrets live in `.env.local` (gitignored) locally and in Vercel project Environment Variables in production. The repo carries only `.env.example` with **names, never values**. No secret is ever committed, pasted into docs, or written into issue bodies.
+
+| Variable | Scope | Used by | Purpose / notes |
+|---|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | public (client + server) | Supabase JS clients | Project URL for anon access. Safe to expose; access is governed by RLS. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | public (client + server) | Supabase JS clients | Anon key. Safe to expose; every table must be RLS-protected so anon can only read `published` content. |
+| `SUPABASE_SERVICE_ROLE_KEY` | **server-only** | Edge Functions, server-side admin writes | Bypasses RLS. Must never reach the browser bundle, client components, or any `NEXT_PUBLIC_*` context. In code, import only from modules marked `server-only`. |
+| `TURNSTILE_SECRET_KEY` | server-only (Edge Function) | Contact pipeline (M4) | Server-side `siteverify` secret from Cloudflare. |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | public (client) | Contact form widget (M4) | Turnstile widget site key. |
+| `EMAIL_PROVIDER_API_KEY` | server-only (Edge Function) | Inquiry notification (M4+) | API key for the chosen email provider. Provider is selected in M4 after a current pricing check (see ADR-0008 when created). |
+| `EMAIL_PROVIDER_NAME` | server-only (Edge Function) | Inquiry notification (M4+) | Which provider adapter to use (e.g. `resend`); set when the provider is chosen in M4. |
+| `EMAIL_FROM` | server-only (Edge Function) | Inquiry notification (M4+) | Verified sender address for notification emails. |
+| `CONTACT_EMAIL` | public display value (stored in `site_settings`, editable from `/admin`) | Contact UI | The public contact email shown on the site and used by the copy button / `mailto:` fallback. Initial value: `fote.engineer@gmail.com`. Editable in `/admin/settings`; the env/DB value is the source of truth, not hardcoded copy. |
+| `IP_HASH_SALT` | server-only (Edge Function) | Rate limiting (M4) | Salt for salted SHA-256 of the submitter IP (`ip_hash`). Never store raw IPs. Rotate with the other secrets if compromise is suspected (see §7). |
+| `NEXT_PUBLIC_SITE_URL` | public (build) | Metadata, canonical URLs, sitemap | Canonical origin, e.g. `https://fotedev.me`. |
+
+Rules:
+
+- `.env.example` lists names only; values go to `.env.local` and Vercel env vars.
+- `SUPABASE_SERVICE_ROLE_KEY`, `TURNSTILE_SECRET_KEY`, `EMAIL_PROVIDER_API_KEY`, `IP_HASH_SALT` are **server-only**: never prefixed `NEXT_PUBLIC_`, never imported in client components.
+- Project ref / URL may be recorded in docs; **keys never are** (prompt-0 §3.9).
+
+## 2. Deploy (Vercel)
+
+Preferred path is Git-integrated deployment: push/merge to `main` → Vercel builds and promotes to production automatically. Nothing is deployed ad-hoc "to see if it works".
+
+1. Ensure the PR is merged with **CI green** (lint, typecheck, unit, build — required status check per `.factory/PROTOCOL.md`) and GATE 2 evidence attached.
+2. Confirm Vercel Environment Variables are set for the **Production** scope (names per §1; values in Vercel dashboard, not in repo).
+3. Merge to `main`. Vercel deploys the production build.
+4. Post-deploy smoke (2 minutes):
+   - `https://fotedev.me` loads over HTTPS; `/en` and `/ar` render; theme has no flash on reload.
+   - Spot-check one project page and `/contact` (direct email fallback visible even if the form is disabled).
+   - `robots.txt` still disallows `/admin`; sitemap lists both locales.
+5. Record the deployment SHA + URL in `.factory/RUN_LOG.md` (and in this file's §10 launch record at M6).
+
+Preview deploys: every PR gets a Vercel preview URL. Preview env vars are set once per project; previews may keep Deployment Protection enabled (production must have it disabled at launch, M6).
+
+## 3. Rollback (Vercel)
+
+Bad publish or regression on production:
+
+1. Identify the last known-good production deployment (Vercel dashboard → Deployments → last `READY` production deploy with passing smoke).
+2. **Promote/rollback:** Vercel dashboard → that deployment → "Promote to Production" (or use the Instant Rollback option). This repoints traffic without a rebuild.
+3. CLI equivalent: `vercel rollback <deployment-url> --prod` (or `vercel promote`, matching the current CLI — check `vercel --help` at the time of the incident).
+4. Verify the site renders correctly again; check that `/en` and `/ar` both work.
+5. **Content-cache check:** if the bad content was ISR-cached, run the targeted revalidation from `/admin` (publish an unchanged field on the affected record) or hit the revalidation path for the affected routes (`/[locale]`, `/[locale]/projects`, `/[locale]/projects/[slug]`). Revalidation failure must be **reported, never hidden** (prompt-0 §3.10).
+6. Fix forward on a branch → PR → CI → merge. Do not hot-patch production by hand.
+7. Log the incident in `.factory/RUN_LOG.md` (issue/SHA, what regressed, rollback time).
+
+Supabase schema note: schema changes are forward-compatible (migrations only, no destructive rewrites). Rollback reverts the **app**, not the DB; if a migration must be reverted, that is a new forward migration with a documented reason.
+
+## 4. Supabase backup & retention
+
+- **Managed backups:** the Supabase free tier's built-in backup schedule is limited and can change — **TO CAPTURE IN M1 (record with source URL + date: Supabase docs, "Backups"/pricing page, current free-tier retention window)**. Do not assume daily backups exist.
+- **Self-service exports (owner-run, monthly, ~5 minutes):**
+  1. Supabase dashboard → Database → Backups: note latest available backup timestamp.
+  2. Export content tables to a local timestamped folder (SQL dump or CSV of `site_settings`, `projects`, `services`, `credentials`, `contributions`, `media_assets` metadata): `supabase db dump --data-only -f backup-YYYYMMDD.sql` (or Table Editor CSV exports).
+  3. Copy the certificate PDF and other irreplaceable media out of Storage to the same folder. The repo already contains the certificate at root; keep the M0 backup path known.
+  4. Store outside the repo working tree. Note the backup date in the monthly checklist (§6).
+- **Retention of operational data:**
+  - `inquiries`: retained **24 months** from `created_at`, then purged (§8). Rate-limit counters are ephemeral windows, not records.
+  - Backups that include inquiries inherit the same 24-month horizon — delete or age out inquiry-bearing dumps older than 24 months during the monthly checklist.
+
+## 5. Quota monitoring checklist — monthly, 10 minutes
+
+Run on the 1st of each month (calendar reminder). Record results as one line in `.factory/RUN_LOG.md`.
+
+1. **Vercel:** dashboard → Usage — build minutes, bandwidth, function usage, analytics events. **Free-tier limits: TO CAPTURE IN M1 (record with source URL + date: Vercel pricing/limits docs).**
+2. **Supabase:** dashboard → Usage/Reports — database size, storage used, egress, Edge Function invocations, Auth MAUs. **Free-tier limits: TO CAPTURE IN M1 (record with source URL + date: Supabase pricing page).**
+3. **Turnstile / Cloudflare:** widget request volume; **limits: TO CAPTURE IN M1 (record with source URL + date: Cloudflare Turnstile docs).**
+4. **Email provider:** emails sent this month; **plan limits: TO CAPTURE IN M4 (record with source URL + date: chosen provider's pricing page, ADR-0008).**
+5. **Inquiries growth:** row count vs the daily global cap (50/day expected ceiling ≈ ~1,500/month worst case ≈ ~1.5 MB/inquiries table). If growth is anomalous, check rate-limit counters for abuse.
+6. **Trend vs. thresholds:** any metric > 60% of its free-tier cap → open a GitHub issue titled `[OPS] Quota headroom <metric>` with the numbers and the source URL/date of the cap.
+7. **Backups:** latest Supabase backup timestamp sane; monthly export (§4) done.
+8. **Domain & email expiries:** `fotedev.me` renewal date and professional-email expiry are recorded in §10 — flag anything inside 60 days.
+
+Behavior when limits are reached (design contract, enforced in M4/M5): writes **fail closed** (contact form returns the generic error + direct-email fallback remains), while the public site stays cached and readable (ISR/edge cache does not depend on Supabase availability).
+
+## 6. Free-tier limits table — placeholders
+
+Every number below must be captured from the vendor's own page in M1 (and re-checked in M6), with **source URL + capture date** written inline. Do not fill from memory; vendor limits change.
+
+| Resource | Provider | Limit | Source URL | Captured on |
+|---|---|---|---|---|
+| DB size | Supabase | **TO CAPTURE IN M1** | — | — |
+| Storage (files) | Supabase | **TO CAPTURE IN M1** | — | — |
+| Bandwidth/egress | Supabase | **TO CAPTURE IN M1** | — | — |
+| Edge Function invocations | Supabase | **TO CAPTURE IN M1** | — | — |
+| Auth MAUs | Supabase | **TO CAPTURE IN M1** | — | — |
+| Build minutes | Vercel | **TO CAPTURE IN M1** | — | — |
+| Bandwidth | Vercel | **TO CAPTURE IN M1** | — | — |
+| Hobby plan use terms | Vercel | **TO CAPTURE IN M6 — ADR-0002 terms check** (Hobby = non-commercial) | — | — |
+| Turnstile widget requests | Cloudflare | **TO CAPTURE IN M1** | — | — |
+| Email sends | Provider chosen in M4 | **TO CAPTURE IN M4** | — | — |
+
+## 7. Secret rotation
+
+Rotate when: a key may have leaked, an offboarding/change occurs, or at least **every 12 months** as hygiene. Steps:
+
+1. **Supabase keys:** Supabase dashboard → Settings → API. The `anon` key and `service_role` key are re-issued/reset there (current Supabase UI supports legacy JWT secret rotation; capture the exact flow in M1 — record with source URL + date). Update `.env.local` and all Vercel env scopes, then redeploy (§2). Any change to `service_role` requires a redeploy of the Edge Function environment.
+2. **Turnstile secret:** Cloudflare dashboard → Turnstile → widget → rotate secret key. Update `TURNSTILE_SECRET_KEY` in the Edge Function env + Vercel.
+3. **Email provider key:** provider dashboard → revoke + create new key → update `EMAIL_PROVIDER_API_KEY`.
+4. **`IP_HASH_SALT`:** rotating it invalidates historical `ip_hash` comparability (old hashes no longer match new ones — rate-limit windows simply reset per hash). Acceptable: `ip_hash` is anti-abuse, not identity. Update env, redeploy function.
+5. **Supabase admin password / MFA:** change password from the account settings; re-enroll MFA if the authenticator is lost (see §9 — a second factor slot / recovery codes exist for this).
+6. After each rotation: run the §2 smoke, submit one test inquiry (archived afterwards), confirm Edge Function 200.
+7. Never rotate by editing committed files — env vars only.
+
+## 8. Inquiry retention & delete-on-request
+
+- **Retention:** inquiries live 24 months from `created_at`, then are purged. The retention policy is documented from M1; the purge script itself is delivered in M4 (when inquiries start flowing). Mechanism: `supabase/purge_inquiries.sql` deletes rows older than 24 months along with their rate-limit artifacts (the requester's `rate_limit_counters` keys: `net:<ip_hash>`, `email:<…>`). Run it monthly (add to §5 checklist) or schedule via the tooling available at that time — record the actual mechanism in M4.
+- **Delete-on-request (GDPR-style, honored on email request):**
+  1. Request arrives (any channel). Verify it plausibly identifies the requester (the inquiry email address; ask for confirmation from that address if unclear).
+  2. In `/admin/inquiries`, locate rows by email; either archive + hard-delete after typed confirmation in the admin UI (mechanism as implemented in M5 — the UI states which), or run a parameterized SQL delete for that email via the Supabase SQL editor / script.
+  3. Confirm removal (`SELECT count(*) WHERE email = ...` → 0), and purge the requester's `rate_limit_counters` keys (`net:<ip_hash>`, `email:<…>`).
+  4. Reply to the requester confirming deletion. Note the action (date + row id) in the RUN_LOG, not the inquiry content.
+  5. If the request also covers notification/backup copies: note that monthly backups age out within the 24-month horizon; delete the corresponding dump if it is current-month.
+- No raw IPs are ever stored (salted `ip_hash` only). The salted `ip_hash` is retained up to 24 months for abuse control and is deletable on request: deleting it only weakens rate limiting for that client, which is acceptable and is stated in the reply.
+
+## 9. Admin MFA enrollment (single admin: Ahmed)
+
+The admin account is created once in M1. MFA-ready; enabling MFA before launch is recommended and documented in `docs/OPERATIONS.md` §9 (this section), but it is not a CI gate. Enrollment steps (Supabase Auth):
+
+1. Log in at `/admin/login` (or Supabase dashboard → Authentication → Users for account-level settings).
+2. From the account/session, enable a **TOTP factor** (authenticator app: Aegis, 1Password, Google Authenticator, etc.). Scan the QR / enter the secret; verify with the first 6-digit code.
+3. **Store recovery codes** offline (password manager). Recovery codes are the fallback if the authenticator device is lost.
+4. Log out → log in again → confirm the MFA challenge appears and succeeds.
+5. Record the enrollment date in `.factory/RUN_LOG.md`. Do not store TOTP secrets or recovery codes in the repo.
+6. If the authenticator is lost: use a recovery code to sign in, then re-enroll a new factor (§7.5). If both are lost, account recovery goes through Supabase Auth email flow — which requires the admin email inbox to be accessible; that is why recovery codes are mandatory.
+7. No public signup route exists anywhere in the app (no registration page; signup disabled by convention — verified in M2/M5). Exactly one admin user exists.
+
+## 10. Operational records
+
+- **Launch record (filled at M6):** deployed SHA `—` · deployment URL `—` · domain `fotedev.me` · date/time `—` · Lighthouse medians (P/A/BP/SEO) `—` · smoke matrix `—` · rollback = previous production deployment (§3).
+- **Expiries & calendar reminders:**
+  - Domain `fotedev.me`: 1-year registration — expiry date **TO RECORD IN M6** (DNS engineer A). Reminder at −60 days.
+  - Professional email: exists for 1 month at start — must NOT be a launch dependency (ADR-0004); if it lapses, `CONTACT_EMAIL` is switched from `/admin` to the fallback address within minutes.
+  - Vercel plan terms check: re-verified at M6 (ADR-0002); re-check annually or when Vercel announces plan changes.
+- **Incident log:** incidents are appended to `.factory/RUN_LOG.md` (issue/SHA, symptom, action, resolution time). This file holds the runbooks, not the history.
+
+## 11. Incident runbooks
+
+### 11.1 Contact form down (Edge Function erroring / Turnstile failing / rate limiter stuck)
+
+Symptom: submissions fail, `/contact` shows the failure state.
+
+1. **First, confirm the fallback is intact:** the direct email card (copy button + `mailto:`) is always rendered on `/contact` and on every failure state — visitors are never blocked from reaching Ahmed. This is the design contract (ADR-0004); no hotfix is needed to restore reachability.
+2. Diagnose: check Supabase Edge Function logs (`supabase functions list` / dashboard logs) and whether Turnstile `siteverify` returns errors; check `rate_limit_counters` for a corrupted/global-capped window.
+3. Fix forward: correct the function/env, redeploy the function (`supabase functions deploy submit-inquiry`), re-probe with test Turnstile keys (200/403/429 paths).
+4. If the outage spans hours: consider temporarily raising visibility — e.g. make the direct email card more prominent via `/admin` settings copy — but do not deploy untested changes.
+5. Log the incident (§10). Losses during the outage: inquiries not received — mitigated by the fallback; mention the outage window when replying to late emails if relevant.
+
+### 11.2 Bad publish (wrong content is live / revalidation failed)
+
+Symptom: a published edit shows wrong/broken content on the public site, or publish returned success but the page did not change (revalidation failure — which must surface as an error in `/admin`, never fake success).
+
+1. **Fastest path:** §3 rollback — promote the previous production deployment (the site is static/ISR; rollback is instant and safe).
+2. **Or fix content forward:** in `/admin`, revert the offending record to its prior values (draft → correct → publish again). The publish action re-runs targeted `revalidatePath`/`revalidateTag`.
+3. If revalidation fails again: check server action logs (request id), verify env vars in production scope, and manually trigger revalidation by re-publishing an unchanged field on the affected record. **Do not declare it fixed until the live URL shows the correct content.**
+4. If drafts leaked publicly (preview bug): immediately re-verify `/admin` noindex + auth gating, unpublish the affected record, and treat as a launch-blocking regression (security verifier scenarios, M5 §6).
+5. Log the incident with SHA, symptom, action, and the measured recovery time.
+
+### 11.3 Free-tier quota exhausted
+
+Writes fail closed; the public site stays cached and readable by design. Actions: open `[OPS]` issue per §5.6, decide (cleanup / upgrade / migrate) with Ahmed; until decided, the direct email fallback carries contact traffic.
