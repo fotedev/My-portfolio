@@ -4,7 +4,7 @@ Columns are fixed; add one row per milestone (or per significant rework). No nar
 
 | Issue | Milestone | Skills used | CI failures | Review rounds | Duration (est.) | Cost (est.) | Prod verification (URL / SHA / date) |
 |---|---|---|---|---|---|---|---|
-| — | M0 — foundation, factory, specs (pre-repo; this row written before first push) | Evidence Auditor (none), Certificate Reader (none), Spec Authors ×6 (none), Spec Consistency Reviewer (none), Edge-Case Auditor (`edge-cases`), Patch Engineer (none) | n/a (CI starts M2) | 2 (consistency review + edge-case audit; 18 fixes applied) | ~1 session | ~2.3M subagent tokens | n/a — no production yet |
+| — (backlog = output) | M0 — foundation, factory, specs | Evidence Auditor (none), Certificate Reader (none), Spec Authors ×6 (none), Spec Consistency Reviewer (none), Edge-Case Auditor (`edge-cases`), Patch Engineer (none) | n/a (CI starts M2) | 2 (consistency review + edge-case audit; 18 fixes applied) | ~1 session | ~2.3M subagent tokens | pushed to `main` 2026-11-06 — commits `90a7bae`, `baf1d3b`, `6c02153` on https://github.com/fotedev/My-portfolio |
 
 ## Deviations & notes (measured facts, not essays)
 
