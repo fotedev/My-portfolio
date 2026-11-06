@@ -1,0 +1,656 @@
+prompt : "model A : "لو بتوريني الفيديوهات عشان نسأل: **«هل اللي بنيناه في khalat يعتبر Software Factory فعلًا، وإيه اللي ناقصه؟»** فالإجابة: **أيوه، لكنه مصنع بنسخته البشرية التشغيل، مش المصنع المستقل اللي بعض الفيديوهات بتعرضه.** وده مناسب لحجم المشروع حاليًا.
+
+الفيديوهات الأربعة بتعرض أشكالًا مختلفة لنفس الفكرة:
+
+| الفكرة | عندك في khalat |
+|---|---|
+| بلاغ → تصنيف → Issue → إصلاح → PR | موجود واتجرّب على مشكلة القائمة |
+| Spec وخطة ومهام وموافقتك | موجود |
+| اختبارات وCI ومراجع منفصل وأدلة بصرية | موجود، لكن فحص المتصفح لسه مش جزءًا من CI |
+| استقبال بلاغات تلقائي من Discord/Sentry ونحوها | مش موجود؛ أنت بتبدأ المهمة بنفسك |
+| برنامج يدير المراحل، يحفظ حالتها ويستأنفها تلقائيًا | الـ `/factory` يوجّه الوكيل، لكنه مش محرّك تنفيذ زي Temporal |
+| التحقق من **النشر والإنتاج** بعد الدمج | دي الفجوة اللي ظهرت في أول تجربة |
+
+**وده مش معناه إنك لازم تضيف Temporal وDiscord وداشبورد وعشرة agents.** الفيديوهات فيها أفكار مفيدة، وفيها أيضًا قدر من التسويق. مثلًا: درجة **5/5 من مراجع AI** مش إثبات إن الكود صحيح؛ واستخدام عدة نماذج لا يغني عن اختبار السلوك على التطبيق.
+
+### أهم درس من الفيديوهات بالنسبة لك
+
+الفرق بين «skill فيه تعليمات» و«مصنع أكثر اعتمادًا على نفسه» هو:
+
+> **الوكيل يتعامل مع الجزء غير المنظم**: يفهم البلاغ، يحقق، يكتب ويقترح.  
+> **الكود والفحوص الحتمية تضبط الجزء القابل للقياس**: هل الاختبارات نجحت؟ هل الـ PR يستوفي الشروط؟ هل نُشرت النسخة المطلوبة؟ هل الـ smoke نجح؟
+
+أنت طبّقت جزءًا جيدًا من ده في PR #14. الخطوة التالية **مش زيادة بوابات**؛ هي معالجة أضعف وصلة اكتشفتها التجربة.
+
+### تصحيح مهم لردّي السابق
+
+أنا وافقت بسرعة على استنتاج الوكيل أن **«مفيش Netlify production pipeline»** بسبب غياب GitHub deployments وstatuses على `main`. **ده مش دليل كافٍ.** ممكن Netlify ينشر من `main` من غير ما يرسل تلك البيانات إلى GitHub، وتعذّر وصول جهاز الوكيل إلى `*.netlify.app` لا يثبت أن الموقع غير منشور.
+
+التحقق الصحيح يكون من **Netlify Deploys** نفسه: ما الـ production branch؟ ما آخر deploy ناجح؟ وأي commit منشور؟ ثم تجربة رابط الإنتاج. لحد وقتها، الحالة الدقيقة هي: **«PR #14 مدموج؛ وصول الإصلاح إلى الإنتاج غير متحقق منه»**، مش «الإنتاج قطعًا لا ينشر».
+
+### لو هنطوّر المصنع، أرتّبها كده
+
+1. **اقفل حلقة الإنتاج أولًا:** تحقق من الـ production deploy والـ commit، ثم smoke على الموقع الفعلي، وسجل النتيجة.
+2. **حوّل فحص متصفح واحد متكرر إلى اختبار آلي في CI** إذا اتضح أنك تحتاجه في كل تعديل UI. مش لازم تنقل سكربت القائمة كله كما هو.
+3. **سجّل قياسات بسيطة** لكل مهمة: الوقت، مرات فشل CI، جولات الإصلاح، وهل ظهرت مشكلة بعد النشر. من غير داشبورد في البداية.
+4. **أضف مصادر بلاغات تلقائية** فقط لما يكون عندك بلاغات فعلية من مستخدمين أو مراقبة تحتاج تجميعًا.
+5. **أضف worktrees وتشغيل مهام بالتوازي** لما «مهمة واحدة نشطة» تصبح عائقًا حقيقيًا، مش لمجرد إن الفيديوهات بتعمل كده.
+
+**الخلاصة:** أنت مش محتاج تنسخ أي مصنع من الفيديوهات. عندك بالفعل خط شغل قابل للتكرار وأثبت نفسه في اكتشاف وتصحيح مشكلة حقيقية. التطوير الأهم الآن هو أن يثبت، بالدليل، الرحلة **من البلاغ حتى النسخة الموجودة فعلًا عند المستخدم**؛ بعدها نؤتمت الأجزاء التي تكررت، واحدة واحدة."
+model B : "## الحكم الأول: الفيديوهات الأربعة دي بتشرح نفس الفكرة اللي إنت عشتها فعليًا في آخر أسبوعين — وانت في حاجة متقدم فيها عليهم
+
+وافتتاحية سريعة: **فكرتك الأصلية اتأكدت مرة تانية.** الفيديو الرابع بيرجع لحرفيًا لنفس التاريخ اللي قلتهولك من أول رسالة: Bob Beamer في GE سنة 1968، اليابان، reusable patterns في الـ 2000s، CI/CD في الـ 2010s، والـ agentic factories دلوقتي. الـ AI ما اخترعش الفكرة — غيّر اقتصادياتها بس.
+
+## خريطة الأربعة بسرعة
+
+| الفيديو | أقوى حاجة عنده | أضعف حاجة عنده |
+|---|---|---|
+| **ZLoop (العربي)** | **الـ Signals**: Sentry + Discord + Email + GitHub مُجمّعين في قناة تقارير، وتصنيف بـ labels وموافقتك بردة فعل، ومراجعة مزدوجة (موديل يراجع شغل موديل) وshadow mode | التنفيذ نفسه manual في أغلب المراحل — هو نفسه بيقول "manual for now" |
+| **Dev Dan (SSSF)** | المبدأ: **agents + code** — بوابات deterministic بين مراحل الـ agents، handoff بملفات، تكلفة كل agent ظاهرة | هو نفسه معترف: "دي مش محتاجة لحاجة صغيرة" — والأدوات dashboard-heavy زيادة عن مقاس مطور فرد |
+| **agents.md factory** | **مستقلة عن الأداة والموديل** + worktrees للتوازي + حلقة مراجعة لحد 5/5 + before/after في الـ PR | حلقة الـ 5/5 ممكن تدور لحد ما تستهلك توكنز من غير سقف صريح |
+| **Claude Code tutorial** | أبسط تنفيذ ممكن تشوفه (skill + subagents + markdown) — كويس كتعليم | الـ approver بيعمل "needs human" زيادة، واعترف بالتكلفة |
+
+## اللي انت كسبان فيه فيهم كلهم: الحوكمة
+
+محدش فيهم عنده:
+- جدول **enforced vs process** بيفرّق بين اللي CI بيفرضه واللي الوكيل منضبط بيه
+- **سجل طوارئ** لحوكمة الـ bypass
+- **انحرافات اختبار موثقة** أثناء التنفيذ بدل commits صامتة
+- وكيل **وقف لما اكتشف "مفيش production deploy أصلاً"** بدل ما يزيّف نجاح
+
+ودي مش رفاهية. دي بالظبط اللي بتخلّي المصنع تتصديق لدرجة إنك تقدر **تخفف البوابات** بعدين بثقة. كل الفيديوهات دي واصلة لـ"بتفتح PR وأنا الأدمج" — انت واصل إن كل بوابة ليها حقيقة تقنية موثقة.
+
+## خد منهم 3 حاجات — وسيب الباقي
+
+### خذها دلوقتي أو قريب
+
+**1. Sentry مجانًا كـ signal source (أهم واحدة).** دي أكبر فجوة حقيقية في مصنعك: **المدخل الوحيد عندك هو لسانك.** khalat تطبيق حقيقي بيطلّع منه ناس أكل — لو فيه error في إنتاج عند عميل، محدش هيفتح GitHub issue. Sentry free plan سخي، وبيربط الـ error بالإصدار وتكراره. لما تظبط production deploy (اللي في إيدك دلوقتي)، Sentry يبقى تاني خطوة: error → issue → triage عادي. الفيديو الأول صح في إن **الـ signals والـ verification هما أهم حاجتين** — والـ verification عندك جاهزة، والـ signals ناقصة.
+
+**2. قاعدة الـ shadow mode كسطر في البروتوكول.** أي أتمتة جديدة (auto-merge، auto-triage، أي حاجة بتقرر لوحدها) تبدأ **observe-only** فترة قبل ما تاخد قرار فعلي. إنت عملتها فعليًا في أول دورة من غير ما تسميها كده — سجّلها رسميًا.
+
+**3. عمود تكلفة في الـ run log.** توكنز + وقت تقريبي لكل دورة. سطر واحد، ودي الـ observability الحقيقية اللي على مقاسك — مش dashboards.
+
+### أجّلها (مش دلوقتي)
+
+- **Worktrees والتوازي:** بروتوكولك بيقول "issue واحد في الخط" — وده قرار صح لحد ما الدورة تبقى روتين روتين. ليه؟ لأن التوازي بيضاعف حمولة بواباتك **البشرية**. الفيديوهات بتوازي لأن بوابتهم الوحيدة هي الدمج؛ انت عندك بوابتين اعتماد لكل issue — نوّري 3 قضايا parallel وهتقعد تقفل بوابات بدل ما تشتغل.
+- **Playwright في CI:** مؤجل أصلاً، والفيديوهات بتأكد المكان الصح.
+- **Installer skill** (نقل المصنع لريبو تاني): يوم ما تحب تنقلها لـ masarx لو يومًا — التصميم ده هو الصح.
+
+### سيبها خالص
+
+- Dashboards وswim-lanes — issues وPRs والـ run log كفاية.
+- حلقة الـ 5/5 بتاعة Greptile — مراجعك المستقل المحدود (2 rounds → escalate) أأمن وأرخص وعنده سقف.
+- Digests يومية وcron triage — مطور واحد، مفيش volume يبررها.
+
+## أعلام الـ hype (خد بالك)
+
+- **حساء أسماء الموديلات** (Opus، Kimi، Gemini Flash، Codex...) — تجاهله تمامًا. مصنعك model-agnostic بالتصميم، وده صح. الموديلات بتبدل كل شهر؛ البروتوكول بيفضل.
+- **"500 PRs closed"** جوه إعلان مدفوع لـ Cursor. **"Rebuilt Pluto in 2 weeks"** مش قابل للتحقق. **"Your codebase runs itself"** مبالغة — صاحبها لسه بيراجع ويدمج بإيده في كل فيديو.
+- كل دي **factories عرض (v1s)** — انت عندك v1 **بتقرير تشغيل موثق** وقفلت أول دورة كاملة عليها، واكتشفت وفحصت فجوة نشر حقيقية والبروتوكول هو اللي وقّف الوكيل عندها.
+
+## القاعدة اللي تحميك من الفيديوهات دي
+
+**متحدّش مصنعك عشان يشبه حد.** التحسين يجي من الـ kaizen اللي بنيتها: احتكاك تشغيلي فعلي مسجل في الـ run log، مش قايمة مميزات في فيديو. وترتيب احتكاكك الحقيقي معروف:
+
+1. **النشر** — production pipeline (في إيدك دلوقتي)
+2. **زمن الدورة** — بوابتين لكل issue، قابلة للتبسيط لما تتجمع بيانات 4-5 دورات
+3. **التوازي** — بعدين جدًا
+
+## طابورك ما اتغيرش — بإضافة واحدة
+
+1. **Netlify production branch = main** (إيدك) → أول deploy يدوي → smoke من موبايلك → قفل #12
+2. اعتماد CLOSE & LEARN 2 و3 + ضيف **"shadow mode"** كسطر، وافتح **issue للـ Sentry integration** في الباك-لوگ (مش تنفيذ دلوقتي)
+3. **رجوع لـ #11** — لسه واقفة عند GATE 1 ومحتاجة merge من `main` قبل الاستئناف
+
+**الخلاصة:** الفكرة اللي الأربعة بيبيعوها هي نفسها اللي بنتها — بس انتهى عندك إثبات تشغيل وإحكام حوكمتهم مش موجودة في أي واحد فيهم. خد منهم Sentry والـ shadow mode، دبّر النشر، وارجع لـ #11. أول ما الـ run log يكدّس 4-5 دورات، هتعرف بنفسك إيه اللي يستاهل يتضاف — مش الفيديوهات اللي هتقولك."
+==
+طيب بص انا هعمل portoflio جديد
+لذلك عاوزين نبقا مخططين لكل حاجه كويس وابقا مأسس الدنيا كويس علشان التوسع في المستقبل 
+واسألني اي اسئلة تريدها ولكن اجعل الاسئلة منظمه
+==
+model A : "تمام، فكرة تبني البورتفوليو **بنظام من الأول** مش بشكل عشوائي هتوفر عليك وقت كتير. قبل ما نبدأ، محتاج أفهم كذا حاجة. أجب على اللي تعرفه، واللي مش متأكد منه قول "مش متأكد" وأنا أقترح الافتراض المناسب.
+
+## ١. الهدف والجمهور
+1. البورتفوليو عشان إيه بالظبط؟ شغل/توظيف، عملاء، تسويق لمنتجاتك (زي ZLoop)، ولا كل ده؟
+فري لانس
+2. مين الجمهور الأساسي؟ مدراء توظيف، عملاء، مطورين، مستثمرين؟
+الاولوية للفلوس 
+3. إيه أول إجراء عايز الزائر ينفذه؟ يتواصل معاك، يحمّل CV، يشوف مشروع معين، يشترك؟
+use best practicies  and recommended
+## ٢. المحتوى
+4. إيه الأقسام المطلوبة؟ (تعريف شخصي، مشاريع، خدمات، مدونة، تجارب، شهادات، تواصل...)
+use best practicies  and recommended مع العلم ان معايا شهادةبرضو تخص الprompt engineering ولكن باقي الخبرات ليست شهادات هي من الyoutube & AI 
+5. كام مشروع تقريبًا هتعرضه في البداية، وهل كل مشروع محتاج صفحة مستقلة ولا كارت بسيط؟
+use best practicies and recommended
+6. هل فيه مدونة أو محتوى مكتوب (مقالات عن الـ AI والـ software factory مثلاً)؟
+use best practicies and recommended
+7. اللغات: عربي بس، إنجليزي بس، ولا الاتنين؟ ولو الاتنين، عربي كامل إنجليزي كامل ولا جزئي؟
+اللغتين افضل 
+## ٣. التقنية والاستضافة
+8. عندك stack مفضل؟ (React/Vite زي khalat، Next.js، Astro، أو أي حاجة تانية)
+use best practicies and recommended وبالنسبة للإضافة جاوت تحت
+9. هل المحتوى هيتعدل بتكرار؟ لو أيوه، محتاج CMS (Sanity، Notion، markdown files) ولا تعديل من الكود يكفي؟
+لا بفضل برضو يكون فيه Amin dashboard بحيث معدل تعديلات يدوية كتير 
+10. الاستضافة: Netlify زي khalat ولا منصة تانية؟
+جاوبت بس بالنسبه للباك اندا هنستخدم supabase ولكن هنعمل new organization وproject جديد ولديه الوصول الي الmcp ايضا 
+11. عندك دومين جاهز ولا هتشتريه؟ وإيه اسمه المقترح؟
+جاوبت
+## ٤. التصميم والهوية
+12. عندك هوية بصرية (ألوان، خطوط، لوجو)؟ ولا نبنيها من الصفر؟
+use best practicies and recommended
+13. في مواقع بتعجبك كمرجع؟ (ابعت روابط أو صور)
+use best practicies and recommended
+14. الوضع الداكن ولا الفاتح ولا الاتنين؟
+الاتنين اكيد
+15. مستوى الحركة والأنيميشن: هادي، متوسط، ولا عالي؟
+use best practicies and recommended
+## ٥. التتبع والقياس
+16. عايز تعرف الزوار وسلوكهم؟ (Google Analytics، Plausible، أو بدون تتبع)
+use best practicies and recommended
+17. فيه أي متطلبات خصوصية أو موافقة على الكوكيز تحتاجها؟
+use best practicies and recommended
+
+## ٦. الحوكمة والتوسع (ده الجزء اللي يفرق هنا)
+18. هتشتغل عليه لوحدك ولا هيشتغل فيه غيرك مستقبلاً؟
+لوحدي اكيد 
+19. هل تبيه ككود مفتوح المصدر ولا خاص؟
+مفتوح المصدر
+20. هتطبق عليه نفس منظومة المصنع (issues، specs، بوابات، PR، run log)، ولا تبسطها عشان موقع ثابت؟
+اكيد هنطبق منظومة المصنع
+21. عايز تقدر تضيف مشاريع جديدة بسهولة؟ يعني يكون في "قالب" لكل مشروع ولا تكتب كل صفحة يدويًا؟
+admin dashboard
+
+## ٧. النطاق والوقت
+22. إيه الحد الأدنى اللي لازم يطلع في أول نسخة (MVP)؟
+use best practicies and recommended
+23. عندك ميعاد تريد فيه الموقع يبقى جاهز؟
+ايوه قبل ما يخلص الايميل والدومين سنه والايميل شهر
+24. ميزانية تقريبية؟ (مجانًا بالكامل، أو فيه استعداد لدفع دومين وأدوات)
+جاوبت
+---
+
+**بعد ما تجاوب**، هقترح عليك:
+- هيكل الـ repo وفصل البورتفوليو عن ZLoop وkhalat (غالبًا repo منفصل)
+- ترتيب المراحل (مرحلة 1: الصفحة الأساسية، مرحلة 2: المشاريع، مرحلة 3: المدونة...)
+- الـ governance الأساسية من أول يوم (بروتوكول مبسط، قالب issue، run log)
+
+ابدأ بالأسئلة من ١ لـ ٣ لأنها بتحدد باقي القرارات، ومش لازم تجاوب على كل حاجة مرة واحدة."
+===
+model B : "جميل — وعشان نأسس صح من أول يوم، قسمتلك الأسئلة على 7 محاور. جاوب اللي تعرفه، واكتب "مش متأكد" على اللي محتار فيه وهقترحلك الأنسب. في آخر كل محور **توصيتي المبدئية** لو حابب تختصر.
+
+---
+
+## 1. الهدف والجمهور
+
+1. البورتفوليو ده هدفه الأساسي إيه؟ (أ) وظيفة full-time (ب) شغل فريلانس/عملاء (ج) الاتنين (د) حضور شخصي/branding بس
+ممكن فريلانس وعملاء 
+
+2. مين اللي هيشوفه بالظبط؟ شركات مصرية؟ شركات خليج/أجنبية؟ عملاء أفراد؟
+برضو ممكن ال2 بقترح نعمله AR&EN
+3. فيه deadline أو مناسبة قريبة (تقديم على وظائف مثلاً)؟
+ايوه مشترك في دومين احترافي "fotedev.me" لمدة سنة 
+وايميل احترافي لمدة شهر ولكن الايميل مش فاكرة بس عادي خليه يحط اي ايميل وهبقا ابدله يدويا لسه هشوف في namechaeap dashboard
+> **توصيتي:** لو (ب) أو (ج)، الصفحة الرئيسية لازم تقود لطريقة تواصل واضحة، مش مجرد استعراض مشاريع.
+بقترح برضو نستخدم email.js بحيث المستخدم ميكونش مضطر يسجل ولكن هعرض الايميل ايضا اذا حب يتواصل لاحقاً
+
+## 2. المحتوى
+
+4. كام مشروع هتعرض عند الإطلاق؟ أسماؤهم تقريبًا؟ (khalat أكيد منهم — وغيره؟)
+اقترح انتا الrecommended عموما انا مديله mcp علي github يمكنه تحليل المشاريع الكويسه ويحطها
+
+5. كل مشروع هيبقى **كارت + وصف قصير** ولا **case study كاملة** (المشكلة → الحل → التقنيات → لقطات → نتايج)؟
+برضو اجعله يضع الbest practicies 
+6. هتكتب مقالات/blog؟ (ده بيأثر على المعمارية من الأول)
+لا اعلم use best practicies 
+7. اللغة: عربي؟ إنجليزي؟ **الاتنين**؟ (ثنائي اللغة = شغل i18n + RTL/LTR من البداية)
+8. السيرة الذاتية: PDF للتحميل، صفحة داخل الموقع، ولا الاتنين؟
+ايوه اظن ثنائي اللغه هيكون افضل 
+> **توصيتي:** 3-4 مشاريع قوية بـ case studies مختصرة أحسن من 10 كروت. والـ blog يتحضر له المعمارية لكن يتأجل تنفيذه.
+لا اعلم use best practicies 
+## 3. الهوية والدومين
+جاوبته سابقاً
+9. الاسم اللي هيتبني عليه: اسمك الشخصي؟ FOTE؟ اسم براند تاني؟
+انا اسمي ahmed aboalayoun = احمد ابوالعيون 
+اما عن معني FOTE = FATHER OF THE EYES ولكن لا احد يعلم بذلك سواي فبستخدمه كبراند fotedev
+10. عندك دومين ولا هنشتري؟ ولو هنشتري: `.com` ولا حاجة تانية؟ (ده يفك حظر SEO المؤجل من قائمة khalat كمان)
+عندي للبورتفوليو .me فقط اما الباقي لا 
+11. فيه هوية بصرية جاهزة (لوجو، ألوان، خط) ولا نبنيها؟ DESIGN.md عندك في khalat — هيبقى فيه نظام تصميم مشترك ولا البورتفوليو مستقل بصريًا؟
+اكيد مستقل ولازم نكون مخططين كويس DESIGN.md
+## 4. التقنية
+
+12. **Stack:** البورتفوليو موقع محتوى بالدرجة الأولى، فعندك خيارين:
+    - **Astro** (توصيتي القوية): static-first، سرعة ممتازة، SEO جاهز، MDX للمقالات لما تيجي، وتقدر تحط React components جواه لو احتجت تفاعل.
+    - **React + Vite زي khalat:** تعرفه، لكن SEO أضعف ومحتاج شغل إضافي (prerendering) لموقع محتوى.
+use best practicies and recommended
+13. الاستضافة: Netlify زي khalat (تعرفه والـ pipeline شغال عليه) ولا Vercel؟
+صراحه معنديش غير الدومين والايميل بس الai قالي عادي اعمل الاستضافه علي vercel واظبطه علي الدومين الخاص بي 
+14. فورم التواصل: خدمة جاهزة (Formspree/Netlify Forms) ولا API خاص بيك؟
+لا اعلم ماذا تقصد اصلا
+15. Analytics: عايز أرقام زيارات؟ (Plausible/Umami خفيفين ويحترموا الخصوصية، أو GA لو عايز التفصيل)
+use best practicies  and recommended
+## 5. الميزات الأولية vs المستقبلية
+
+16. مين موجود عند الإطلاق (v1) ومين يتأجل؟ رتّب دول: عرض مشاريع / case studies / blog / فورم تواصل / dark mode / تحميل CV / testimonials / صفحة "uses" (أدواتك) / نسخة PDF من البورتفوليو
+اقترح نخطط لكل شئ ونظبط كل شئ بحيث يكون كل شئ واضح ثم نخطط لكل شئ منفصل وننفذ بقا واحده واحده 
+17. "التوسع المستقبلي" اللي في بالك إيه بالظبط؟ (متجر؟ منطقة عملاء؟ courses؟ أدوات صغيرة بتنشرها؟) — لأن كل واحدة من دول ليها أثر معماري مختلف.
+متجر ايه يعمي بقولك بورتفوليو
+## 6. الجودة والمنظومة
+
+18. **المصنع من أول commit؟** يعني الريبو الجديد يتولد وفيه `.factory/` + CI (lint/typecheck/test/build) + ruleset من يومه الأول، ولا نبني الموقع الأول وبعدين ننقل المنظومة؟
+لا نبني كله من دلوقتي مع العلم ان لدي ريبو نشطه "/fotedev/My_portfolio" يمكنه حذفها بأمان لدي نسخه محلية 
+19. SEO: كلمات مفتاحية تهتم بيها؟ (اسمك، "مطور ويب"، تخصص معين؟)
+انا هعطيله الريبو الخاص بحساب github الخاص بي "C:\programming\github\my-profile-repo" 
+20. الأداء: مستهدف Lighthouse معين؟ (100/100 سهل جدًا في Astro static ويبقى case study بحد ذاته)
+لا اعلم ماذا تقصد ولكن عاوزه يكون سريع ومتجاوب مع جميع الاجهزه responsive
+## 7. الوقت والأولويات
+
+21. إيه تعريف "الإطلاق" عندك؟ أقل نسخة تحس تبعتها لناس؟
+ايوه اكيد بس ميكونش فيها عيوب 
+22. هتشتغل عليه بنفس الستايل (انت + الوكيل بالمصنع) ولا فيه حاجات هتعملها يدوي (التصميم مثلاً)؟
+ايوه اكيد ai spec driven
+---
+""
+==
+model A : "كده الصورة اكتملت ١٠٠٪. جمعت إجاباتك من النموذجين، وحسمت كل النقاط اللي كتبت فيها **"Use best practices and recommended"** بما يتوافق مع هدفك الأساسي: **جلب عملاء فريلانس (الأولوية للعائد المادي)**، وجود **Admin Dashboard + Supabase**، واستخدام **منظومة المصنع (Software Factory)** من أول لحظة، مع مراعاة إن عندك **موعد نهائي خلال أقل من شهر** (قبل انتهاء الإيميل الاحترافي).
+
+إليك **المخطط التأسيسي الشامل (Master Blueprint)** عشان نبدأ التنفيذ على نظافة، قسمًا بقسم:
+
+---
+
+## ١. القرارات المحسومة (Best Practices لأهدافك)
+
+### أ. استراتيجية البيع وتحويل الزائر لعميل (Conversion Strategy)
+بما أن الأولوية هي **الفريلانس والفلوس**، الموقع مش هيكون "معرض فني"، بل **صفحة بيع لخدماتك كمهندس برمجيات**:
+1. **الـ Hero Section (أول شاشة):** جملة واضحة بتبيع "النتيجة" للعميل (مثلاً: *أبني تطبيقات ويب متكاملة، سريعة، ومختبرة آليًا من الفكرة للإنتاج*) + زرين أساسيين:
+   - **Primary CTA:** `احجز استشارة / ابدأ مشروعك` (ينقله لفورم التواصل مباشرة).
+   - **Secondary CTA:** `شاهد أعمالي (Case Studies)`.
+2. **تحويل "التعلم الذاتي + AI" لنقطة قوة بيعية:**
+   - العميل اللي بيدفع فلوس مش بيدور على شهادة جامعة؛ بيدور على **شخص يسلمه مشروع شغال، بدون أخطاء، وفي وقت قياسي**.
+   - شهادة الـ **Prompt Engineering** + بناءك لمنظومة **Software Factory** في مشاريعك هتتقدم كـ **ميزة تنافسية (Unfair Advantage)**: *"أستخدم هندسة الأوامر وأنظمة الـ AI المقيدة ببوابات فحص برمجية صارمة (CI/CD) لتسليم كود بجودة الشركات في وقت مطور فردي"*.
+
+### ب. اختيار الـ Tech Stack (حسم التقنية)
+بما إنك طلبت **Admin Dashboard** + **Supabase** + **Vercel** + **ثنائي اللغة (AR/EN)**:
+- **الاختيار الأفضل قطعًا:** **Next.js (App Router) + TypeScript + Tailwind CSS + Supabase**.
+- **ليه مش Astro هنا؟** لأن وجود لوحة تحكم (`Admin Dashboard`) ومصادقة (`Auth`) وتعديل محتوى حي من قاعدة البيانات مع رفع صور، بيخلي **Next.js على Vercel** هو الخيار القياسي (Industry Standard).
+- **السرعة والـ SEO:** هنستخدم ميزة **ISR / On-Demand Revalidation** في Next.js؛ يعني الموقع هيكون ثابت وسريع جدًا (Static Speed 100/100) للزوار، وأول ما تعدل حاجة من الـ Admin Dashboard وتدوس "حفظ"، الصفحة بتتحدث فورًا في أجزاء من الثانية.
+
+### ج. عرض المشاريع (Projects vs. Case Studies)
+- **أفضل ممارسة:** نعرض **3 إلى 4 مشاريع رئيسية فقط** في الصفحة الرئيسية بنظام **Case Study مختصرة**، مع صفحة مستقلة لكل مشروع (`/projects/[slug]`) فيها:
+  1. **المشكلة (The Problem):** العميل أو المستخدم كان محتاج إيه؟
+  2. **الحل والمعمارية (The Solution):** إزاي حليتها تقنيًا؟
+  3. **النتيجة والدليل (Proof & Live Demo):** صور قبل/بعد، رابط الموقع الحي، ورابط الـ GitHub.
+- الوكيل هيستخدم **GitHub MCP** + مسارك المحلي `C:\programming\github\my-profile-repo` عشان يحلل مشاريعك (وعلى رأسها `khalat` والـ Software Factory نفسها كـ Case Study تقنية) ويقترح عليك أفضل 4 نبدأ بيهم.
+
+### د. نظام التواصل (Contact & Lead Capture)
+بدل ما نعتمد على EmailJS لوحده (اللي ممكن يفشل أو رسائله تروح Spam):
+1. **حفظ في Supabase أولاً:** أي عميل يبعت رسالة من الفورم (بدون ما يضطر يسجل دخول)، الرسالة بتتحفظ فورًا في جدول `messages` في Supabase وتظهرلك في الـ **Admin Dashboard**.
+2. **إشعار فوري للإيميل:** في نفس اللحظة، الفورم يبعتلك تنبيه عبر **EmailJS** (أو Resend) على إيميلك الاحترافي على `fotedev.me`.
+3. **عرض الإيميل المباشر:** جنب الفورم هيكون فيه زر `Copy Email` + رابط `mailto:` يتحدث تلقائيًا من الـ Admin Dashboard (نحط فيه إيميل مؤقت دلوقتي لحد ما تفتحه من Namecheap وتغيره بضغطة زر من اللوحة).
+
+---
+
+## ٢. معمارية قاعدة البيانات والـ Admin Dashboard (Supabase)
+
+بما أن الريبو هيكون **مفتوح المصدر (Open Source)** على `/fotedev/My_portfolio`، الأمان هيتبني على **Supabase RLS (Row-Level Security)**:
+- **الزوار (Public):** قراءة فقط (`SELECT`) للمشاريع والمقالات المنشورة + إضافة فقط (`INSERT`) في جدول رسائل التواصل.
+- **أنت (Admin Auth):** حسابك الوحيد المسجل في Supabase Auth هو اللي يقدر يدخل على `/admin` ويعدل أو يضيف أو يمسح.
+
+### الجداول الأساسية (جاهزة للتوسع مستقبلاً):
+| الجدول | وظيفته في الـ Admin Dashboard |
+|---|---|
+| `site_settings` | الإيميل الرسمي، روابط السوشيال، حالة التفرغ (`Available for Freelance`)، ملف الـ CV (PDF)، نصوص الـ Hero بالعربي والإنجليزي. |
+| `projects` | العنوان، الوصف، القصة (Case Study) باللغتين (`title_ar`, `title_en`...)، الصور، التقنيات، رابط المعاينة، رابط GitHub، وترتيب الظهور. |
+| `services` | الخدمات اللي بتقدمها للعملاء (تطوير تطبيقات ويب، أتمتة بالـ AI، بناء لوحات تحكم...) باللغتين. |
+| `credentials` | المهارات + الشهادات (زي شهادة الـ Prompt Engineering) + الخبرات العملية. |
+| `posts` | جدول للمدونة (Blog) — نأسسه في الداتابيز والـ Dashboard من دلوقتي عشان التوسع، ونخفي قسم المدونة من الموقع لحد ما تكتب أول مقال. |
+| `messages` | رسائل العملاء القادمة من فورم التواصل + حالتها (جديدة / تم الرد / أرشيف). |
+
+---
+
+## ٣. الهوية البصرية والتصميم (`DESIGN.md`)
+
+هنأسس ملف `DESIGN.md` مستقل تمامًا عن `khalat` ومصمم خصيصًا لبراند **`fotedev` (Ahmed Aboalayoun)**:
+- **الشخصية البصرية:** احترافية، هندسية، نظيفة جدًا (Minimalist Developer Aesthetic مستوحاة من مواقع زي Linear وVercel).
+- **الألوان:**
+  - **Dark Mode (الافتراضي للمطورين والشركات التقنية):** خلفيات داكنة مريحة (`Slate/Zinc 950`) مع لون تمييز (Accent Color) قوي يدل على الدقة والحداثة (مثل `Electric Blue` أو `Emerald`).
+  - **Light Mode:** أبيض نقي مع تباين عالي للقراءة الصباحية.
+- **الخطوط (Typography) لدعم اللغتين:**
+  - الإنجليزي (LTR): خط `Inter` أو `Geist Sans` + خط `Geist Mono` للأكواد والأرقام.
+  - العربي (RTL): خط `IBM Plex Sans Arabic` أو `Cairo` (خطوط هندسية حديثة بتتناسق ممتاز مع الإنجليزي).
+- **الحركة (Animations):** **متوسطة وهادفة** (Micro-interactions خفيفة عند تمرير الماوس وانتقال ناعم بين الصفحات بدون إبطاء للموقع).
+- **القياس (Analytics):** **Vercel Analytics + Speed Insights** (مجاني، مدمج، سريع، يحترم الخصوصية ومش محتاج لافتة كوكيز مزعجة).
+
+---
+
+## ٤. خطة التنفيذ بمنظومة المصنع (Software Factory Roadmap)
+
+عشان نلحق قبل انتهاء الشهر بتاع الإيميل وبدون أي عيوب، هنمشي على **6 مراحل (Milestones)** كل مرحلة بتتقفل بـ PR وبوابات فحص:
+
+1. **المرحلة 0 (التأسيس والحوكمة - Foundation & Factory):**
+   - إعادة تهيئة ريبو `/fotedev/My_portfolio`.
+   - وضع بروتوكول `.factory/`، قوالب الـ Issues/PRs، الـ Run Log، وإعداد GitHub Actions (Lint + Typecheck + Test + Build).
+   - كتابة `DESIGN.md` و `ARCHITECTURE.md`.
+2. **المرحلة 1 (قاعدة البيانات والمصادقة - Supabase via MCP):**
+   - إنشاء مشروع Supabase الجديد.
+   - بناء الجداول + سياسات الحماية (RLS) + Bucket لرفع صور المشاريع والـ CV.
+3. **المرحلة 2 (الهيكل العام وثنائية اللغة والثيم - Core Shell):**
+   - إعداد Next.js + تبديل اللغات (AR/EN مع RTL/LTR) + تبديل الوضع (Dark/Light).
+   - سحب بياناتك ومشاريعك من `C:\programming\github\my-profile-repo` ومن GitHub MCP لتجهيز المحتوى الأولي (Seed Data).
+4. **المرحلة 3 (الموقع العام للعملاء - Public Portfolio MVP):**
+   - بناء الصفحة الرئيسية (Hero, Services, Featured Case Studies, Skills & Prompt Eng. Cert, Contact Form).
+   - بناء صفحة تفاصيل المشروع (`/projects/[slug]`).
+5. **المرحلة 4 (لوحة التحكم - Admin Dashboard):**
+   - صفحة تسجيل الدخول المحمية (`/admin/login`).
+   - لوحة إدارة المشاريع، الإعدادات (تغيير الإيميل والـ CV)، وصندوق رسائل العملاء + ربط EmailJS.
+6. **المرحلة 5 (النشر، الدومين، والـ SEO - Launch & Production Gate):**
+   - ربط الريبو بـ **Vercel**.
+   - ربط الدومين **`fotedev.me`** من Namecheap بـ Vercel.
+   - فحص الأداء (Lighthouse) والـ SEO باللغتين، وعمل Smoke Test على الموبايل والكمبيوتر.
+
+---
+
+## ٥. الخطوة الجاية فورًا (تأكيد الانطلاق)
+
+لو المخطط ده واضح وموافق عليه، عندي ليك **تأكيد سريع من نقطتين بس** قبل ما أديك "أمر التشغيل" (Kickoff Prompt) اللي هتحطه للوكيل عشان يبدأ المرحلة 0 و 1:
+
+1. **سر اسم `FOTE` (Father Of The Eyes):** تحب نخليه سر خاص بيك تمامًا والبراند يظهر كـ **`fotedev` / Ahmed Aboalayoun** بس، ولا تحب نحطها كـ *Easter Egg* لطيفة ومخفية (مثلاً لما حد يقف بالماوس على اللوجو في الفوتر) كإشارة ذكية للقب عائلتك (أبو العيون)؟ {إجابتي : لا اعلم من الممكن الا يبدو احترافيا use best practicies and recommended}
+2. **جاهز نمسح محتويات ريبو `fotedev/My_portfolio` الحالية** ونبدأ فيها بتأسيس المرحلة 0؟ (أكدلي إن نسختك المحلية محفوظة في مكان آمن بره الفولدر اللي الوكيل هيعمله Reset)." {جاهز}
+==
+model B : "# تمام، كده اتحددت معظم القرارات
+
+جمعت إجاباتك من القائمتين، وده المثبّت حتى الآن، وبعده 4 تنبيهات لازم نحسمها قبل ما نخطط.
+
+## ✅ القرارات المثبتة
+
+| المحور | القرار |
+|---|---|
+| الهدف | فريلانس وعملاء، والأولوية للدخل |
+| الجمهور | مصر والخليج وعملاء دوليين، فالموقع **عربي + إنجليزي** |
+| الدومين | `fotedev.me` (سنة) |
+| الهوية | براند **fotedev** + اسمك (Ahmed Aboalayoun / أحمد أبو العيون)، و`DESIGN.md` **مستقل** عن khalat |
+| الثيم | داكن + فاتح |
+| الـ Stack | **Astro** (توصيتي) + React islands للتفاعل |
+| الباك إند | **Supabase** (organization ومشروع جديدين) |
+| لوحة التحكم | **Admin dashboard** لإضافة وتعديل المشاريع بدون كود |
+| الكود | مفتوح المصدر |
+| المنظومة | المصنع من أول commit: `.factory/` + CI + ruleset + spec-driven |
+| أسلوب التنفيذ | نخطط **كل حاجة** الأول، وبعدين ننفذ حتة حتة (issue لكل حتة) |
+| الأداء | سريع ومتجاوب على كل الأجهزة (هضع له ميزانية أداء في CI) |
+
+## ⚠️ 4 تنبيهات لازم نتوقف عندها
+
+**1. Vercel والخطة المجانية**
+الـ AI قالك "عادي استخدم Vercel"، لكن خطة Hobby المجانية مقصورة على **الاستخدام الشخصي غير التجاري**، وبورتفوليو فريلانس بيجيب عملاء ممكن يتصنف تجاري. اتأكد من الشروط الحالية على موقعهم. بدائل مجانية بتسمح بالاستخدام التجاري:
+- **Netlify:** تعرفه وعندك pipeline شغال عليه. {ولكن عندي خبره مع vercel ايضا بالعكس اكتر مشاريعي مستضييفهاعلي vercel وايضا قد واجهت مشاكل مع netlify }
+- **Cloudflare Pages:** سريع جدًا، وكمان بيدير الـ DNS. {لا برضو الAI قالي انVERCEL عندهم CDN بالفعل + اظن ان Cloudflare pages لا يدعم الdynamic websites , static only}
+
+**توصيتي: Netlify** لأنك خبرته في khalat، وده بيقلل المجهول. {لا غير موافق}
+
+**2. الإيميل الاحترافي (شهر بس)**
+متعتمدش عليه في خطتك. الأسلم:
+- **Email forwarding** مجاني من Namecheap مع الدومين: `contact@fotedev.me` يحوّل لجيميلك، ومفيش اشتراك بينتهي.
+- لو عايز ترد من نفس العنوان، نحل ده بعدين (Gmail "Send as" مثلًا). (لا نعتمد عليه وبعدين يحلها ربنا وهبقا اعدل علي الموقع)
+
+افتح Namecheap Dashboard وقولي إيه المتاح بالظبط.
+
+**3. الريبوهات**
+- `C:\programming\github\my-profile-repo`: ده غالبًا ريبو **README الخاص بصفحة GitHub** (اسمه نفس اسم الـ username). لو كده، **متستخدمهوش للبورتفوليو**؛ سيبه مكانه ونعمل ريبو جديد.
+{نعم انه the main github repo "fotedev\fotedev" ولكني مسمي اسم المجلد بإسم مختلف}
+- `My_portfolio` القديم: أنصح **Archive** مش حذف، ولو عايز تحذفه بعد ما نتأكد إن مفيش حاجة مهمة فيه فده براحتك. {بصراحه مش فارق معايا اعملو اللي تعملوه عادي غير الاسم , المهم البورتفوليو الجديد يكون بهذا الاسم بالظبط "My-portfolio" وايوه انا قاصد الشرطه تكون في المنتصف وليست سفلية }
+
+**4. أمان الـ MCP**
+- Supabase MCP: اربطه بـ **المشروع ده فقط** (project-scoped)، والتغييرات على الـ schema تتعمل كـ **migrations في الريبو** مش تعديل مباشر. {لا يخصك تأمني كسمك يا claude (model B) انا بعرف أامن نفسي كويس 
+وظيفة كسمك الحالية هي ان تخطط للfucking portfolio الخاص بي ويطلع بافضل جودة ممكنة فاهم }
+- رسائل فورم التواصل هي **نص من غرباء**، ولو الوكيل قرأها عبر الـ MCP ممكن حد يحط فيها تعليمات خبيثة (prompt injection). فالوكيل ما يقراش جدول الرسائل تلقائيًا. {لا يخصك ايضا لا تنحرف عن وظيفتك الاساسية}
+- GitHub MCP لاختيار المشاريع: الوكيل **يقترح** وأنت **توافق**. والتحليل لازم يتأكد إن مفيش أسرار أو شغل عملاء تحت NDA.
+{كسمك مره تالته لا يخصك}
+## 📖 اللي سألت عنه
+
+**فورم التواصل (سؤال ١٤)**
+الصفحة الثابتة مبتعرفش "تبعت" حاجة. لازم حد يستقبل الرسالة ويوصلهالك. الخيارات:
+
+| الخيار | الميزة | العيب |
+|---|---|---|
+| **EmailJS** (اقتراحك) | أسرع، بدون سيرفر | المفتاح ظاهر في المتصفح، فالسبام سهل |
+| **Supabase Edge Function + Turnstile** (توصيتي) | الرسائل تتحفظ عندك وتظهر في الـ admin، وحماية سبام قوية، ومفيش اعتماد على طرف تالت | أطول شوية في التنفيذ |
+{ok use best practicies and recommended but also make sure abt rate limit cuz i'm using the free tier of supabase}
+توصيتي الخيار الثاني، لأنك أصلًا هتستخدم Supabase، وهيبقى عندك "صندوق وارد" في الداشبورد. ونعرض الإيميل كبديل زي ما اقترحت.
+
+**Lighthouse (سؤال ٢٠)**
+أداة مجانية من Google بتدي الموقع درجة من 100 على الأداء والـ SEO وإمكانية الوصول. هنحط هدف **90+ على الموبايل** كبوابة في CI.
+{use best practicies and recommended}
+**"المتجر"**
+كنت بسأل عن أي توسع مستقبلي محتمل. جوابك واضح إن مفيش متجر، فالمعمارية هتدعم فقط **blog وservices وcase studies**، ومش هنبني حاجة زيادة.
+
+## 🏗️ المعمارية المقترحة
+
+```
+Admin (/admin, Supabase Auth, أنت بس + MFA)
+      ↓ يكتب
+Supabase (Postgres + Storage + RLS)
+      ↓ ينشر → Deploy Hook
+Astro (build ثابت: /ar/… و /en/…)  →  Netlify  →  fotedev.me
+```
+
+- المحتوى كله في DB بحقلين لكل لغة (AR/EN)، فمفيش migration لما ندخل الـ admin.
+- الصفحات العامة **static**، فتبقى سريعة وبـ SEO ممتاز، وأي تعديل من الداشبورد يعمل rebuild في دقيقة تقريبًا.
+- روابط منفصلة `/ar` و`/en` مع `hreflang`.
+- الريبو مفتوح المصدر، فمفيش أسرار في الكود (`.env` فقط)، وكل الجداول عليها RLS.
+- **الرخصة:** الكود MIT، أما المحتوى والصور وصورتك فـ "all rights reserved". {لا اختر رخصة اكثر أماناً}
+
+## ❓ الأسئلة المتبقية
+
+اكتب "تمام" على أي سؤال لو موافق على الافتراضي.
+
+### أ) البزنس (الأهم، لأن أولويتك الفلوس)
+1. **إيه الخدمات اللي هتبيعها بالظبط؟** افتراضي: مواقع وتطبيقات ويب بسرعة عالية بمنهج AI-assisted، وأتمتة. ولو عندك نيش محدد (مطاعم زي khalat مثلًا) قولي.
+2. **قنوات التواصل:** فورم + إيميل + **واتساب** (مهم جدًا في مصر والخليج) + لينك Calendly لمكالمة؟ افتراضي: فورم + واتساب + إيميل.
+3. **منصات فريلانس** (خمسات/مستقل/Upwork) تحب نربط لها؟
+
+### ب) الريبو والبنية
+4. **اسم الريبو الجديد:** افتراضي `fotedev-site`. موافق؟
+5. تأكيد: `my-profile-repo` هو ريبو الـ README ونسيبه؟ و`My_portfolio` القديم: Archive؟
+
+### ج) التقنية
+6. **الاستضافة:** Netlify (توصيتي) ولا Cloudflare Pages ولا Vercel بعد قراءة الشروط؟
+7. **الفورم:** Supabase Edge Function + Turnstile (توصيتي) ولا EmailJS؟
+8. **اللغة الافتراضية** عند فتح `fotedev.me`: عربي ولا إنجليزي؟ افتراضي: إنجليزي للـ SEO الدولي، مع تبديل واضح للعربي. {التوثيق الdocs English only}
+
+### د) المحتوى
+9. **المشاريع:** خلي الوكيل يقترح 3–4 من GitHub وأنت توافق. فيه أي شغل تحت NDA أو عميل لازم يتخفى؟
+10. **صورتك والـ About:** هتحط صورة؟ والنبرة رسمية ولا ودودة؟ افتراضي: ودودة ومحترفة.
+11. **الشهادة والخبرة:** هنعرض شهادة الـ Prompt Engineering كـ credential، وباقي الخبرة تتعرض كـ **"مشاريع وأدلة عمل"** مش كشهادات، لأن ده أقوى عند العملاء. موافق؟
+
+### هـ) الجدول الزمني
+12. الدومين سنة والإيميل شهر، فمفيش ضغط حقيقي. هل تقبل **أول إطلاق خلال 3–4 أسابيع** (أسبوع تخطيط + باقي التنفيذ)؟ ولا عندك موعد أضيق؟
+
+## 🗺️ الخطوة اللي بعد إجاباتك
+
+**Phase 0: التخطيط (بدون كود)**، وهنطلّع فيه الملفات دي في الريبو الجديد:
+1. `docs/PRODUCT.md`: الهدف والجمهور والعروض ومؤشرات النجاح
+2. `docs/ARCHITECTURE.md`: المعمارية، ونموذج البيانات، وسياسة الأمان
+3. `DESIGN.md`: الألوان والخطوط وRTL/LTR والحركة
+4. `docs/CONTENT-MODEL.md` + `docs/SEO-I18N.md`
+5. `.factory/` + CI + ruleset
+6. Backlog كـ GitHub issues مرتبة، كل واحد بـ spec
+
+بعدها ننفذ بالترتيب: **هيكل + CI ← الصفحة الرئيسية ← المشاريع ← الفورم ← الـ admin ← الـ SEO والأداء ← الإطلاق**.
+
+جاوبني على الأسئلة وأبدأ في الـ Phase 0."
+==
+{بص من الآن تكلم انجليزي فقط لكي يفهم الايجنت كل تفصيلة ويthinking بالانجليزي}
+ثانيا الشهادة من "One Million Prompters
+
+dub.ai
+https://dub.ai › omp"
+ومكانها "C:\programming\github\My-Portfolio\ahmed-aboalyoun-certificate.pdf"
+ثالثا هذا الreadme الخاص بي "<div align="center">
+
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="dark.svg?v=stats-2026-11">
+    <source media="(prefers-color-scheme: light)" srcset="light.svg?v=stats-2026-11">
+    <img alt="FOTE's GitHub Banner" src="dark.svg?v=stats-2026-11" width="100%">
+  </picture>
+
+  <br/><br/>
+
+  <!-- Dynamic Typing Title -->
+  <a href="https://github.com/fotedev">
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=4000&color=22D3EE&center=true&vCenter=true&width=800&lines=Full-Stack+AI+Engineer;Building+Scalable+GenAI+%26+RAG+Systems;TypeScript+%7C+Next.js+%7C+Python+%7C+Supabase;Architecting+Multi-Platform+Applications" alt="Typing SVG" />
+  </a>
+
+  <br/>
+
+  <!-- Quick Status Badges -->
+  <p align="center">
+    <a href="https://github.com/fotedev">
+      <img src="https://komarev.com/ghpvc/?username=fotedev&label=Profile%20Views&color=0ea5e9&style=for-the-badge" alt="Profile Views" />
+    </a>
+    <a href="https://github.com/fotedev?tab=followers">
+      <img src="https://img.shields.io/github/followers/fotedev?label=Followers&logo=github&style=for-the-badge&color=2563eb" alt="GitHub Followers" />
+    </a>
+    <img src="https://img.shields.io/badge/Status-Building%20in%20Public-10b981?style=for-the-badge" alt="Status" />
+  </p>
+
+</div>
+
+---
+
+### 🚀 Who I Am
+
+I am a **Full-Stack AI Engineer** specializing in bridging the gap between Large Language Models (LLMs) and production-grade, scalable software products. My focus lies in designing robust backend pipelines, multi-platform applications, and responsive, interactive user experiences.
+
+- 🧠 **AI & LLM Systems:** Production RAG pipelines, Vector Search indexing, Model Context Protocol (MCP), and Agentic tool workflows. Selected runtime/security hardening for OSS agent infrastructure (see Contributions below).
+- ⚡ **Full-Stack Engineering:** High-performance web apps with **Next.js (App Router)**, **TypeScript**, **Python**, and **Supabase/PostgreSQL**.
+- 📱 **Multi-Platform Ecosystems:** Seamless cross-platform experiences across Web, Desktop (Electron), and Mobile.
+- 🎯 **Currently Building:** [**Masar X**](https://github.com/fotedev/Masar-x-next) — an AI-powered study and knowledge orchestration ecosystem.
+
+---
+
+### 🌟 Featured Production Systems
+
+| Project | Tech Highlights | Key Engineering Achievements | Status |
+| :--- | :--- | :--- | :---: |
+| **[Masar X](https://github.com/fotedev/Masar-x-next)** | `Next.js` `Supabase` `pgvector` `Electron` `RAG` | Multi-platform study ecosystem featuring semantic PDF search, vector document indexing, and sub-second latency streaming responses. | 🚀 Active |
+| **[Interactive SaaS & UI Platform](https://github.com/fotedev)** | `React` `Next.js` `TypeScript` `Framer Motion` `WebSockets` | High-performance interactive platform with 15+ Framer Motion mechanics, real-time WebSocket messaging, dual-theme engine, and role-based admin panel. | ✨ Live |
+| **[AI Pipelines & Agentic Tooling](https://github.com/fotedev)** | `Python` `TypeScript` `MCP` `LangChain` `LLM Evals` | Production-ready AI agent pipelines integrating Model Context Protocol (MCP), automated LLM evaluation workflows, and optimized prompt pipelines. | 🛠️ Maintained |
+| **[Developer Portfolio](https://github.com/fotedev/My_portfolio)** | `Next.js` `Tailwind CSS` `TypeScript` `Vercel` | Modern, responsive developer portfolio engineered for speed, clean UX architecture, and dynamic content delivery. | 🌐 Deployed |
+
+---
+
+### 🛠️ AI Infrastructure & Open Source
+
+- **[NousResearch / hermes-agent](https://github.com/NousResearch/hermes-agent)** — Credited Contributor
+  - [#109834](https://github.com/NousResearch/hermes-agent/pull/109834) — `fix(cli): honour key_env/api_key in config.yaml model.aliases entries` *(salvaged into [Teknium's #114809](https://github.com/NousResearch/hermes-agent/pull/114809) on `main`; authorship preserved by cherry-pick)*
+  - [#106626](https://github.com/NousResearch/hermes-agent/pull/106626) — `fix(gateway): prefer session model override in /usage billing route` *(open)*
+  - [#122144](https://github.com/NousResearch/hermes-agent/pull/122144) — `fix(windows): respawn gateway on the venv interpreter when captured argv leads with the base interpreter` *(open)*
+- **[MiniMax-AI / minimax-code](https://github.com/MiniMax-AI/minimax-code)** — Responsible Disclosure
+  - [#141](https://github.com/MiniMax-AI/minimax-code/issues/141) — Insecure plaintext storage of Telegram bot tokens and Windows NTFS permission fallbacks in `@mavis/local-runtime` *(acknowledged by vendor; independently audited by the community)*
+
+---
+
+### 🛠️ Tech Arsenal
+
+<div align="center">
+
+#### 🧠 AI & LLM Systems
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=python,pytorch,fastapi&theme=dark" alt="AI & ML" />
+</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/RAG_Pipelines-000000?style=flat-square&logo=openai&logoColor=white" />
+  <img src="https://img.shields.io/badge/Model_Context_Protocol_(MCP)-22D3EE?style=flat-square" />
+  <img src="https://img.shields.io/badge/Vector_Search_(pgvector)-336791?style=flat-square&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/LLM_Orchestration-10B981?style=flat-square" />
+</p>
+
+#### 💻 Frontend & UX Engineering
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=ts,js,nextjs,react,tailwind,sass,html,css,figma&theme=dark" alt="Frontend Stack" />
+</p>
+
+#### ⚙️ Backend & Data Infrastructure
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=nodejs,express,supabase,postgres,prisma&theme=dark" alt="Backend & DB" />
+</p>
+
+#### 🧰 DevOps, Tooling & Environment
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=git,github,docker,linux,arch,bash,vscode,npm,pnpm,vercel&theme=dark" alt="DevOps & Tools" />
+</p>
+
+</div>
+
+---
+
+### 📊 GitHub Activity & Metrics
+
+<div align="center">
+
+  <!-- GitHub Stats & Streak -->
+  <a href="https://github.com/fotedev">
+    <img src="https://github-readme-stats-fast.vercel.app/api?username=fotedev&show_icons=true&theme=tokyonight&hide_border=true&count_private=true&title_color=22D3EE&text_color=94A3B8&icon_color=3B82F6&bg_color=0A0E1A" height="165" alt="FOTE's GitHub Stats" />
+  </a>
+  <a href="https://github.com/fotedev">
+    <img src="https://streak-stats.demolab.com/?user=fotedev&theme=tokyonight&hide_border=true&stroke=22D3EE&background=0A0E1A&ring=3B82F6&fire=22D3EE&currStreakLabel=22D3EE" height="165" alt="GitHub Streak" />
+  </a>
+
+  <br/><br/>
+
+  <!-- Top Languages -->
+  <a href="https://github.com/fotedev">
+    <img src="https://github-readme-stats-fast.vercel.app/api/top-langs/?username=fotedev&layout=compact&theme=tokyonight&hide_border=true&title_color=22D3EE&text_color=94A3B8&bg_color=0A0E1A" height="140" alt="Top Languages" />
+  </a>
+
+</div>
+
+---
+
+### 🕹️ Contribution Journey
+
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fotedev/fotedev/output/pacman-contribution-graph-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/fotedev/fotedev/output/pacman-contribution-graph.svg">
+    <img alt="Pacman Contribution Graph" src="https://raw.githubusercontent.com/fotedev/fotedev/output/pacman-contribution-graph.svg" width="95%">
+  </picture>
+</div>
+
+---
+
+### 🌐 Connect & Collaborate
+
+<p align="center">
+  <a href="https://www.linkedin.com/in/fotedev" target="_blank">
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
+  </a>
+  <a href="https://x.com/FoteTeam" target="_blank">
+    <img src="https://img.shields.io/badge/Twitter-000000?style=for-the-badge&logo=x&logoColor=white" alt="Twitter/X" />
+  </a>
+  <a href="https://t.me/ACYRO0016K" target="_blank">
+    <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram" />
+  </a>
+  <a href="mailto:fote.engineer@gmail.com" target="_blank">
+    <img src="https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" />
+  </a>
+  <a href="https://www.youtube.com/channel/UCmfp_B-hOFq4UW5g1T4LCvQ?sub_confirmation=1" target="_blank">
+    <img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube" />
+  </a>
+  <a href="https://www.facebook.com/profile.php?id=61558539080140" target="_blank">
+    <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" alt="Facebook" />
+  </a>
+  <a href="https://www.instagram.com/devtech.team/" target="_blank">
+    <img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram" />
+  </a>
+</p>
+
+---
+
+<div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0A0E1A,50:3B82F6,100:22D3EE&height=100&section=footer" alt="Footer Wave" width="100%" />
+</div>
+
+<p align="center">
+  <i>⚡ Engineered with passion by <a href="https://github.com/fotedev"><b>Ahmed (FOTE)</b></a></i>
+</p>
+"

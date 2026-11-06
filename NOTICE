@@ -1,0 +1,19 @@
+NOTICE — License split for this repository
+
+Source code in this repository is licensed under the GNU Affero General Public
+License v3.0 only (see the LICENSE file).
+
+The following are NOT covered by that license and are
+Copyright (c) 2026 Ahmed Aboalayoun — All Rights Reserved:
+
+  - The brand identity "fotedev" / "FOTE" and associated logos and wordmarks.
+  - All prose and written content: portfolio copy, case studies, articles,
+    translations, and the contents of the `docs/` narrative sections authored
+    for this project.
+  - Photographs, screenshots of Ahmed's products, and other media.
+  - The "One Million Prompters" certificate PDF and any scan or reproduction
+    of it (© its issuing bodies; referenced by permission of the recipient).
+  - Personal data and personal identifiers.
+
+Nothing in the AGPL license grants any right to use, reproduce, or distribute
+the items above. Inquiries: fote.engineer@gmail.com

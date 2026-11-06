@@ -1,0 +1,28 @@
+# Local-only milestone tooling (never committed)
+prompt-*.md
+
+# Personal asset — upload source for Supabase Storage in M1, never committed
+ahmed-aboalyoun-certificate.pdf
+
+# Environment
+.env*
+!.env.example
+
+# Dependencies & build output
+node_modules/
+.next/
+out/
+dist/
+
+# Test & coverage
+coverage/
+
+# Logs
+*.log
+
+# OS / editor noise
+Thumbs.db
+.DS_Store
+
+# ZCode session tooling (local only)
+.zcode/
