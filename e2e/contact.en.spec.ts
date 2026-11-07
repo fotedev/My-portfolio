@@ -98,15 +98,16 @@ test.describe("contact EN", () => {
 
   test("rapid submissions hit the persistent rate limit (429)", async ({ page }) => {
     test.setTimeout(180_000);
-    // Self-sufficient: earlier specs (AR happy path, EN happy path) already
-    // consumed an unknown number of slots of the net window (3/10min per
-    // runner IP), so we submit until the 429 appears — it must appear within
-    // 3 more attempts because the cap is 3 per window.
+    // Deterministic across fixed-window boundaries: the net cap (3/10min)
+    // usually blocks by attempt 4, but a 10-minute window can roll mid-run —
+    // so all attempts reuse ONE unique email and the email cap (5/day, 24h
+    // window) guarantees the 429 by attempt 5 at the latest.
+    const rateLimitEmail = `ratelimit-${Date.now()}@example.com`;
     let rateLimited = false;
-    for (let attempt = 1; attempt <= 3 && !rateLimited; attempt++) {
+    for (let attempt = 1; attempt <= 6 && !rateLimited; attempt++) {
       await page.goto("/en/contact");
       await page.getByRole("textbox", { name: "Name" }).fill(`RateLimit ${attempt}`);
-      await page.getByRole("textbox", { name: "Email" }).fill(`ratelimit-${Date.now()}-${attempt}@example.com`);
+      await page.getByRole("textbox", { name: "Email" }).fill(rateLimitEmail);
       await page.getByLabel("What do you need?").selectOption("other");
       await page
         .getByRole("textbox", { name: "Message" })
