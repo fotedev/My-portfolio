@@ -1,58 +1,158 @@
 {
   "meta": {
-    "siteName": "Ahmed Aboalayoun — fotedev",
-    "titleTemplate": "{title} · fotedev",
-    "description": "Full-Stack AI Engineer building web applications and AI tools around your business."
+    "siteName": "Ahmed Aboalayoun — Full-Stack AI Engineer",
+    "titleTemplate": "{title} | Ahmed Aboalayoun",
+    "description": "Full-Stack AI Engineer building production web applications, RAG systems and AI tools around your business. Bilingual, evidence-backed, shipped through a deterministic software factory.",
+    "ogImageAlt": "fotedev — Ahmed Aboalayoun, Full-Stack AI Engineer"
   },
   "nav": {
     "home": "Home",
     "projects": "Projects",
+    "services": "Services",
     "about": "About",
     "contact": "Contact",
+    "privacy": "Privacy",
     "openMenu": "Open navigation menu",
     "closeMenu": "Close navigation menu"
   },
   "home": {
-    "badge": "Portfolio under construction — full launch coming soon",
-    "title": "Web applications and AI tools built around your business.",
-    "subtitle": "I'm Ahmed, a Full-Stack AI Engineer. This site is being built in the open — sections arrive milestone by milestone.",
     "ctaPrimary": "Discuss your project",
     "ctaSecondary": "Explore selected work",
-    "placeholderTitle": "Selected work",
-    "placeholderBody": "Case studies are being verified and written right now. Check back at the next milestone."
+    "workTitle": "Selected work",
+    "workSubtitle": "Production and open-source builds, each with its evidence on the page.",
+    "servicesTitle": "Services",
+    "servicesSubtitle": "What I build for clients, from approved spec to handover.",
+    "servicesCta": "All services",
+    "howTitle": "How I work",
+    "howSubtitle": "A deterministic factory, not improvised code.",
+    "credTitle": "Open-source and security engineering",
+    "credSubtitle": "Public record, verified and dated. Statuses stay honest: merged stays merged, open stays open, acknowledged stays acknowledged.",
+    "credentialsTitle": "Verified credentials",
+    "aboutTitle": "About",
+    "aboutPreview": "I'm Ahmed Aboalayoun (fotedev), a Full-Stack AI Engineer. I build web platforms, production RAG systems and the tooling around them, and I run my own work through a spec-gated software factory so every claim on this site can be traced to evidence.",
+    "aboutCta": "More about me",
+    "contactTitle": "Have a project in mind?",
+    "contactBody": "Email is the fastest way to reach me. A direct form is coming; until then your message lands straight in my inbox.",
+    "contactCta": "Get in touch",
+    "proofAi": "Production AI & RAG systems",
+    "proofOss": "OSS contributor — NousResearch",
+    "proofSecurity": "Responsible security disclosure",
+    "proofCert": "1M Prompters certified"
+  },
+  "how": {
+    "s1Title": "Spec first",
+    "s1Body": "Every build starts from a short written spec you approve: scope, constraints, and what \"done\" means, before any code exists.",
+    "s2Title": "Vertical slices",
+    "s2Body": "Work ships in thin, working slices you can open and use, not a big reveal at the end.",
+    "s3Title": "CI-enforced gates",
+    "s3Body": "Lint, types, tests and build run automatically on every change. Nothing merges without passing.",
+    "s4Title": "Handover",
+    "s4Body": "You get documentation, deployment and the keys: a system you own and understand."
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Selected case studies. Every claim on these pages has a dated source in the evidence log.",
+    "caseStudy": "Case study",
+    "liveDemo": "Live demo",
+    "sourceCode": "Source code",
+    "privateRepo": "Private production repo",
+    "backToProjects": "All projects",
+    "problem": "The problem",
+    "solution": "What I built",
+    "results": "Results",
+    "stack": "Stack",
+    "lastUpdated": "Last updated {date}",
+    "notFound": "No published case study with this slug."
+  },
+  "services": {
+    "title": "Services",
+    "subtitle": "Three engagements, each ending in something you own: deployed software, documentation and a handover.",
+    "deliverables": "What you get",
+    "cta": "Discuss this service"
+  },
+  "about": {
+    "title": "About",
+    "intro1": "I'm Ahmed Aboalayoun (fotedev), a Full-Stack AI Engineer based in Egypt, working in English and Arabic. I build web platforms, production RAG systems, and the automation and tooling around them.",
+    "intro2": "I run my own work through a software factory: locked specs, vertical slices, CI-enforced gates and a measured run log. That is also why every claim on this site links to a dated source.",
+    "factoryTitle": "The software factory",
+    "factoryBody": "Milestones are gated: a spec is approved first, each slice passes lint, types, tests and a production build in CI, and results are recorded. If a claim cannot be verified, it does not ship.",
+    "arsenalTitle": "Tech arsenal",
+    "arsenalAiLabel": "AI & LLM",
+    "arsenalAiItems": "RAG pipelines, pgvector, embeddings, prompt engineering, MCP tooling, agentic workflows",
+    "arsenalFrontendLabel": "Frontend",
+    "arsenalFrontendItems": "Next.js (App Router), React 19, TypeScript (strict), Tailwind CSS, RTL/i18n",
+    "arsenalBackendLabel": "Backend & data",
+    "arsenalBackendItems": "Supabase, PostgreSQL, Row Level Security, Edge Functions, Zod",
+    "arsenalDevopsLabel": "DevOps",
+    "arsenalDevopsItems": "GitHub Actions CI, Vercel, pnpm monorepos, deterministic release gates",
+    "ossTitle": "Open-source record",
+    "ossBody": "Contributions to NousResearch/hermes-agent (one merged via salvage with preserved authorship, two open) and a responsible security disclosure to MiniMax-AI, acknowledged by the vendor. Full details with dates below.",
+    "certTitle": "Certificate",
+    "certBody": "One Million Prompters — Certificate of Completion, credited to Dubai Future Foundation and the Dubai Centre for Artificial Intelligence. Offered here as a supporting credential, not a quality guarantee.",
+    "certCta": "View the certificate"
+  },
+  "contact": {
+    "title": "Contact",
+    "body": "Email is the fastest way to reach me. A direct form is coming soon; until then your message lands straight in my inbox, and nothing is collected on this page.",
+    "emailLabel": "Email",
+    "copyEmail": "Copy email address",
+    "copied": "Copied",
+    "mailto": "Write an email"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "updated": "Last updated: 7 November 2026",
+    "introTitle": "What this policy covers",
+    "introBody": "This policy explains what happens to data on fotedev.me. It is written to be read, not to hide behind.",
+    "currentTitle": "What is collected today",
+    "currentBody": "Nothing. This site has no contact form yet, no analytics, no advertising trackers, and no cookies. The only thing stored in your browser is a theme preference (light or dark) in localStorage, which never leaves your device.",
+    "hostingTitle": "Hosting",
+    "hostingBody": "The site is hosted on Vercel. As with any web host, Vercel processes standard request logs (IP address, user agent, requested URL) for security and operation. Vercel Web Analytics and Speed Insights are not enabled at this time; if that changes, this policy is updated first.",
+    "formTitle": "When the contact form launches",
+    "formBody": "The upcoming form will collect your name, email address, an optional service interest and your message, solely to reply to your inquiry. Submissions will be stored in a Supabase database in the EU (Frankfurt) region, with access restricted to me. Inquiries are deleted 24 months after the last message in a thread, or earlier on request.",
+    "deletionTitle": "Your data, your call",
+    "deletionBody": "You can ask me to delete your data at any time: email fote.engineer@gmail.com and I will delete the inquiry and confirm the deletion.",
+    "questionsTitle": "Questions",
+    "questionsBody": "Anything about this policy: fote.engineer@gmail.com."
   },
   "footer": {
-    "rights": "Code: AGPL-3.0-only · Brand & content: All rights reserved.",
+    "tagline": "Web applications and AI tools built around your business.",
+    "navLabel": "Footer",
+    "pagesLabel": "Pages",
+    "connectLabel": "Connect",
+    "copyEmail": "Copy email address",
+    "copied": "Copied",
+    "useSystemTheme": "Use system theme",
+    "rights": "© {year} Ahmed Aboalayoun · Code: AGPL-3.0-only · Content & assets: all rights reserved.",
     "builtWith": "Built in the open with a deterministic software factory."
   },
   "theme": {
-    "toggle": "Switch color theme"
+    "toggle": "Switch color theme",
+    "reset": "Use system theme"
   },
   "localeSwitcher": {
     "label": "Language",
+    "switchToAria": "Switch language to {name}",
     "en": "English",
     "ar": "العربية"
+  },
+  "oss": {
+    "merged": "Merged",
+    "open": "Open PR",
+    "acknowledged": "Acknowledged disclosure",
+    "verifiedOn": "Verified on {date}",
+    "viewOnGithub": "View on GitHub",
+    "mergedVia": "Merged via #{number}"
+  },
+  "credential": {
+    "recipient": "Recipient",
+    "viewPdf": "View PDF (new tab)",
+    "downloadPdf": "Download PDF",
+    "pdfLinkNote": "The certificate PDF opens outside this site."
   },
   "notFound": {
     "title": "Page not found",
     "body": "The page you are looking for does not exist or has moved.",
     "backHome": "Back to home"
-  },
-  "about": {
-    "title": "About",
-    "body": "Full story arrives with the content milestone (M3)."
-  },
-  "projects": {
-    "title": "Projects",
-    "body": "Selected case studies are being verified and written (M3)."
-  },
-  "contact": {
-    "title": "Contact",
-    "body": "The contact form is wired in M4. Until then, email is the fastest way to reach me.",
-    "emailLabel": "Email"
-  },
-  "privacy": {
-    "title": "Privacy",
-    "intro": "This privacy policy is delivered in Milestone 3 with the public content. No analytics or tracking scripts run on this site yet; the contact form does not exist yet, so no inquiry data is collected at this stage."
   }
 }
