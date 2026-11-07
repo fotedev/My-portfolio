@@ -69,7 +69,7 @@ insert into public.service_translations (service_id, locale, title, summary, del
 select s.id, v.locale, v.title, v.summary, v.deliverables
 from (values
   ('web-apps', 'en',
-   'Web applications & dashboards',
+   'High-performance web platforms (Next.js, TypeScript & Supabase)',
    'A production web application or dashboard — not a prototype: real data, user accounts with roles, and the views and reports your team uses daily. Deployed, documented, and handed over to you.',
    array[
      'A short written spec you approve',
@@ -87,7 +87,7 @@ from (values
      'نشر على الإنتاج مع التوثيق والتسليم'
    ]),
   ('ai-doc-tools', 'en',
-   'AI knowledge & document tools',
+   'Full-stack AI & production RAG systems',
    'A tool that turns your documents into answers: semantic search and Q&A over your own files — PDFs, contracts, knowledge bases — with source citations and access control, instead of manual digging.',
    array[
      'A document ingestion pipeline for your formats',
@@ -96,7 +96,7 @@ from (values
      'Access control plus an evaluation pass on your real documents'
    ]),
   ('ai-doc-tools', 'ar',
-   'أدوات معرفة ومستندات بالذكاء الاصطناعي',
+   'أنظمة RAG إنتاجية وحلول ذكاء اصطناعي متكاملة',
    'أداة تحوّل مستنداتك إلى إجابات: بحث دلالي وأسئلة وأجوبة على ملفاتك الخاصة — ملفات PDF وعقود وقواعد معرفة — مع الاستشهاد بالمصادر وصلاحيات الوصول، بدل البحث اليدوي في الملفات.',
    array[
      'خط معالجة لاستيعاب مستنداتك بصيغها',
@@ -105,22 +105,22 @@ from (values
      'صلاحيات وصول واختبار جودة على مستنداتك الحقيقية'
    ]),
   ('workflow-automation', 'en',
-   'Workflow automation & integrations',
-   'Automations that connect the tools you already use: data sync between systems, notifications and alerts, scheduled jobs, and API integrations that remove repetitive manual work from your week.',
+   'Agentic workflows, MCP tooling & deterministic CI pipelines',
+   'Automations and agent tooling that connect the systems you already use: MCP servers, scheduled jobs, data sync between systems, and deterministic CI pipelines that make every change testable and reversible.',
    array[
      'A short workflow audit of what is manual today',
-     'The integration or automation, built and monitored',
-     'Failure alerts and a runbook',
-     'Documentation and handover'
+     'MCP tooling or the integration, built and monitored',
+     'A deterministic CI pipeline with lint, types, tests and build as gates',
+     'Failure alerts, runbook, documentation and handover'
    ]),
   ('workflow-automation', 'ar',
-   'أتمتة سير العمل والتكاملات',
-   'أتمتة تربط الأدوات التي تستخدمها فعلًا: مزامنة البيانات بين الأنظمة، إشعارات وتنبيهات، مهام مجدولة، وتكاملات واجهات برمجية (API) تلغي العمل اليدوي المتكرر من أسبوعك.',
+   'سير عمل وكيلي وأدوات MCP وخطوط CI حتمية',
+   'أتمتة وأدوات وكلاء تربط الأنظمة التي تستخدمها فعلًا: خوادم MCP، مهام مجدولة، مزامنة بيانات بين الأنظمة، وخطوط CI حتمية تجعل كل تغيير قابلًا للاختبار والتراجع.',
    array[
      'فحص مختصر لسير العمل اليدوي اليوم',
-     'التكامل أو الأتمتة: بناء ومتابعة',
-     'تنبيهات عند الفشل ودليل تشغيل',
-     'التوثيق والتسليم'
+     'أدوات MCP أو التكامل: بناء ومتابعة',
+     'خط CI حتمي يجعل فحص الكود والأنواع والاختبارات والبناء بوابات إلزامية',
+     'تنبيهات الفشل ودليل التشغيل والتوثيق والتسليم'
    ])
 ) as v(key, locale, title, summary, deliverables)
 join public.services s on s.key = v.key
@@ -167,7 +167,7 @@ select
   'https://dub.ai/omp',      -- program page (provided by Ahmed; NOT printed on the PDF)
   (select id from public.media_assets where bucket = 'public-assets' and storage_path = 'certificates/omp-certificate.pdf'),
   1,
-  'draft'                    -- draft until Ahmed confirms the entry at GATE 2
+  'published'                -- published at GATE 2 sign-off (2026-11-07); TO VERIFY fields stay NULL
 where not exists (select 1 from public.credentials c where c.proof_url = 'https://dub.ai/omp');
 
 insert into public.credential_translations (credential_id, locale, title, issuer_display, summary)
@@ -252,17 +252,35 @@ on conflict (contribution_id, locale) do update
       updated_at = now();
 
 -- ============================================================================
--- 6. projects — case studies approved for seeding (default: Masar X only).
---    SEED DRAFTS — content review at GATE 2. No unverifiable claims (no
---    latency/scale numbers). results stays NULL (no verified results yet).
+-- 6. projects — case studies approved at GATE 2 sign-off (2026-11-07):
+--    masar-x, ghost, khalat (published + featured). khalat has no public
+--    source (private repo → "Private Production Repo" badge; owner-attested
+--    content only, no invented stack). ghost carries the responsible-use note
+--    from its own docs (README/SECURITY.md). No unverifiable claims.
 -- ============================================================================
+-- NOTE on ordering: enforce_publish_gate() refuses status='published' without an
+-- AR translation, so rows insert as 'draft' and are published via UPDATE after
+-- the translations below (the gate's own instruction).
 insert into public.projects (slug, status, is_featured, sort_order, tech_stack, repo_url, live_url)
-values (
+values
+  (
   'masar-x', 'draft', true, 1,
   array['Next.js', 'TypeScript', 'Supabase', 'pgvector', 'Electron', 'Expo'],
   'https://github.com/fotedev/Masar-x-next',
   'https://masarx.vercel.app'
-)
+  ),
+  (
+  'ghost', 'draft', true, 2,
+  array['PowerShell', 'Python'],
+  'https://github.com/fotedev/ghost',
+  null
+  ),
+  (
+  'khalat', 'draft', true, 3,
+  '{}',
+  null, -- repo is private → UI renders the "Private Production Repo" badge
+  null
+  )
 on conflict (slug) do update
   set tech_stack = excluded.tech_stack,
       repo_url = excluded.repo_url,
@@ -283,7 +301,31 @@ from (values
    'منصة دراسية ذكية ثنائية اللغة: بحث دلالي في ملفات PDF وفهرسة متجهية للمستندات عبر تطبيقات الويب وسطح المكتب والجوال، على خلفية Supabase واحدة.',
    'يحتاج الطلاب إلى البحث والمذاكرة من مجموعات PDF كبيرة بسرعة، وعلى أي جهاز يتوفرون عليه، دون أن تظل موادهم وتقدمهم موزعة على أنظمة منفصلة.',
    'مستودع Monorepo بإدارة pnpm يتشارك خلفية Supabase واحدة (RLS ودوال Edge) بين تطبيق ويب Next.js وتطبيق سطح مكتب Electron وتطبيق جوال Expo، مع بحث دلالي على ملفات PDF المستوعبة وفهرسة متجهية للمستندات.',
-   null)
+   null),
+  ('ghost', 'en',
+   'ghost',
+   'Open-source CLI (28 stars) that resets device and machine identifiers for AI coding IDEs, with guided flows, audit logs and restore scripts on Windows and Linux. Positioned as developer privacy hygiene; the project''s own docs tell users to comply with each vendor''s terms of service.',
+   'AI coding IDEs fingerprint hardware and machine identifiers. Developers re-imaging a machine, selling hardware, or separating work environments have no clean, documented way to reset those identities, so they fall back to scattered manual registry and config edits.',
+   'GHOST (Guided Hardware & OS Scrubbing Toolkit) is a PowerShell and Python CLI with guided per-IDE reset flows covering Cursor, Windsurf, Trae, Qoder and other AI IDEs, plus audit logs and restore scripts. Pester, ShellCheck and unittest suites run in CI. It is positioned as developer privacy hygiene: the README and SECURITY.md state that users are responsible for complying with each vendor''s terms.',
+   '28 GitHub stars (verified 2026-11-07). Pester, ShellCheck and unittest suites run on every push via CI. Apache-2.0 licensed.'),
+  ('ghost', 'ar',
+   'ghost',
+   'أداة سطر أوامر مفتوحة المصدر (28 نجمة) تعيد ضبط معرّفات الجهاز والنظام لبيئات التطوير المدعومة بالذكاء الاصطناعي، بمسارات موجّهة وسجلات تدقيق وسكربتات استرجاع على ويندوز ولينكس. تُقدَّم كنظافة خصوصية للمطوّر؛ وتنص وثائق المشروع نفسها على أن المستخدم مسؤول عن الالتزام بشروط كل مورّد.',
+   'بيئات تطوير الذكاء الاصطناعي تبصم على الجهاز ومعرّفات النظام. المطوّر الذي يعيد تجهيز جهازه أو يبيعه أو يفصل بين بيئات عمله لا يملك طريقة نظيفة وموثّقة لتصفير تلك الهويات، فيلجأ إلى تعديلات يدوية متفرقة في السجل والإعدادات.',
+   'GHOST (Guided Hardware & OS Scrubbing Toolkit) واجهة سطر أوامر بلغتي PowerShell وPython بمسارات إعادة ضبط موجّهة لكل بيئة على حدة، تغطي Cursor وWindsurf وTrae وQoder وغيرها، مع سجلات تدقيق وسكربتات استرجاع. تعمل مجموعات اختبار Pester وShellCheck وunittest في CI. تُقدَّم الأداة كنظافة خصوصية للمطوّر: ينص الملفان README وSECURITY.md على أن المستخدم مسؤول عن الالتزام بشروط كل مورّد.',
+   '28 نجمة على GitHub (تحقّق 2026-11-07). تعمل مجموعات اختبار Pester وShellCheck وunittest مع كل دفع عبر CI. مرخّصة بموجب Apache-2.0.'),
+  ('khalat', 'en',
+   'Khalat',
+   'Production commerce and ordering web application, built and operated under a deterministic AI software-factory pipeline: locked specifications, milestone gates and CI-enforced quality checks. The source is private, so every statement on this page is owner-attested rather than publicly verifiable.',
+   'A live ordering business needed software it could audit: decisions traceable, schema changes reviewed, releases gated, instead of a prototype that breaks quietly in production.',
+   'The build runs as a governed factory. Each milestone starts from an approved spec, ships as a vertical slice through CI (lint, types, tests, build) and ends in a measured run log. Nothing merges without passing the gates; nothing publishes without an explicit owner decision.',
+   'Running in production. Every milestone shipped through the factory''s gates: approved spec, CI-enforced quality checks, measured run log (owner-attested; the repository is private).'),
+  ('khalat', 'ar',
+   'Khalat',
+   'تطبيق ويب إنتاجي للتجارة والطلبات، بُني ويُشغَّل عبر خطّ مصنع برمجيات حتمي بالذكاء الاصطناعي: مواصفات مقفلة، وبوابات مراحل، وفحوص جودة يفرضها CI. المصدر خاص، لذا كل ما يُذكر هنا تصريحات موثّقة من المالك لا يمكن التحقق منها علنًا.',
+   'كان عمل طلبات حيّ يحتاج برمجيات قابلة للتدقيق: قرارات قابلة للتتبع، وتغييرات مخطط تُراجَع، وإصدارات عبر بوابات، بدل نموذج أولي ينهار بصمت في الإنتاج.',
+   'يُنفَّذ البناء كمصنع خاضع للحوكمة. تبدأ كل مرحلة من مواصفة معتمدة، وتُسلَّم كشريحة عمودية تمرّ عبر CI (فحص الكود، الأنواع، الاختبارات، البناء)، وتنتهي بسجل تشغيل مقاس. لا يُدمج شيء دون اجتياز البوابات، ولا يُنشر شيء دون قرار صريح من المالك.',
+   'يعمل في الإنتاج. كل مرحلة عبرت بوابات المصنع: مواصفة معتمدة، وفحوص جودة عبر CI، وسجل تشغيل مقاس (موثّق من المالك؛ المستودع خاص).')
 ) as v(slug, locale, title, summary, problem, solution, results)
 join public.projects p on p.slug = v.slug
 on conflict (project_id, locale) do update
@@ -293,6 +335,11 @@ on conflict (project_id, locale) do update
       solution = excluded.solution,
       results = excluded.results,
       updated_at = now();
+
+-- Publish after translations exist (publish-gate ordering; see note above)
+update public.projects
+set status = 'published', updated_at = now()
+where slug in ('masar-x', 'ghost', 'khalat');
 
 -- ============================================================================
 -- 7. posts / inquiries — intentionally EMPTY (zero seed, Rule: deferred/no UI)

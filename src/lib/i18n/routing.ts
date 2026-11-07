@@ -14,3 +14,15 @@ export const routing = defineRouting({
 export function isLocale(value: string): value is Locale {
   return (locales as readonly string[]).includes(value);
 }
+
+/**
+ * Narrow a route param to a Locale or throw. Route params are typed `string`;
+ * the intl middleware only lets valid prefixes through, so this is a
+ * type-level seatbelt, not UX.
+ */
+export function toLocale(value: string): Locale {
+  if (!isLocale(value)) {
+    throw new Error(`Unknown locale: ${value}`);
+  }
+  return value;
+}

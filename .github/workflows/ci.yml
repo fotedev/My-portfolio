@@ -39,7 +39,8 @@ jobs:
       - name: Build
         run: pnpm build
         env:
-          # Public build-time values only; secrets are never needed for a
-          # placeholder-shell build and are configured per-environment in Vercel.
+          # Public values only: the anon (publishable) key + project URL are
+          # read-only, RLS-protected, and required for build-time content reads.
           NEXT_PUBLIC_SUPABASE_URL: https://zfhfeiqdsugjqliufhke.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://fotedev.me

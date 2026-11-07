@@ -4,6 +4,8 @@
 
 All rows verified live on **2026-11-06**.
 
+**Re-verified 2026-11-07 (M3 publish pass):** OSS statuses unchanged (#114809 merged 2026-09-18; #106626 + #122144 open, updated 2026-10-17; minimax #141 closed not_planned 2026-10-19). `fotedev/ghost` re-confirmed: public, **28 stars**, Apache-2.0, pushed 2026-11-07. `fotedev/Masar-x-next` re-confirmed: public, homepage `https://masarx.vercel.app/`, pushed 2026-11-07. **khalat published as a case study per owner directive (2026-11-07): repository is private (GitHub API 404, verified 2026-11-06), so all case-study statements are owner-attested in this conversation; the UI renders a "Private production repo" badge and `repo_url` stays NULL — no public-source claim is made. `fotedev/context` stays unpublished (undocumented repo; owner directive: keep as draft — no row created).**
+
 ## Verified profile links (seed source: profile README `fotedev/fotedev`)
 
 | Item | Value | Source |
@@ -22,9 +24,9 @@ All rows verified live on **2026-11-06**.
 | Repo | Verified state (2026-11-06) | Live demo | Honest summary | Recommendation |
 |---|---|---|---|---|
 | `fotedev/Masar-x-next` | Public, TypeScript, last commit 2026-11-05 (active) | `https://masarx.vercel.app` (repo homepage + README) | pnpm monorepo: Next.js web (live in production) + Electron desktop + Expo mobile sharing one Supabase backend (RLS, Edge Functions); bilingual AR/EN AI study platform with semantic PDF search and vector indexing | **Strong — propose as case study #1** |
-| `fotedev/ghost` | Public, PowerShell (+ Python core), last commit 2026-11-04, 28 stars, Apache-2.0, Pester/ShellCheck/unittest suites + CI | none (CLI, clone-and-run) | GHOST rotates device/machine identifiers for AI IDEs (Cursor, Windsurf, ZCode, …) with audit logs and restore scripts. **Caveat:** its own README/SECURITY.md warn it may violate vendor ToS — frame strictly as privacy/dev-hygiene engineering, or skip | **Strong with framing caveat — Ahmed's call** |
+| `fotedev/ghost` | Public, PowerShell (+ Python core), 28 stars (re-verified 2026-11-07), Apache-2.0, Pester/ShellCheck/unittest suites + CI | none (CLI, clone-and-run) | GHOST rotates device/machine identifiers for AI IDEs (Cursor, Windsurf, ZCode, …) with audit logs and restore scripts. **Caveat:** its own README/SECURITY.md warn it may violate vendor ToS — frame strictly as privacy/dev-hygiene engineering, or skip | **PUBLISHED in M3 (owner decision 2026-11-07): privacy/dev-hygiene framing + explicit responsible-use note in both locales** |
 | `fotedev/context` | Public, Python, last commit 2026-09-21; no root README (`docs/README.md` is entry), no demo | none | "File Aggregator": CLI/TUI/GUI aggregating source files + snippets into arena contexts, tiktoken token counting, Gemini Flash judge for model-output comparison (LMArena workflow), 18 stars | **Weak — real but undocumented; needs a README pass before it can be a case study** |
-| `fotedev/khalat` | **Does not exist publicly — GitHub API 404.** Closest match: `fotedev/ELKHLAT` is **private** | n/a | n/a publicly | **Blocked as-is.** Options for Ahmed: (a) make ELKHLAT public, (b) drop it, (c) describe without public source (weakens evidence rule) |
+| `fotedev/khalat` | **Does not exist publicly — GitHub API 404.** Closest match: `fotedev/ELKHLAT` is **private** | n/a | n/a publicly | **PUBLISHED in M3 (owner directive 2026-11-07, option c): private production repo, `repo_url` NULL, "Private production repo" badge, all statements owner-attested — zero public-source claims** |
 | Old `fotedev/My_portfolio` | Public, JavaScript, pushed 2025-09-02; README fetch failed (API symlink-blob error) — metadata only | `https://fote.vercel.app` (repo homepage) | Previous portfolio; self-referential for the new site | **Skip as case study** |
 | "Interactive SaaS & UI Platform" / "AI Pipelines & Agentic Tooling" (profile rows) | Both link to the GitHub **profile**, not distinct repos | — | Content leads only — no backing repo found | **Not publishable as case studies** |
 

@@ -1,25 +1,25 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/lib/i18n/navigation";
-import { locales } from "@/lib/i18n/routing";
+import { locales, type Locale } from "@/lib/i18n/routing";
 
-const localeLabels: Record<string, string> = { en: "EN", ar: "ع" };
+/** Abbreviated visible labels; full localized names for screen readers. */
+const localeLabels: Record<Locale, string> = { en: "EN", ar: "ع" };
+const localeNames: Record<Locale, string> = { en: "English", ar: "العربية" };
 
 /**
- * Language switcher that preserves the equivalent path (prompt-3 §4):
- * /en/projects/abc ↔ /ar/projects/abc.
- *
- * next-intl's usePathname returns the locale-stripped internal pathname
- * (e.g. "/projects"), and the locale-aware router re-prefixes the target
- * locale — the documented next-intl idiom, no manual segment swapping.
+ * Language switcher that preserves the equivalent path (SEO-I18N §3.3):
+ * /en/projects/abc ↔ /ar/projects/abc. Every button carries a descriptive
+ * aria-label — "ع" alone is not an accessible name.
  */
 export function LocaleSwitcher() {
   const locale = useLocale();
+  const t = useTranslations("localeSwitcher");
   const router = useRouter();
   const pathname = usePathname();
 
-  function switchTo(nextLocale: string) {
+  function switchTo(nextLocale: Locale) {
     if (nextLocale === locale) {
       return;
     }
@@ -27,20 +27,22 @@ export function LocaleSwitcher() {
   }
 
   return (
-    <div role="group" aria-label="Language" className="flex items-center gap-1">
+    <div role="group" aria-label={t("label")} className="flex items-center gap-1">
       {locales.map((l) => (
         <button
           key={l}
           type="button"
+          aria-label={t("switchToAria", { name: localeNames[l] })}
+          title={t("switchToAria", { name: localeNames[l] })}
           aria-current={l === locale ? "true" : undefined}
           onClick={() => {
             switchTo(l);
           }}
-          className={`min-h-11 rounded-md border border-border-subtle px-2.5 text-sm transition-colors duration-200 ${
+          className={`min-h-11 rounded-md border border-border-subtle px-2.5 text-sm transition-colors duration-150 ${
             l === locale ? "bg-accent-strong text-white" : "bg-surface hover:bg-background"
           }`}
         >
-          {localeLabels[l] ?? l}
+          {localeLabels[l]}
         </button>
       ))}
     </div>
