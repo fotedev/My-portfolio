@@ -210,9 +210,11 @@ The publish gate (ROADMAP §M5): **p95 ≤ 60 s (gating), ≤ 5 s aspiration.** 
 | 2 | local build | 0.22 s |
 | 3 | local build | 0.23 s |
 | 4 | full-suite run | 0.31 s |
-| Prod ×3 | **TO RECORD after the M5 production verify** (scratch draft → publish → poll prod URL → unpublish → delete) | — |
+| Prod 1 | production `fotedev-portfolio.vercel.app` (scratch draft → publish → poll prod URL → unpublish → delete), 2026-11-07 | 3.76 s |
+| Prod 2 | production, same probe | 3.81 s |
+| Prod 3 | production, same probe | 2.66 s |
 
-Local p50 ≈ 0.23 s — two orders of magnitude under the gate. Public pages run `revalidate = false` (on-demand only, ARCHITECTURE §5.1): nothing goes stale on a timer, and unpublished slugs 404 until publish revalidates their path.
+Local p50 ≈ 0.23 s; **production p50 ≈ 3.76 s, max 3.81 s** (includes client→edge round trips) — under the 5 s aspiration and far under the 60 s gate. Probe rows were fully removed (verified `count = 0`). Public pages run `revalidate = false` (on-demand only, ARCHITECTURE §5.1): nothing goes stale on a timer, and unpublished slugs 404 until publish revalidates their path.
 
 ### 12.2 Media uploads
 
