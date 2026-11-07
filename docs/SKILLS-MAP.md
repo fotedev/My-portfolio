@@ -112,7 +112,9 @@ Measured record — what was actually **opened/loaded**, not what was planned. K
 | M0 | Certificate Reader | none |
 | M0 | Spec Consistency Reviewer | none |
 | M0 | Edge-Case Auditor | `edge-cases` |
+| M1 | Schema Architect (work done by main — subagent spawn failed on harness quota; deviation logged in RUN_LOG) | `supabase-postgres-best-practices` (conventions applied during authoring) |
+| M2 | Shell implementation (done by main per owner directive; skills loaded in-session) | `react-best-practices`, `tailwindcss-responsive-darkmode`, `limit-any-type`, `coding-standards` |
 
-Note: the M0 `Repo Hygienist` assignment lists `organize-root`, but it was **judged by name only and never opened** — the root hygiene (backup, moves, `.gitignore`) was done directly by the main agent following the spec's explicit steps, so the skill's procedure was unnecessary. No other skill has been opened in this project to date.
+Note: the M0 `Repo Hygienist` assignment lists `organize-root`, but it was **judged by name only and never opened** — the root hygiene (backup, moves, `.gitignore`) was done directly by the main agent following the spec's explicit steps, so the skill's procedure was unnecessary.
 
 Every planned-but-not-opened skill above means the subagent proceeded via the spec and repo docs (rule 6) or had no advisory need; nothing was silently skipped.
