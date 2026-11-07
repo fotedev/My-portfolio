@@ -1,0 +1,46 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e33] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e34]:
+      - img [ref=e35]
+    - generic [ref=e38]:
+      - button "Open issues overlay" [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: "0"
+          - generic [ref=e42]: "1"
+        - generic [ref=e43]: Issue
+      - button "Collapse issues badge" [ref=e44]:
+        - img [ref=e45]
+  - alert [ref=e47]: المشاريع
+  - link "تخطَّ إلى المحتوى" [ref=e48] [cursor=pointer]:
+    - /url: "#content"
+  - banner [ref=e49]:
+    - navigation "Main" [ref=e50]:
+      - link "fotedev" [ref=e51] [cursor=pointer]:
+        - /url: /ar
+      - list [ref=e52]:
+        - listitem [ref=e53]:
+          - link "الرئيسية" [ref=e54] [cursor=pointer]:
+            - /url: /ar
+        - listitem [ref=e55]:
+          - link "المشاريع" [ref=e56] [cursor=pointer]:
+            - /url: /ar/projects
+        - listitem [ref=e57]:
+          - link "نبذة" [ref=e58] [cursor=pointer]:
+            - /url: /ar/about
+        - listitem [ref=e59]:
+          - link "تواصل" [ref=e60] [cursor=pointer]:
+            - /url: /ar/contact
+      - generic [ref=e61]:
+        - group "Language" [ref=e62]:
+          - button "EN" [ref=e63]
+          - button "ع" [ref=e64]
+        - button "تبديل مظهر الألوان" [ref=e65]:
+          - generic [ref=e66]: ☀
+  - main [ref=e67]:
+    - generic [ref=e68]:
+      - heading "المشاريع" [level=1] [ref=e69]
+      - paragraph [ref=e70]: دراسات الحالة المختارة تُدقَّق وتُكتب (M3).
+  - contentinfo [ref=e71]:
+    - generic [ref=e72]:
+      - paragraph [ref=e73]: "الكود: AGPL-3.0 فقط · الهوية والمحتوى: جميع الحقوق محفوظة."
+      - paragraph [ref=e74]: بُني علنًا عبر مصنع برمجيات حتمية.

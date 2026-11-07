@@ -1,0 +1,21 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: fotedev admin
+        - generic [ref=e6]: English-only backoffice
+    - main [ref=e7]:
+      - generic [ref=e8]:
+        - heading "Admin sign-in" [level=1] [ref=e9]
+        - generic [ref=e10]:
+          - generic [ref=e11]:
+            - generic [ref=e12]: Email
+            - textbox "Email" [ref=e13]: fote.siengineer@gmail.com
+          - generic [ref=e14]:
+            - generic [ref=e15]: Password
+            - textbox "Password" [ref=e16]: wrong-password-test
+          - alert [ref=e28]: Sign-in failed. Check your credentials and try again.
+          - button "Sign in" [ref=e17]
+  - button "Open Next.js Dev Tools" [ref=e23] [cursor=pointer]:
+    - img [ref=e24]
+  - alert [ref=e27]
