@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "siteName": "Ahmed Aboalayoun — fotedev",
+    "titleTemplate": "{title} · fotedev",
+    "description": "Full-Stack AI Engineer building web applications and AI tools around your business."
+  },
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "about": "About",
+    "contact": "Contact",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu"
+  },
+  "home": {
+    "badge": "Portfolio under construction — full launch coming soon",
+    "title": "Web applications and AI tools built around your business.",
+    "subtitle": "I'm Ahmed, a Full-Stack AI Engineer. This site is being built in the open — sections arrive milestone by milestone.",
+    "ctaPrimary": "Discuss your project",
+    "ctaSecondary": "Explore selected work",
+    "placeholderTitle": "Selected work",
+    "placeholderBody": "Case studies are being verified and written right now. Check back at the next milestone."
+  },
+  "footer": {
+    "rights": "Code: AGPL-3.0-only · Brand & content: All rights reserved.",
+    "builtWith": "Built in the open with a deterministic software factory."
+  },
+  "theme": {
+    "toggle": "Switch color theme"
+  },
+  "localeSwitcher": {
+    "label": "Language",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for does not exist or has moved.",
+    "backHome": "Back to home"
+  },
+  "about": {
+    "title": "About",
+    "body": "Full story arrives with the content milestone (M3)."
+  },
+  "projects": {
+    "title": "Projects",
+    "body": "Selected case studies are being verified and written (M3)."
+  },
+  "contact": {
+    "title": "Contact",
+    "body": "The contact form is wired in M4. Until then, email is the fastest way to reach me.",
+    "emailLabel": "Email"
+  },
+  "privacy": {
+    "title": "Privacy",
+    "intro": "This privacy policy is delivered in Milestone 3 with the public content. No analytics or tracking scripts run on this site yet; the contact form does not exist yet, so no inquiry data is collected at this stage."
+  }
+}
