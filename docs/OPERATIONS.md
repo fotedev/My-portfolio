@@ -36,6 +36,8 @@ All secrets live in `.env.local` (gitignored) locally and in Vercel project Envi
 | `EMAIL_FROM` | server-only (Edge Function) | Inquiry notification (M4+) | Verified sender address for notification emails. |
 | `CONTACT_EMAIL` | public display value (stored in `site_settings`, editable from `/admin`) | Contact UI | The public contact email shown on the site and used by the copy button / `mailto:` fallback. Initial value: `fote.engineer@gmail.com`. Editable in `/admin/settings`; the env/DB value is the source of truth, not hardcoded copy. |
 | `IP_HASH_SALT` | server-only (Edge Function) | Rate limiting (M4) | Salt for salted SHA-256 of the submitter IP (`ip_hash`). Never store raw IPs. Rotate with the other secrets if compromise is suspected (see §7). |
+| `ALLOWED_ORIGINS` | server-only (Edge Function) | Contact pipeline (M4) | Comma-separated CORS + siteverify hostname allowlist (e.g. `https://fotedev.me,https://fotedev-portfolio.vercel.app,http://localhost:3000`). No wildcards in production. |
+| `OWNER_EMAIL` | server-only (Edge Function) | Inquiry notification (M4+) | Notification recipient; defaults to the `site_settings` contact email when unset. |
 | `NEXT_PUBLIC_SITE_URL` | public (build) | Metadata, canonical URLs, sitemap | Canonical origin, e.g. `https://fotedev.me`. |
 
 Rules:
@@ -92,10 +94,11 @@ Run on the 1st of each month (calendar reminder). Record results as one line in 
 1. **Vercel:** dashboard → Usage — build minutes, bandwidth, function usage, analytics events. **Free-tier limits: TO CAPTURE IN M1 (record with source URL + date: Vercel pricing/limits docs).**
 2. **Supabase:** dashboard → Usage/Reports — database size, storage used, egress, Edge Function invocations, Auth MAUs. **Free-tier limits: TO CAPTURE IN M1 (record with source URL + date: Supabase pricing page).**
 3. **Turnstile / Cloudflare:** widget request volume; **limits: TO CAPTURE IN M1 (record with source URL + date: Cloudflare Turnstile docs).**
-4. **Email provider:** emails sent this month; **plan limits: TO CAPTURE IN M4 (record with source URL + date: chosen provider's pricing page, ADR-0008).**
+4. **Email provider (Resend, ADR-0008):** emails sent this month vs 3,000/mo free tier (100/day); until the M6 key is set this stays 0 (degraded mode — notify is log-only).
 5. **Inquiries growth:** row count vs the daily global cap (50/day expected ceiling ≈ ~1,500/month worst case ≈ ~1.5 MB/inquiries table). If growth is anomalous, check rate-limit counters for abuse.
 6. **Trend vs. thresholds:** any metric > 60% of its free-tier cap → open a GitHub issue titled `[OPS] Quota headroom <metric>` with the numbers and the source URL/date of the cap.
 7. **Backups:** latest Supabase backup timestamp sane; monthly export (§4) done.
+8. **Inquiry purge:** run `supabase/purge_inquiries.sql` (24-month retention, §8) — via the Supabase SQL editor or the Management API; note the deleted-row count (expected 0 for years).
 8. **Domain & email expiries:** `fotedev.me` renewal date and professional-email expiry are recorded in §10 — flag anything inside 60 days.
 
 Behavior when limits are reached (design contract, enforced in M4/M5): writes **fail closed** (contact form returns the generic error + direct-email fallback remains), while the public site stays cached and readable (ISR/edge cache does not depend on Supabase availability).
@@ -119,7 +122,7 @@ Captured from the vendors' own pages — **source URL + capture date** written i
 | Billable-resource allotments | Vercel Hobby | monthly allotment per resource per fair-use guidelines (no single flat figure published on the limits page) | https://vercel.com/docs/limits/fair-use-guidelines | 2026-11-06 |
 | Hobby plan use terms | Vercel | **TO CAPTURE IN M6 — ADR-0002 terms check** (Hobby = non-commercial) | — | — |
 | Turnstile plan | Cloudflare Free | **Unlimited challenges (traffic or verification requests)**; up to 20 widgets; 10 hostnames/widget; 7-day analytics | https://developers.cloudflare.com/turnstile/plans/ | 2026-11-06 |
-| Email sends | Provider chosen in M4 | **TO CAPTURE IN M4** | — | — |
+| Email sends | Resend (ADR-0008) | Free: **3,000 emails/month, 100/day** — currently in degraded mode (no key set; notify = log-only until M6) | https://resend.com/pricing | 2026-11-07 |
 
 **Pausing mitigation (Supabase):** the free project pauses after 1 week of inactivity. Mitigations: (a) public pages are static/ISR-cached, so a paused DB never takes the site down; (b) a scheduled GitHub Action keep-alive ping (any read query, e.g. `select 1`) runs weekly — wired in M2/M5 CI tooling; (c) admin activity during content edits also counts as activity.
 

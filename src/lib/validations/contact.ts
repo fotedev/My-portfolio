@@ -3,6 +3,9 @@ import { z } from "zod";
 /**
  * Contact form schema (prompt-5 §4) — committed + unit-tested in M2, wired to
  * the UI and the `submit-inquiry` Edge Function in M4.
+ *
+ * WIRE CONTRACT: the Edge Function in supabase/functions/submit-inquiry/index.ts
+ * mirrors this schema field-for-field (npm:zod there). Keep both in sync.
  */
 export const serviceKeys = ["web-apps", "ai-doc-tools", "workflow-automation", "other"] as const;
 export const budgetRanges = ["<1k", "1k-3k", "3k-10k", "10k-plus", "unsure"] as const;
@@ -28,10 +31,16 @@ export const contactSchema = z.object({
     .max(2000, "Message must be at most 2000 characters"),
   budgetRange: z.enum(budgetRanges).optional(),
   timeline: z.enum(timelines).optional(),
-  /** Client-generated idempotency token (double-submit dedupe in M4). */
+  /** Client-generated idempotency token (double-submit dedupe). */
   submissionToken: z.string().uuid("Invalid submission token"),
-  /** Must be empty — hidden honeypot field; filled ⇒ bot (Edge Function drops silently). */
-  honeypot: z.literal("", { message: "Honeypot must be empty" }),
+  /**
+   * Hidden honeypot field. The WIRE KEY is `company_website` on purpose
+   * (prompt-5 §3): a field literally named "honeypot" announces the trap to
+   * bots. Filled ⇒ bot — the Edge Function returns 200 and drops silently.
+   */
+  company_website: z.literal("", { message: "Honeypot must be empty" }),
+  /** Turnstile token from the widget (cf-turnstile-response). */
+  turnstileToken: z.string().min(1, "Turnstile token is required").max(2048),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;

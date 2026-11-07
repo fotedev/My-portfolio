@@ -73,7 +73,18 @@ export function Navbar() {
               setIsMenuOpen((open) => !open);
             }}
           >
-            <span aria-hidden="true">{isMenuOpen ? "✕" : "☰"}</span>
+            {/* SVG glyphs (no text) — visible text would violate Label-in-Name */}
+            <span aria-hidden="true" className="inline-flex">
+              {isMenuOpen ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
+                  <path d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </span>
             <span className="sr-only">{isMenuOpen ? t("closeMenu") : t("openMenu")}</span>
           </button>
         </div>

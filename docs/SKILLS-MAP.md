@@ -115,6 +115,7 @@ Measured record — what was actually **opened/loaded**, not what was planned. K
 | M1 | Schema Architect (work done by main — subagent spawn failed on harness quota; deviation logged in RUN_LOG) | `supabase-postgres-best-practices` (conventions applied during authoring) |
 | M2 | Shell implementation (done by main per owner directive; skills loaded in-session) | `react-best-practices`, `tailwindcss-responsive-darkmode`, `limit-any-type`, `coding-standards` |
 | M3 | Public MVP implementation (done by main per owner directive; skills loaded in-session) | `humanizer`, `frontend-design`, `ui-ux-pro-max` (reference), `framer-motion` |
+| M4 | Contact slice implementation (done by main per owner directive; skills loaded in-session) | `turnstile-spin` (canonical siteverify contract; wizard skipped — test-keys decision), `supabase-postgres-best-practices`; `ui-styling`/`react-best-practices`/`playwright-best-practices` not loaded (repo patterns established — rule 6) |
 
 Note: the M0 `Repo Hygienist` assignment lists `organize-root`, but it was **judged by name only and never opened** — the root hygiene (backup, moves, `.gitignore`) was done directly by the main agent following the spec's explicit steps, so the skill's procedure was unnecessary.
 
