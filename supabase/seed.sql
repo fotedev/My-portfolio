@@ -142,7 +142,8 @@ values (
   'application/pdf',
   285463, -- exact local file size in bytes (stat, 2026-11-06)
   'One Million Prompters certificate of completion',
-  'شهادة إتمام مبادرة مليون خيّر لأوامر الذكاء الاصطناعي'
+  'شهادة إتمام مبادرة مليون خيّر لأوامر الذكاء الاصطناعي',
+  false
 )
 on conflict (bucket, storage_path) do update
   set mime_type = excluded.mime_type,
@@ -159,7 +160,7 @@ on conflict (bucket, storage_path) do update
 -- ============================================================================
 insert into public.credentials (kind, recipient_name, issued_at, credential_id, verification_url,
                                 proof_url, asset_media_id, sort_order, status)
-values (
+select
   'certificate',
   'Ahmed Aboalyoun',        -- exactly as printed on the PDF (Latin script)
   null, null, null,          -- TO VERIFY ×3
@@ -167,7 +168,6 @@ values (
   (select id from public.media_assets where bucket = 'public-assets' and storage_path = 'certificates/omp-certificate.pdf'),
   1,
   'draft'                    -- draft until Ahmed confirms the entry at GATE 2
-)
 where not exists (select 1 from public.credentials c where c.proof_url = 'https://dub.ai/omp');
 
 insert into public.credential_translations (credential_id, locale, title, issuer_display, summary)

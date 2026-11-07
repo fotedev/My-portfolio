@@ -1,7 +1,7 @@
 # ADR-0006 — Supabase region selection
 
-**Status:** Proposed — confirmed at M1 Step 0 (region recorded here once the project is created)
-**Date:** 2026-11-06
+**Status:** Accepted — confirmed at M1 Step 0
+**Date:** 2026-11-06 (confirmed 2026-11-07)
 **Deciders:** Ahmed Aboalayoun, engineering agent
 
 ## Context
@@ -19,4 +19,4 @@ All public pages are statically cached at the CDN (docs/ARCHITECTURE.md §5), so
 - Egypt/Gulf users get the best achievable first-byte latency for dynamic interactions.
 - If `me-central-1` is not offered, `eu-central-1` adds modest latency (~30–60 ms) for Gulf users on dynamic paths only; acceptable and documented here.
 - Region choice is effectively permanent for the project's life; changing it later requires a data migration (accepted, given the static-first architecture).
-- **Confirmation record (to be filled at Step 0):** region offered / selected: `TO CONFIRM`, project ref: `TO CONFIRM`.
+- **Confirmation record (filled at Step 0, 2026-11-07):** region selected: **`eu-central-1`** · project ref: **`zfhfeiqdsugjqliufhke`** · org: `zhujtufyfpjmyftruahv` (fotedev-portfolio) · status ACTIVE_HEALTHY, Postgres 17.11. First project attempt (`prfcjdsgrgabgkegwjfv`, same region) came up INACTIVE and was abandoned (archived dead ref — never used).

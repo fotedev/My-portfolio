@@ -30,6 +30,21 @@ begin
 end;
 $$;
 
+-- ============================================================================
+-- 2. Admin allowlist (ADR-0007) — created BEFORE is_admin() (SQL bodies are
+--    validated at creation time and reference this table)
+-- ============================================================================
+create table public.admin_users (
+  user_id  uuid primary key,
+  added_at timestamptz not null default now(),
+  note     text
+);
+alter table public.admin_users enable row level security;
+-- No policies on purpose: only the security-definer is_admin() and the
+-- service role may read it. Revokes below are defense in depth.
+revoke all on public.admin_users from anon;
+revoke all on public.admin_users from authenticated;
+
 -- Single-admin allowlist check (ADR-0007). SECURITY DEFINER so it can read
 -- admin_users even though admin_users itself has no RLS policies.
 create or replace function public.is_admin()
@@ -43,20 +58,6 @@ as $$
     select 1 from public.admin_users au where au.user_id = auth.uid()
   );
 $$;
-
--- ============================================================================
--- 2. Admin allowlist (ADR-0007)
--- ============================================================================
-create table public.admin_users (
-  user_id  uuid primary key,
-  added_at timestamptz not null default now(),
-  note     text
-);
-alter table public.admin_users enable row level security;
--- No policies on purpose: only the security-definer is_admin() and the
--- service role may read it. Revokes below are defense in depth.
-revoke all on public.admin_users from anon;
-revoke all on public.admin_users from authenticated;
 
 -- ============================================================================
 -- 3. Site settings (singleton) + translations
@@ -355,6 +356,9 @@ create table public.schema_migrations (
   name       text not null,
   applied_at timestamptz not null default now()
 );
+alter table public.schema_migrations enable row level security;
+create policy "schema_migrations_admin_read" on public.schema_migrations
+  for select to authenticated using (public.is_admin());
 insert into public.schema_migrations (version, name) values ('0001', 'initial_schema')
 on conflict (version) do nothing;
 
@@ -416,7 +420,14 @@ set search_path = ''
 as $$
 declare
   v_has_ar boolean;
-  v_translations_table text := tg_table_name || '_translations';
+  -- translation-table names are not uniformly "<base>_translations":
+  -- projects → project_translations, credentials → credential_translations, posts → posts_translations
+  v_translations_table text := case tg_table_name
+    when 'projects'    then 'project_translations'
+    when 'credentials' then 'credential_translations'
+    when 'posts'       then 'posts_translations'
+    else tg_table_name || '_translations'
+  end;
   v_fk_column          text := regexp_replace(tg_table_name, 's$', '') || '_id';
 begin
   if new.status <> 'published' then
@@ -477,7 +488,7 @@ create policy "projects_admin_all" on public.projects
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "project_tr_anon_read" on public.project_translations
   for select to anon using (
-    exists (select 1 from public.projects p where p.id = project_id and p.status = 'published')
+    exists (select 1 from public.projects p where p.id = project_translations.project_id and p.status = 'published')
   );
 create policy "project_tr_admin_all" on public.project_translations
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
@@ -489,7 +500,7 @@ create policy "services_admin_all" on public.services
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "service_tr_anon_read" on public.service_translations
   for select to anon using (
-    exists (select 1 from public.services s where s.id = service_id and s.is_active = true)
+    exists (select 1 from public.services s where s.id = service_translations.service_id and s.is_active = true)
   );
 create policy "service_tr_admin_all" on public.service_translations
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
@@ -501,7 +512,8 @@ create policy "credentials_admin_all" on public.credentials
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "credential_tr_anon_read" on public.credential_translations
   for select to anon using (
-    exists (select 1 from public.credentials c where c.id = credential_id and c.status = 'published')
+    -- qualified: credentials also has a text column named credential_id — never rely on unqualified scope
+    exists (select 1 from public.credentials c where c.id = credential_translations.credential_id and c.status = 'published')
   );
 create policy "credential_tr_admin_all" on public.credential_translations
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
@@ -513,7 +525,7 @@ create policy "contributions_admin_all" on public.contributions
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "contribution_tr_anon_read" on public.contribution_translations
   for select to anon using (
-    exists (select 1 from public.contributions c where c.id = contribution_id and c.is_published = true)
+    exists (select 1 from public.contributions c where c.id = contribution_translations.contribution_id and c.is_published = true)
   );
 create policy "contribution_tr_admin_all" on public.contribution_translations
   for all to authenticated using (public.is_admin()) with check (public.is_admin());

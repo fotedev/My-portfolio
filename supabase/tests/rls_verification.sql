@@ -18,6 +18,8 @@ create temp table rls_results (
   pass     boolean,
   detail   text
 );
+-- the temp table is owned by the connecting role; allow all simulated roles to record results
+grant select, insert, update on rls_results to anon, authenticated, service_role;
 
 -- ============================================================================
 -- Fixtures (service role bypasses RLS)
@@ -72,15 +74,16 @@ do $$
 declare
   r1 boolean; r2 boolean; r3 boolean; r4 boolean; r_other boolean; r_reset boolean;
 begin
+  -- calls 1–3 of 3 allowed: the perform is #1, r1 is #2, r2 is #3
   perform public.check_and_increment_rate_limit('test:net:fixture', 600, 3);
-  r1 := public.check_and_increment_rate_limit('test:net:fixture', 600, 3); -- 2
-  r2 := public.check_and_increment_rate_limit('test:net:fixture', 600, 3); -- 3
-  r3 := public.check_and_increment_rate_limit('test:net:fixture', 600, 3); -- 4 → blocked
-  r4 := public.check_and_increment_rate_limit('test:net:fixture', 600, 3); -- 5 → blocked
+  r1 := public.check_and_increment_rate_limit('test:net:fixture', 600, 3); -- call 2 → allowed
+  r2 := public.check_and_increment_rate_limit('test:net:fixture', 600, 3); -- call 3 → allowed (at limit)
+  r3 := public.check_and_increment_rate_limit('test:net:fixture', 600, 3); -- call 4 → blocked
+  r4 := public.check_and_increment_rate_limit('test:net:fixture', 600, 3); -- call 5 → blocked
   r_other := public.check_and_increment_rate_limit('test:other:fixture', 600, 3); -- independent key
   delete from public.rate_limit_counters where key = 'test:net:fixture';  -- simulate window reset
   r_reset := public.check_and_increment_rate_limit('test:net:fixture', 600, 3);
-  if r1 and r2 and r3 and (not r4) and r_other and r_reset then
+  if r1 and r2 and (not r3) and (not r4) and r_other and r_reset then
     insert into rls_results (check_no, name, pass, detail)
     values (2, 'rate limit allows up to limit then blocks; keys independent; window reset works',
             true, format('seq=%s,%s,%s,over=%s other=%s reset=%s', r1, r2, r3, r4, r_other, r_reset));
@@ -160,20 +163,30 @@ begin
   end;
 end $$;
 
+-- counters are SQL-level revoked from anon (defense in depth) → expect permission denied OR empty
 do $$
-declare n integer;
+declare n integer := -1;
 begin
-  select count(*) into n from public.rate_limit_counters;
+  begin
+    select count(*) into n from public.rate_limit_counters;
+  exception when insufficient_privilege then
+    n := -1; -- denied at SQL level
+  end;
   insert into rls_results (check_no, name, pass, detail)
-  values (9, 'anon SELECT rate_limit_counters → denied/empty', n = 0, format('rows=%s', n));
+  values (9, 'anon SELECT rate_limit_counters → denied/empty', n = 0 or n = -1, format('rows=%s', n));
 end $$;
 
+-- admin_users is SQL-level revoked from anon (defense in depth) → same dual expectation
 do $$
-declare n integer;
+declare n integer := -1;
 begin
-  select count(*) into n from public.admin_users;
+  begin
+    select count(*) into n from public.admin_users;
+  exception when insufficient_privilege then
+    n := -1; -- denied at SQL level
+  end;
   insert into rls_results (check_no, name, pass, detail)
-  values (10, 'anon SELECT admin_users → denied/empty', n = 0, format('rows=%s', n));
+  values (10, 'anon SELECT admin_users → denied/empty', n = 0 or n = -1, format('rows=%s', n));
 end $$;
 
 do $$

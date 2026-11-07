@@ -3,7 +3,20 @@
 Operational runbook for the `fotedev` portfolio (`fotedev/My-portfolio`, live at `https://fotedev.me`).
 Owner/operator: Ahmed Aboalayoun (single admin, see `docs/decisions/ADR-0005-single-admin-no-page-builder.md`).
 
-Status: **M1 in progress.** Supabase Free-plan limits were captured live from vendor pages on **2026-11-06** (§6); Vercel / Cloudflare / email-provider limits remain placeholders until captured the same way — numbers are never guessed (see §6).
+Status: **M1 complete (schema + RLS proven + seeded).** Supabase Free-plan limits were captured live from vendor pages on **2026-11-06** (§6).
+
+## 0. Supabase project record
+
+| Item | Value |
+|---|---|
+| Organization | `zhujtufyfpjmyftruahv` — **fotedev-portfolio** |
+| Project ref | **`zfhfeiqdsugjqliufhke`** ("My-portfolio") |
+| Region | `eu-central-1` (ADR-0006) |
+| Postgres | 17.11 · status ACTIVE_HEALTHY (verified 2026-11-07) |
+| Access in-session | `SUPABASE_ACCESS_TOKEN` in repo-local `.env.local` (gitignored) → Management API (`api.supabase.com`); **token is scoped to the fotedev-portfolio org only — khalat/Masar X projects are unreachable by it by design** |
+| MCP wiring | `~/.zcode/cli/config.json` `mcp.servers.supabase` repointed to this ref + same token (takes effect on next session; the old `supabase-masarx` server stays untouched/off-limits) |
+| RLS verification | `supabase/tests/rls_verification.sql` — **20/20 PASS** on 2026-11-07 (results pasted in the M1 PR); RLS enabled on **18/18** tables |
+| Storage | bucket `public-assets` (public read, admin write; images ≤ 2 MB, PDFs ≤ 10 MB, MIME whitelist); certificate at `public-assets/certificates/omp-certificate.pdf` (285,463 bytes, public fetch verified 2026-11-07) |
 
 ---
 
