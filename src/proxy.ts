@@ -67,6 +67,9 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
     // Belt and braces (SEO-I18N §7.3): header + admin layout meta.
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
+    // Draft previews / admin responses must never be CDN- or proxy-cached
+    // (prompt-6 §5): private cache only.
+    response.headers.set("Cache-Control", "private, no-store");
     return response;
   }
 

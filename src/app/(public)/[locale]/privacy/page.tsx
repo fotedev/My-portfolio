@@ -4,7 +4,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { isLocale, toLocale, type Locale } from "@/lib/i18n/routing";
 import { routeMetadata } from "@/lib/seo";
 
-export const revalidate = 3600;
+// On-demand ISR (prompt-6 §4 / ARCHITECTURE §5.1): no time-based revalidation —
+// admin publishes revalidate these paths explicitly via revalidatePath.
+export const revalidate = false;
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;

@@ -145,7 +145,7 @@ Rotate when: a key may have leaked, an offboarding/change occurs, or at least **
 - **Retention:** inquiries live 24 months from `created_at`, then are purged. The retention policy is documented from M1; the purge script itself is delivered in M4 (when inquiries start flowing). Mechanism: `supabase/purge_inquiries.sql` deletes rows older than 24 months along with their rate-limit artifacts (the requester's `rate_limit_counters` keys: `net:<ip_hash>`, `email:<…>`). Run it monthly (add to §5 checklist) or schedule via the tooling available at that time — record the actual mechanism in M4.
 - **Delete-on-request (GDPR-style, honored on email request):**
   1. Request arrives (any channel). Verify it plausibly identifies the requester (the inquiry email address; ask for confirmation from that address if unclear).
-  2. In `/admin/inquiries`, locate rows by email; either archive + hard-delete after typed confirmation in the admin UI (mechanism as implemented in M5 — the UI states which), or run a parameterized SQL delete for that email via the Supabase SQL editor / script.
+  2. In `/admin/inquiries`, locate rows by email and use the **Purge** action: it hard-deletes the row after the 8-character reference is retyped (RLS policy `inquiries_admin_delete`, migration `0003`). Bulk archive first if several rows belong to the requester. (Alternatively a parameterized SQL delete by email via the Supabase SQL editor.)
   3. Confirm removal (`SELECT count(*) WHERE email = ...` → 0), and purge the requester's `rate_limit_counters` keys (`net:<ip_hash>`, `email:<…>`).
   4. Reply to the requester confirming deletion. Note the action (date + row id) in the RUN_LOG, not the inquiry content.
   5. If the request also covers notification/backup copies: note that monthly backups age out within the 24-month horizon; delete the corresponding dump if it is current-month.
@@ -197,3 +197,35 @@ Symptom: a published edit shows wrong/broken content on the public site, or publ
 ### 11.3 Free-tier quota exhausted
 
 Writes fail closed; the public site stays cached and readable by design. Actions: open `[OPS]` issue per §5.6, decide (cleanup / upgrade / migrate) with Ahmed; until decided, the direct email fallback carries contact traffic.
+
+## 12. Admin & publish pipeline ops (M5)
+
+### 12.1 Publish → visible latency (measured)
+
+The publish gate (ROADMAP §M5): **p95 ≤ 60 s (gating), ≤ 5 s aspiration.** Mechanism: publish server action writes the row, then runs the targeted `revalidatePath` plan (ARCHITECTURE §5.2); the next request re-renders. Measured **publish-click → public URL reflects the change**:
+
+| Run | Where | Publish→visible |
+|---|---|---|
+| 1 | local build (`pnpm start`, same-process revalidation) | 0.49 s |
+| 2 | local build | 0.22 s |
+| 3 | local build | 0.23 s |
+| 4 | full-suite run | 0.31 s |
+| Prod ×3 | **TO RECORD after the M5 production verify** (scratch draft → publish → poll prod URL → unpublish → delete) | — |
+
+Local p50 ≈ 0.23 s — two orders of magnitude under the gate. Public pages run `revalidate = false` (on-demand only, ARCHITECTURE §5.1): nothing goes stale on a timer, and unpublished slugs 404 until publish revalidates their path.
+
+### 12.2 Media uploads
+
+- Limits: images (PNG/JPEG/WEBP/AVIF) ≤ 2 MB, PDF ≤ 10 MB — enforced client-side AND server-side; the server sniffs **magic bytes** (declared Content-Type is never trusted — a renamed HTML/executable is rejected). The bucket's own MIME whitelist + 10 MB cap are the coarse backstop.
+- Both alt texts (EN + AR) are DB-required (`media_assets.alt_en/alt_ar NOT NULL`) — the upload form refuses without them.
+- Path convention: `media/<yyyy-mm>/<uuid>-<slugified-name>.<ext>`. Deleting an asset that a project/credential still references is blocked with a typed error; detach it in the editor first.
+
+### 12.3 Admin login rate limits & retry policy
+
+- Supabase Auth enforces built-in rate limits on `signInWithPassword` (per-IP + per-account); the login form shows one generic "Sign-in failed" message (no user enumeration) and offers no signup.
+- Manual retry policy: after 3 failed attempts, wait 15 minutes before retrying ( Supabase's limits will also throttle); persistent lockout → check Supabase Auth logs (dashboard → Authentication → Logs), reset the password from the dashboard if needed (§7.5 covers credential hygiene).
+- Sessions are cookie-based; expiry mid-edit surfaces as a typed `{ok:false, error:"Your session expired…"}` toast on the next save attempt — reload, sign in again, re-apply the edit (the unsaved-changes guard warns before accidental navigation).
+
+### 12.4 CI/E2E footprint on the live DB
+
+The Playwright suite (CI + local) writes real rows to the production Supabase project: contact specs create test inquiries (subject pattern `CI E2E|RateLimit|Degraded Test|اختبار آلي`) and the admin specs archive/purge them; the publish spec creates a `ci-e2e-<runid>` draft project and unpublishes + deletes it. The global daily rate-limit counter burns ~5–8/day from CI runs (cap 50/day, resets 00:00 UTC) — acceptable; if CI frequency rises, raise the global cap or gate the suite behind a schedule.
