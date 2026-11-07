@@ -7,7 +7,8 @@ const validBase = {
   serviceInterest: "web-apps",
   message: "I need a bilingual dashboard for my small business.",
   submissionToken: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
-  honeypot: "",
+  company_website: "",
+  turnstileToken: "test-token",
 } as const;
 
 describe("contactSchema", () => {
@@ -55,8 +56,16 @@ describe("contactSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects a filled honeypot (bot marker)", () => {
-    const result = contactSchema.safeParse({ ...validBase, honeypot: "http://spam.example" });
+  it("rejects a filled honeypot (bot marker on the stealth wire key)", () => {
+    const result = contactSchema.safeParse({
+      ...validBase,
+      company_website: "http://spam.example",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a missing Turnstile token", () => {
+    const result = contactSchema.safeParse({ ...validBase, turnstileToken: "" });
     expect(result.success).toBe(false);
   });
 });

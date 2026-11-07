@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ContactForm } from "@/components/contact/contact-form";
 import { CopyEmailButton } from "@/components/copy-email-button";
 import { JsonLd } from "@/components/json-ld";
 import { btnPrimary, btnSecondary } from "@/components/ui/cta";
@@ -29,7 +30,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   if (!isLocale(rawLocale)) {
     notFound();
   }
-  const locale: Locale = rawLocale;
+  const locale: Locale = toLocale(rawLocale);
   setRequestLocale(locale);
   const t = await getTranslations("contact");
   const settings = await getSiteSettings(locale);
@@ -69,6 +70,12 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                   className={btnSecondary}
                 />
               </div>
+            </div>
+          )}
+
+          {email && (
+            <div className="mt-10">
+              <ContactForm email={email} />
             </div>
           )}
         </div>

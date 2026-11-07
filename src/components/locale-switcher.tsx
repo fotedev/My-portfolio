@@ -32,7 +32,9 @@ export function LocaleSwitcher() {
         <button
           key={l}
           type="button"
-          aria-label={t("switchToAria", { name: localeNames[l] })}
+          // Content-based naming (WCAG 2.5.3 Label-in-Name): the accessible
+          // name comes from the button's own text (sr-only + visible token),
+          // so the visible "EN"/"ع" is always part of it.
           title={t("switchToAria", { name: localeNames[l] })}
           aria-current={l === locale ? "true" : undefined}
           onClick={() => {
@@ -42,7 +44,8 @@ export function LocaleSwitcher() {
             l === locale ? "bg-accent-strong text-white" : "bg-surface hover:bg-background"
           }`}
         >
-          {localeLabels[l]}
+          <span className="sr-only">{t("switchToAria", { name: localeNames[l] })}</span>
+          <span aria-hidden="true">{localeLabels[l]}</span>
         </button>
       ))}
     </div>

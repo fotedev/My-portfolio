@@ -14,9 +14,12 @@
   --surface-elevated: #ffffff;
   --border-subtle: #e2e8f0;
   --border-strong: #cbd5e1;
+  --border-interactive: #64748b;
   --foreground: #0f172a;
   --muted-foreground: #475569;
-  --accent: #0284c7;
+  /* Light accent = DESIGN §2.2 #2563EB (5.1:1 on white) — #0284c7 was 4.09:1
+     and failed WCAG AA as text; caught by the M4 axe E2E. */
+  --accent: #2563eb;
   --accent-strong: #2563eb;
   --accent-foreground: #ffffff;
   --accent-subtle: rgba(37, 99, 235, 0.08);
@@ -29,7 +32,7 @@
   --warning-bg: rgba(245, 158, 11, 0.12);
   --danger: #dc2626;
   --danger-text: #b91c1c;
-  --ring: #0284c7;
+  --ring: #2563eb;
   --code-background: #f1f5f9;
   /* The ONLY permitted gradient — hero decorative wash (DESIGN §2.2) */
   --hero-wash: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(14, 116, 144, 0.04));
@@ -41,6 +44,7 @@
   --surface-elevated: #111827;
   --border-subtle: #1f2a3d;
   --border-strong: #334155;
+  --border-interactive: #64748b;
   --foreground: #f8fafc;
   --muted-foreground: #94a3b8;
   --accent: #22d3ee;
@@ -67,6 +71,7 @@
   --color-surface-elevated: var(--surface-elevated);
   --color-border-subtle: var(--border-subtle);
   --color-border-strong: var(--border-strong);
+  --color-border-interactive: var(--border-interactive);
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);

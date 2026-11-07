@@ -1,29 +1,10 @@
-import { createServerClient } from "@supabase/ssr";
-import type { Metadata } from "next";
-import { cookies } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-};
-
-/** Admin home stub (M2). Real dashboard arrives in M5. */
+/** Admin home (M2 shell + M4 hardening): session AND allowlist enforced. */
 export default async function AdminHomePage() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll() {
-          // Server components cannot set cookies; middleware refreshes sessions.
-        },
-      },
-    },
-  );
+  const supabase = await createSupabaseServerClient();
 
   const {
     data: { user },
@@ -33,11 +14,30 @@ export default async function AdminHomePage() {
     redirect("/admin/login");
   }
 
+  // Defense in depth with the proxy gate: RLS enforces the allowlist for
+  // data; this screen also refuses non-admins outright.
+  const { data: isAdmin } = await supabase.rpc("is_admin");
+  if (!isAdmin) {
+    return (
+      <section>
+        <h1 className="text-2xl font-semibold">Not authorized</h1>
+        <p className="mt-2 text-muted-foreground">
+          {user.email} is signed in but is not on the admin allowlist. Ask the owner to add this
+          account to <code>admin_users</code>.
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section>
       <h1 className="text-2xl font-semibold">Signed in</h1>
       <p className="mt-2 text-muted-foreground">
-        {user.email} — dashboard ships in M5 (projects, services, credentials, inbox, settings).
+        {user.email} — inbox is live at{" "}
+        <Link href="/admin/inquiries" className="text-accent underline underline-offset-4">
+          /admin/inquiries
+        </Link>
+        ; full CRUD (projects, services, credentials, settings) ships in M5.
       </p>
     </section>
   );
