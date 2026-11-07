@@ -3,7 +3,20 @@
 Operational runbook for the `fotedev` portfolio (`fotedev/My-portfolio`, live at `https://fotedev.me`).
 Owner/operator: Ahmed Aboalayoun (single admin, see `docs/decisions/ADR-0005-single-admin-no-page-builder.md`).
 
-Status: **M0 draft.** Free-tier numeric limits are intentionally left as placeholders until they are captured live from vendor pages in **Milestone 1** — numbers are never guessed (see §6).
+Status: **M1 complete (schema + RLS proven + seeded).** Supabase Free-plan limits were captured live from vendor pages on **2026-11-06** (§6).
+
+## 0. Supabase project record
+
+| Item | Value |
+|---|---|
+| Organization | `zhujtufyfpjmyftruahv` — **fotedev-portfolio** |
+| Project ref | **`zfhfeiqdsugjqliufhke`** ("My-portfolio") |
+| Region | `eu-central-1` (ADR-0006) |
+| Postgres | 17.11 · status ACTIVE_HEALTHY (verified 2026-11-07) |
+| Access in-session | `SUPABASE_ACCESS_TOKEN` in repo-local `.env.local` (gitignored) → Management API (`api.supabase.com`); **token is scoped to the fotedev-portfolio org only — khalat/Masar X projects are unreachable by it by design** |
+| MCP wiring | `~/.zcode/cli/config.json` `mcp.servers.supabase` repointed to this ref + same token (takes effect on next session; the old `supabase-masarx` server stays untouched/off-limits) |
+| RLS verification | `supabase/tests/rls_verification.sql` — **20/20 PASS** on 2026-11-07 (results pasted in the M1 PR); RLS enabled on **18/18** tables |
+| Storage | bucket `public-assets` (public read, admin write; images ≤ 2 MB, PDFs ≤ 10 MB, MIME whitelist); certificate at `public-assets/certificates/omp-certificate.pdf` (285,463 bytes, public fetch verified 2026-11-07) |
 
 ---
 
@@ -62,7 +75,7 @@ Supabase schema note: schema changes are forward-compatible (migrations only, no
 
 ## 4. Supabase backup & retention
 
-- **Managed backups:** the Supabase free tier's built-in backup schedule is limited and can change — **TO CAPTURE IN M1 (record with source URL + date: Supabase docs, "Backups"/pricing page, current free-tier retention window)**. Do not assume daily backups exist.
+- **Managed backups:** none on the Free plan (checked 2026-11-06). Supabase: "We automatically back up all Pro, Team, and Enterprise Plan projects on a daily basis" (https://supabase.com/docs/guides/platform/backups); the pricing page lists Free automatic backups as "Not included" (https://supabase.com/pricing); and "Database backups are not available for download for Free Plan projects" (https://supabase.com/docs/guides/platform/going-into-prod). Supabase's own recommendation for Free projects is regular `supabase db dump` exports — which is exactly the owner-run routine below. Do not assume daily backups exist.
 - **Self-service exports (owner-run, monthly, ~5 minutes):**
   1. Supabase dashboard → Database → Backups: note latest available backup timestamp.
   2. Export content tables to a local timestamped folder (SQL dump or CSV of `site_settings`, `projects`, `services`, `credentials`, `contributions`, `media_assets` metadata): `supabase db dump --data-only -f backup-YYYYMMDD.sql` (or Table Editor CSV exports).
@@ -87,22 +100,30 @@ Run on the 1st of each month (calendar reminder). Record results as one line in 
 
 Behavior when limits are reached (design contract, enforced in M4/M5): writes **fail closed** (contact form returns the generic error + direct-email fallback remains), while the public site stays cached and readable (ISR/edge cache does not depend on Supabase availability).
 
-## 6. Free-tier limits table — placeholders
+## 6. Free-tier limits table
 
-Every number below must be captured from the vendor's own page in M1 (and re-checked in M6), with **source URL + capture date** written inline. Do not fill from memory; vendor limits change.
+Captured from the vendors' own pages — **source URL + capture date** written inline. Do not fill from memory; vendor limits change. Re-checked in M6.
 
 | Resource | Provider | Limit | Source URL | Captured on |
 |---|---|---|---|---|
-| DB size | Supabase | **TO CAPTURE IN M1** | — | — |
-| Storage (files) | Supabase | **TO CAPTURE IN M1** | — | — |
-| Bandwidth/egress | Supabase | **TO CAPTURE IN M1** | — | — |
-| Edge Function invocations | Supabase | **TO CAPTURE IN M1** | — | — |
-| Auth MAUs | Supabase | **TO CAPTURE IN M1** | — | — |
-| Build minutes | Vercel | **TO CAPTURE IN M1** | — | — |
-| Bandwidth | Vercel | **TO CAPTURE IN M1** | — | — |
+| DB size | Supabase | 500 MB (shared CPU, 500 MB RAM) | https://supabase.com/pricing | 2026-11-06 |
+| Storage (files) | Supabase | 1 GB | https://supabase.com/pricing | 2026-11-06 |
+| Bandwidth/egress | Supabase | 5 GB egress + 5 GB cached egress | https://supabase.com/pricing | 2026-11-06 |
+| Edge Function invocations | Supabase | 500,000 / month included | https://supabase.com/pricing | 2026-11-06 |
+| Auth MAUs | Supabase | 50,000 / month | https://supabase.com/pricing | 2026-11-06 |
+| Project pausing | Supabase | Free projects pause after **1 week of inactivity**; max **2 active projects** | https://supabase.com/pricing | 2026-11-06 |
+| Max file upload | Supabase | 50 MB (platform max; our bucket caps at 10 MB — `0001_initial_schema.sql`) | https://supabase.com/pricing | 2026-11-06 |
+| Deployments per day | Vercel Hobby | 100 / day (also 100 / hour build rate limit) | https://vercel.com/docs/limits | 2026-11-06 |
+| Build time per deployment | Vercel Hobby | 45 minutes max; 1 concurrent build | https://vercel.com/docs/limits | 2026-11-06 |
+| Function duration (Fluid) | Vercel Hobby | 300 s default and max; 2 GB RAM / 1 vCPU | https://vercel.com/docs/limits | 2026-11-06 |
+| Billable-resource allotments | Vercel Hobby | monthly allotment per resource per fair-use guidelines (no single flat figure published on the limits page) | https://vercel.com/docs/limits/fair-use-guidelines | 2026-11-06 |
 | Hobby plan use terms | Vercel | **TO CAPTURE IN M6 — ADR-0002 terms check** (Hobby = non-commercial) | — | — |
-| Turnstile widget requests | Cloudflare | **TO CAPTURE IN M1** | — | — |
+| Turnstile plan | Cloudflare Free | **Unlimited challenges (traffic or verification requests)**; up to 20 widgets; 10 hostnames/widget; 7-day analytics | https://developers.cloudflare.com/turnstile/plans/ | 2026-11-06 |
 | Email sends | Provider chosen in M4 | **TO CAPTURE IN M4** | — | — |
+
+**Pausing mitigation (Supabase):** the free project pauses after 1 week of inactivity. Mitigations: (a) public pages are static/ISR-cached, so a paused DB never takes the site down; (b) a scheduled GitHub Action keep-alive ping (any read query, e.g. `select 1`) runs weekly — wired in M2/M5 CI tooling; (c) admin activity during content edits also counts as activity.
+
+**Backup reality (Supabase Free):** no automatic backups — monthly owner-run `supabase db dump` exports per §4.
 
 ## 7. Secret rotation
 
