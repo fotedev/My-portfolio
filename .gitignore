@@ -26,3 +26,12 @@ Thumbs.db
 
 # ZCode session tooling (local only)
 .zcode/
+
+# Playwright MCP session artifacts
+.playwright-mcp/
+
+# Supabase CLI local state
+supabase/.temp/
+
+# TypeScript incremental build info
+tsconfig.tsbuildinfo
