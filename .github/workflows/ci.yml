@@ -18,6 +18,7 @@ concurrency:
 jobs:
   ci:
     name: CI
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,6 +54,7 @@ jobs:
 
   e2e:
     name: E2E
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     # Serial suite sharing the remote function's rate-limit windows — one
     # runner at a time (concurrency group below also dedupes per ref).
