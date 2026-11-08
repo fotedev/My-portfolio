@@ -39,3 +39,6 @@ tsconfig.tsbuildinfo
 # Playwright test artifacts (local only)
 test-results/
 playwright-report/
+
+# Local Netlify folder
+.netlify
