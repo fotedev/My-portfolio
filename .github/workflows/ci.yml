@@ -4,6 +4,12 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      netlify_base_url:
+        description: "Netlify spike base URL (https://<site>.netlify.app)"
+        required: true
+        type: string
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -83,4 +89,41 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://fotedev.me
           # Optional: enables the /admin/inquiries assertions when present.
+          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+
+  # M6 spike only (ADR-0002): verify the Netlify trial deployment — admin
+  # login, draft→publish→visible on-demand ISR, contact pipeline, EN/AR
+  # render. Targets the ALREADY DEPLOYED site (no build, no webServer).
+  # Skips the 429/honeypot specs (Edge-Function-side, already proven) to
+  # conserve the production rate-limit quota. Runs on workflow_dispatch.
+  e2e-netlify:
+    name: E2E (Netlify spike)
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    concurrency:
+      group: e2e-netlify-${{ github.event.inputs.netlify_base_url }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Playwright tests against Netlify spike
+        run: pnpm exec playwright test e2e/z-admin-publish.spec.ts e2e/contact.en.spec.ts e2e/contact.ar.spec.ts --grep-invert "429|honeypot|degraded mode" --output "$RUNNER_TEMP/pw-output"
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.netlify_base_url }}
+          NEXT_PUBLIC_SUPABASE_URL: https://zfhfeiqdsugjqliufhke.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_URL: ${{ github.event.inputs.netlify_base_url }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
