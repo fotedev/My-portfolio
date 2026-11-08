@@ -120,7 +120,9 @@ Captured from the vendors' own pages — **source URL + capture date** written i
 | Build time per deployment | Vercel Hobby | 45 minutes max; 1 concurrent build | https://vercel.com/docs/limits | 2026-11-06 |
 | Function duration (Fluid) | Vercel Hobby | 300 s default and max; 2 GB RAM / 1 vCPU | https://vercel.com/docs/limits | 2026-11-06 |
 | Billable-resource allotments | Vercel Hobby | monthly allotment per resource per fair-use guidelines (no single flat figure published on the limits page) | https://vercel.com/docs/limits/fair-use-guidelines | 2026-11-06 |
-| Hobby plan use terms | Vercel | **TO CAPTURE IN M6 — ADR-0002 terms check** (Hobby = non-commercial) | — | — |
+| Hobby plan use terms | Vercel | **Non-commercial only — does NOT permit this portfolio.** Fair Use Guidelines: commercial usage requires Pro/Enterprise; "advertising the sale of a product or service" counts as commercial. Pro fallback priced at $20/mo per developer seat. | https://vercel.com/docs/limits/fair-use-guidelines | 2026-11-08 |
+| Free plan (credit system) | Netlify | 300 credits/month; production deploy = 15 credits; bandwidth = 20 credits/GB (≈ 15 GB/month if bandwidth-only); deploy previews unlimited. Migration pending the M6 spike (ADR-0002). | https://www.netlify.com/pricing | 2026-11-08 |
+| Commercial use on Free | Netlify | Explicitly permitted — "you can deploy commercial projects, no credit card required and no fees. Ever."; ToS/AUP restrict unlawful use and reselling only. | https://www.netlify.com/pricing · https://www.netlify.com/legal/terms-of-use | 2026-11-08 |
 | Turnstile plan | Cloudflare Free | **Unlimited challenges (traffic or verification requests)**; up to 20 widgets; 10 hostnames/widget; 7-day analytics | https://developers.cloudflare.com/turnstile/plans/ | 2026-11-06 |
 | Email sends | Resend (ADR-0008) | Free: **3,000 emails/month, 100/day** — currently in degraded mode (no key set; notify = log-only until M6) | https://resend.com/pricing | 2026-11-07 |
 
