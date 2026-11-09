@@ -93,13 +93,13 @@ jobs:
           # Optional: enables the /admin/inquiries assertions when present.
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
 
-  # M6 spike only (ADR-0002): verify the Netlify trial deployment — admin
-  # login, draft→publish→visible on-demand ISR, contact pipeline, EN/AR
-  # render. Targets the ALREADY DEPLOYED site (no build, no webServer).
-  # Skips the 429/honeypot specs (Edge-Function-side, already proven) to
-  # conserve the production rate-limit quota. Runs on workflow_dispatch.
+  # Verify a remote deployment (Netlify) on demand — admin login, draft→
+  # publish→visible on-demand ISR, contact pipeline, EN/AR render. Targets
+  # the ALREADY DEPLOYED site (no build, no webServer). Skips the 429/
+  # honeypot/degraded specs (Edge-Function-side, already proven) to conserve
+  # the production rate-limit quota. Dispatch with netlify_base_url.
   e2e-netlify:
-    name: E2E (Netlify spike)
+    name: E2E (remote target)
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     concurrency:
@@ -121,14 +121,23 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      # Trial-host noindex proof: src/proxy.ts adds X-Robots-Tag on any
-      # non-canonical host — assert it survives the Netlify runtime too.
-      - name: Noindex header check (trial host)
+      # src/proxy.ts adds X-Robots-Tag: noindex on any NON-canonical host
+      # (trial/preview hosts). Assert it — but only for non-canonical hosts,
+      # since the canonical production host must be indexable.
+      - name: Noindex header check (non-canonical hosts only)
         run: |
-          headers=$(curl -sI --max-time 15 "${{ github.event.inputs.netlify_base_url }}")
+          BASE="${{ github.event.inputs.netlify_base_url }}"
+          HOST=$(echo "$BASE" | sed -E 's#https?://##; s#[:/].*$##' | tr '[:upper:]' '[:lower:]')
+          case "$HOST" in
+            fotedev.me|www.fotedev.me)
+              echo "Canonical host $HOST — noindex assertion skipped (must be indexable)."
+              exit 0
+              ;;
+          esac
+          headers=$(curl -sI --max-time 15 "$BASE")
           echo "$headers"
           echo "$headers" | grep -i '^x-robots-tag: *noindex' >/dev/null || {
-            echo "::error::Trial host is not noindexed — expected X-Robots-Tag from src/proxy.ts"
+            echo "::error::Non-canonical host $HOST is not noindexed — expected X-Robots-Tag from src/proxy.ts"
             exit 1
           }
 
