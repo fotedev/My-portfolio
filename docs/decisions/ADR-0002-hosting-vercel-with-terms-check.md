@@ -1,6 +1,6 @@
 # ADR-0002 — Hosting: Vercel, with a mandatory M6 plan-terms check
 
-**Status:** Accepted 2026-11-06 · M6 terms check executed **2026-11-08** (§Verification): Hobby verdict = **FAIL** → Netlify Free spike in progress, Vercel Pro kept as fallback. Final hosting is recorded only after Ahmed approves the spike report.
+**Status:** Accepted 2026-11-06 · M6 terms check executed **2026-11-08** (§Verification): Hobby verdict = **FAIL** · **Final decision 2026-11-10: Netlify Free** — spike passed (§Verification), migration in progress. Vercel Pro remains documented as the evaluated alternative.
 **Deciders:** Ahmed Aboalayoun (owner), spec-driven software factory (M0)
 **Scope:** Locked decision (`prompt-0.md` §2, §3.12) — the hosting *platform preference* is locked; the plan *permitting this use* is verified at M6 before launch.
 
@@ -33,6 +33,13 @@ However, Vercel's **Hobby plan is restricted to non-commercial use**. A portfoli
 - **Known constraint (measured 2026-11-08):** `*.netlify.app` hostnames are TCP-blocked on Ahmed's local network (SNI-based filtering: blocked hosts resolve to the *same* CDN IPs that serve `netlify.com` successfully, `netlify.com` itself connects fine). Consequences: the spike URL is verified from **GitHub Actions CI** (runners reach it), Ahmed views the trial via VPN/hotspot, and a **custom domain on Netlify's CDN is unaffected** by this block (filtering is by hostname, not IP).
 - **Netlify Next.js support evidence:** Netlify officially supports Next.js 16 with App Router, server actions, and the enhanced caching APIs (`revalidateTag`/on-demand ISR) — https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview (updated 2026-02-04) and the "Next.js 16 is ready to deploy on Netlify" changelog (2025-10-21). Known risk class (build succeeds, deploy fails) is exactly what the spike exists to catch.
 - **No DNS was changed for the spike.** `fotedev.me` wiring happens only in the post-approval migration phase.
+
+**Final decision (2026-11-10) — Netlify Free:**
+
+- **Spike result (2026-11-09): PASS.** CI run [42696417212](https://github.com/fotedev/My-portfolio/actions/runs/42696417212) against `https://my-portfolio-fotedev.netlify.app` (branch `m6-netlify-spike`, commit `8cc907d`): 6 tests green in 1m50s — admin login → draft → save → publish → **public page reflected in 1.0 s** (sample 0.959 s; Vercel production samples were 2.66–3.81 s), contact EN/AR happy paths, axe, trial-host noindex asserted, `leftover_ci_rows = 0`. On-demand ISR (`revalidatePath`/`updateTag` on Next 16) works via Netlify's runtime.
+- **Ahmed's confirmation (2026-11-10):** in response to the spike report, Ahmed replied *"you have netlify-mcp now"* — equipping the session with Netlify MCP, which is only meaningful on the Netlify path; recorded here as the written migration decision per the protocol.
+- **Why Netlify over Pro:** spike-proven behavior with better observed latency, $0/mo (budget stays with domain + email), commercial use explicitly permitted. Accepted trade-offs: tighter free-tier ceilings (300 credits/mo; production deploy 15 credits; bandwidth 20 credits/GB ≈ 15 GB/mo bandwidth-only — monthly quota check in `docs/OPERATIONS.md` §5 guards this), loss of Vercel Speed Insights (launch baseline becomes Netlify observability request metrics + first inquiry + uptime), and the local-network SNI block of `*.netlify.app` (custom domains unaffected; verified 2026-11-08/09).
+- **Transition state:** Vercel keeps mirroring `main` as a noindexed fallback mirror (`fotedev-portfolio.vercel.app`) until Ahmed decides to remove it; DNS cutover to Netlify happens only after Ahmed confirms the exact record list at Namecheap.
 
 ## Consequences
 

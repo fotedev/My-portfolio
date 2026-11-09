@@ -46,30 +46,32 @@ Rules:
 - `SUPABASE_SERVICE_ROLE_KEY`, `TURNSTILE_SECRET_KEY`, `EMAIL_PROVIDER_API_KEY`, `IP_HASH_SALT` are **server-only**: never prefixed `NEXT_PUBLIC_`, never imported in client components.
 - Project ref / URL may be recorded in docs; **keys never are** (prompt-0 §3.9).
 
-## 2. Deploy (Vercel)
+## 2. Deploy (Netlify — primary; Vercel mirror during transition)
 
-Preferred path is Git-integrated deployment: push/merge to `main` → Vercel builds and promotes to production automatically. Nothing is deployed ad-hoc "to see if it works".
+Preferred path is Git-integrated deployment: push/merge to `main` → the Netlify site (`my-portfolio-fotedev`) builds and promotes to production automatically. Nothing is deployed ad-hoc "to see if it works".
 
 1. Ensure the PR is merged with **CI green** (lint, typecheck, unit, build — required status check per `.factory/PROTOCOL.md`) and GATE 2 evidence attached.
-2. Confirm Vercel Environment Variables are set for the **Production** scope (names per §1; values in Vercel dashboard, not in repo).
-3. Merge to `main`. Vercel deploys the production build.
+2. Confirm Netlify site environment variables are set (names per §1; values in the Netlify UI/CLI, never in the repo). `NEXT_PUBLIC_SITE_URL=https://fotedev.me` (build-time value — canonical URLs bake into the build).
+3. Merge to `main`. Netlify builds from the linked production branch (set in **Site configuration → Build & deploy → Production branch**; API updates of `build_settings.repo_branch` are refused — change it in the dashboard).
 4. Post-deploy smoke (2 minutes):
    - `https://fotedev.me` loads over HTTPS; `/en` and `/ar` render; theme has no flash on reload.
    - Spot-check one project page and `/contact` (direct email fallback visible even if the form is disabled).
    - `robots.txt` still disallows `/admin`; sitemap lists both locales.
 5. Record the deployment SHA + URL in `.factory/RUN_LOG.md` (and in this file's §10 launch record at M6).
 
-Preview deploys: every PR gets a Vercel preview URL. Preview env vars are set once per project; previews may keep Deployment Protection enabled (production must have it disabled at launch, M6).
+**Transition note (M6):** during the migration window, Vercel continues to build `main` as a noindexed fallback mirror (`fotedev-portfolio.vercel.app`; the in-app noindex rule covers every non-canonical host). Removing the Vercel project is Ahmed's decision after launch is stable. Deploy previews: every PR gets a free Netlify Deploy Preview (unlimited, not credit-billed); Vercel previews continue during the transition.
 
-## 3. Rollback (Vercel)
+**Credit accounting (Netlify):** each production deploy costs 15 credits (300/mo on Free); bandwidth 20 credits/GB. A routine week (CI merges + content publishes) fits comfortably; the monthly quota check (§5) flags pressure before it bites.
 
-Bad publish or regression on production:
+## 3. Rollback (Netlify primary, Vercel mirror secondary)
 
-1. Identify the last known-good production deployment (Vercel dashboard → Deployments → last `READY` production deploy with passing smoke).
-2. **Promote/rollback:** Vercel dashboard → that deployment → "Promote to Production" (or use the Instant Rollback option). This repoints traffic without a rebuild.
-3. CLI equivalent: `vercel rollback <deployment-url> --prod` (or `vercel promote`, matching the current CLI — check `vercel --help` at the time of the incident).
-4. Verify the site renders correctly again; check that `/en` and `/ar` both work.
-5. **Content-cache check:** if the bad content was ISR-cached, run the targeted revalidation from `/admin` (publish an unchanged field on the affected record) or hit the revalidation path for the affected routes (`/[locale]`, `/[locale]/projects`, `/[locale]/projects/[slug]`). Revalidation failure must be **reported, never hidden** (prompt-0 §3.10).
+Bad deploy or regression on production:
+
+1. Identify the last known-good deploy (Netlify **Deploys** list — last `Published` deploy with passing smoke).
+2. **Instant rollback:** Netlify dashboard → that deploy → **Rollback to this deploy** (repoints traffic without a rebuild). API equivalent: `POST /api/v1/sites/{site_id}/deploys/{deploy_id}/restore` — check `netlify api` at incident time.
+3. Verify `https://fotedev.me` renders correctly (`/en` + `/ar`).
+4. **Secondary fallback:** the Vercel mirror still serves the same SHA; if Netlify itself is down, DNS-adjacent options are discussed with Ahmed before any change (never hot-switch DNS under pressure).
+5. **Content-cache check:** if the bad content was ISR-cached, re-publish an unchanged field on the affected record from `/admin` (the publish action re-runs targeted `revalidatePath`/`updateTag`). Revalidation failure must be **reported, never hidden** (prompt-0 §3.10).
 6. Fix forward on a branch → PR → CI → merge. Do not hot-patch production by hand.
 7. Log the incident in `.factory/RUN_LOG.md` (issue/SHA, what regressed, rollback time).
 
@@ -91,7 +93,7 @@ Supabase schema note: schema changes are forward-compatible (migrations only, no
 
 Run on the 1st of each month (calendar reminder). Record results as one line in `.factory/RUN_LOG.md`.
 
-1. **Vercel:** dashboard → Usage — build minutes, bandwidth, function usage, analytics events. **Free-tier limits: TO CAPTURE IN M1 (record with source URL + date: Vercel pricing/limits docs).**
+1. **Netlify (primary host):** team → Usage — credits used vs the 300/mo cap (production deploys 15 credits each, bandwidth 20 credits/GB, deploy previews free/unlimited). Source: https://www.netlify.com/pricing (2026-11-08). Vercel mirror usage checked only while the transition fallback exists.
 2. **Supabase:** dashboard → Usage/Reports — database size, storage used, egress, Edge Function invocations, Auth MAUs. **Free-tier limits: TO CAPTURE IN M1 (record with source URL + date: Supabase pricing page).**
 3. **Turnstile / Cloudflare:** widget request volume; **limits: TO CAPTURE IN M1 (record with source URL + date: Cloudflare Turnstile docs).**
 4. **Email provider (Resend, ADR-0008):** emails sent this month vs 3,000/mo free tier (100/day); until the M6 key is set this stays 0 (degraded mode — notify is log-only).
@@ -134,7 +136,7 @@ Captured from the vendors' own pages — **source URL + capture date** written i
 
 Rotate when: a key may have leaked, an offboarding/change occurs, or at least **every 12 months** as hygiene. Steps:
 
-1. **Supabase keys:** Supabase dashboard → Settings → API. The `anon` key and `service_role` key are re-issued/reset there (current Supabase UI supports legacy JWT secret rotation; capture the exact flow in M1 — record with source URL + date). Update `.env.local` and all Vercel env scopes, then redeploy (§2). Any change to `service_role` requires a redeploy of the Edge Function environment.
+1. **Supabase keys:** Supabase dashboard → Settings → API. The `anon` key and `service_role` key are re-issued/reset there (current Supabase UI supports legacy JWT secret rotation; capture the exact flow in M1 — record with source URL + date). Update `.env.local` and all host env scopes (Netlify; the Vercel mirror while it exists), then redeploy (§2). Any change to `service_role` requires a redeploy of the Edge Function environment.
 2. **Turnstile secret:** Cloudflare dashboard → Turnstile → widget → rotate secret key. Update `TURNSTILE_SECRET_KEY` in the Edge Function env + Vercel.
 3. **Email provider key:** provider dashboard → revoke + create new key → update `EMAIL_PROVIDER_API_KEY`.
 4. **`IP_HASH_SALT`:** rotating it invalidates historical `ip_hash` comparability (old hashes no longer match new ones — rate-limit windows simply reset per hash). Acceptable: `ip_hash` is anti-abuse, not identity. Update env, redeploy function.
