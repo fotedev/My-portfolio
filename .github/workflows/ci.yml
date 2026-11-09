@@ -4,6 +4,12 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      netlify_base_url:
+        description: "Netlify spike base URL (https://<site>.netlify.app)"
+        required: true
+        type: string
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -12,6 +18,7 @@ concurrency:
 jobs:
   ci:
     name: CI
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -47,6 +54,7 @@ jobs:
 
   e2e:
     name: E2E
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     # Serial suite sharing the remote function's rate-limit windows — one
     # runner at a time (concurrency group below also dedupes per ref).
@@ -83,4 +91,61 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://fotedev.me
           # Optional: enables the /admin/inquiries assertions when present.
+          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+
+  # Verify a remote deployment (Netlify) on demand — admin login, draft→
+  # publish→visible on-demand ISR, contact pipeline, EN/AR render. Targets
+  # the ALREADY DEPLOYED site (no build, no webServer). Skips the 429/
+  # honeypot/degraded specs (Edge-Function-side, already proven) to conserve
+  # the production rate-limit quota. Dispatch with netlify_base_url.
+  e2e-netlify:
+    name: E2E (remote target)
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    concurrency:
+      group: e2e-netlify-${{ github.event.inputs.netlify_base_url }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      # src/proxy.ts adds X-Robots-Tag: noindex on any NON-canonical host
+      # (trial/preview hosts). Assert it — but only for non-canonical hosts,
+      # since the canonical production host must be indexable.
+      - name: Noindex header check (non-canonical hosts only)
+        run: |
+          BASE="${{ github.event.inputs.netlify_base_url }}"
+          HOST=$(echo "$BASE" | sed -E 's#https?://##; s#[:/].*$##' | tr '[:upper:]' '[:lower:]')
+          case "$HOST" in
+            fotedev.me|www.fotedev.me)
+              echo "Canonical host $HOST — noindex assertion skipped (must be indexable)."
+              exit 0
+              ;;
+          esac
+          headers=$(curl -sI --max-time 15 "$BASE")
+          echo "$headers"
+          echo "$headers" | grep -i '^x-robots-tag: *noindex' >/dev/null || {
+            echo "::error::Non-canonical host $HOST is not noindexed — expected X-Robots-Tag from src/proxy.ts"
+            exit 1
+          }
+
+      - name: Playwright tests against Netlify spike
+        run: pnpm exec playwright test e2e/z-admin-publish.spec.ts e2e/contact.en.spec.ts e2e/contact.ar.spec.ts --grep-invert "429|honeypot|degraded mode" --output "$RUNNER_TEMP/pw-output"
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.netlify_base_url }}
+          NEXT_PUBLIC_SUPABASE_URL: https://zfhfeiqdsugjqliufhke.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_URL: ${{ github.event.inputs.netlify_base_url }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
