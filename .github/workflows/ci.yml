@@ -6,8 +6,8 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
-      netlify_base_url:
-        description: "Netlify spike base URL (https://<site>.netlify.app)"
+      remote_base_url:
+        description: "Deployed base URL to verify (e.g. https://fotedev.me)"
         required: true
         type: string
 
@@ -93,17 +93,18 @@ jobs:
           # Optional: enables the /admin/inquiries assertions when present.
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
 
-  # Verify a remote deployment (Netlify) on demand — admin login, draft→
-  # publish→visible on-demand ISR, contact pipeline, EN/AR render. Targets
-  # the ALREADY DEPLOYED site (no build, no webServer). Skips the 429/
-  # honeypot/degraded specs (Edge-Function-side, already proven) to conserve
-  # the production rate-limit quota. Dispatch with netlify_base_url.
+  # Verify a remote deployment on demand (introduced for the M6 hosting
+  # spike, kept for production verification) — admin login, draft→publish→
+  # visible on-demand ISR, contact pipeline, EN/AR render. Targets the
+  # ALREADY DEPLOYED site (no build, no webServer). Skips the 429/honeypot/
+  # degraded specs (Edge-Function-side, already proven) to conserve the
+  # production rate-limit quota. Dispatch with remote_base_url.
   e2e-netlify:
     name: E2E (remote target)
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     concurrency:
-      group: e2e-netlify-${{ github.event.inputs.netlify_base_url }}
+      group: e2e-netlify-${{ github.event.inputs.remote_base_url }}
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
@@ -126,7 +127,7 @@ jobs:
       # since the canonical production host must be indexable.
       - name: Noindex header check (non-canonical hosts only)
         run: |
-          BASE="${{ github.event.inputs.netlify_base_url }}"
+          BASE="${{ github.event.inputs.remote_base_url }}"
           HOST=$(echo "$BASE" | sed -E 's#https?://##; s#[:/].*$##' | tr '[:upper:]' '[:lower:]')
           case "$HOST" in
             fotedev.me|www.fotedev.me)
@@ -141,11 +142,11 @@ jobs:
             exit 1
           }
 
-      - name: Playwright tests against Netlify spike
+      - name: Playwright tests against remote target
         run: pnpm exec playwright test e2e/z-admin-publish.spec.ts e2e/contact.en.spec.ts e2e/contact.ar.spec.ts --grep-invert "429|honeypot|degraded mode" --output "$RUNNER_TEMP/pw-output"
         env:
-          PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.netlify_base_url }}
+          PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.remote_base_url }}
           NEXT_PUBLIC_SUPABASE_URL: https://zfhfeiqdsugjqliufhke.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_SITE_URL: ${{ github.event.inputs.netlify_base_url }}
+          NEXT_PUBLIC_SITE_URL: ${{ github.event.inputs.remote_base_url }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
