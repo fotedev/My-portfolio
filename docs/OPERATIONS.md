@@ -46,32 +46,32 @@ Rules:
 - `SUPABASE_SERVICE_ROLE_KEY`, `TURNSTILE_SECRET_KEY`, `EMAIL_PROVIDER_API_KEY`, `IP_HASH_SALT` are **server-only**: never prefixed `NEXT_PUBLIC_`, never imported in client components.
 - Project ref / URL may be recorded in docs; **keys never are** (prompt-0 §3.9).
 
-## 2. Deploy (Netlify — primary; Vercel mirror during transition)
+## 2. Deploy (Vercel — primary)
 
-Preferred path is Git-integrated deployment: push/merge to `main` → the Netlify site (`my-portfolio-fotedev`) builds and promotes to production automatically. Nothing is deployed ad-hoc "to see if it works".
+Preferred path is Git-integrated deployment: push/merge to `main` → Vercel builds and promotes to production automatically. Nothing is deployed ad-hoc "to see if it works".
 
 1. Ensure the PR is merged with **CI green** (lint, typecheck, unit, build — required status check per `.factory/PROTOCOL.md`) and GATE 2 evidence attached.
-2. Confirm Netlify site environment variables are set (names per §1; values in the Netlify UI/CLI, never in the repo). `NEXT_PUBLIC_SITE_URL=https://fotedev.me` (build-time value — canonical URLs bake into the build).
-3. Merge to `main`. Netlify builds from the linked production branch (set in **Site configuration → Build & deploy → Production branch**; API updates of `build_settings.repo_branch` are refused — change it in the dashboard).
+2. Confirm Vercel Environment Variables are set for the **Production** scope (names per §1; values in Vercel dashboard, not in repo). `NEXT_PUBLIC_SITE_URL=https://fotedev.me` (build-time value — canonical URLs bake into the build).
+3. Merge to `main`. Vercel deploys the production build.
 4. Post-deploy smoke (2 minutes):
    - `https://fotedev.me` loads over HTTPS; `/en` and `/ar` render; theme has no flash on reload.
    - Spot-check one project page and `/contact` (direct email fallback visible even if the form is disabled).
    - `robots.txt` still disallows `/admin`; sitemap lists both locales.
 5. Record the deployment SHA + URL in `.factory/RUN_LOG.md` (and in this file's §10 launch record at M6).
 
-**Transition note (M6):** during the migration window, Vercel continues to build `main` as a noindexed fallback mirror (`fotedev-portfolio.vercel.app`; the in-app noindex rule covers every non-canonical host). Removing the Vercel project is Ahmed's decision after launch is stable. Deploy previews: every PR gets a free Netlify Deploy Preview (unlimited, not credit-billed); Vercel previews continue during the transition.
+Domains (wired 2026-11-10): `fotedev.me` apex canonical + `www.fotedev.me` 308 → apex, both attached to project `fotedev-portfolio`; Vercel issues SSL automatically once DNS points at its recommended records. The `fotedev-portfolio.vercel.app` host stays as a noindexed mirror (in-app rule: any non-canonical host gets `X-Robots-Tag: noindex`).
 
-**Credit accounting (Netlify):** each production deploy costs 15 credits (300/mo on Free); bandwidth 20 credits/GB. A routine week (CI merges + content publishes) fits comfortably; the monthly quota check (§5) flags pressure before it bites.
+Hosting history note: a Netlify Free trial (M6 spike, 2026-11-09–10) passed all functional gates but was **reverted same-day** — Netlify Free injects a mandatory "Powered by Netlify" badge on live pages and the hide toggle is paid-only (ADR-0002 §Reversal, evidence in `.factory/evidence/m6/`).
 
-## 3. Rollback (Netlify primary, Vercel mirror secondary)
+## 3. Rollback (Vercel)
 
-Bad deploy or regression on production:
+Bad publish or regression on production:
 
-1. Identify the last known-good deploy (Netlify **Deploys** list — last `Published` deploy with passing smoke).
-2. **Instant rollback:** Netlify dashboard → that deploy → **Rollback to this deploy** (repoints traffic without a rebuild). API equivalent: `POST /api/v1/sites/{site_id}/deploys/{deploy_id}/restore` — check `netlify api` at incident time.
-3. Verify `https://fotedev.me` renders correctly (`/en` + `/ar`).
-4. **Secondary fallback:** the Vercel mirror still serves the same SHA; if Netlify itself is down, DNS-adjacent options are discussed with Ahmed before any change (never hot-switch DNS under pressure).
-5. **Content-cache check:** if the bad content was ISR-cached, re-publish an unchanged field on the affected record from `/admin` (the publish action re-runs targeted `revalidatePath`/`updateTag`). Revalidation failure must be **reported, never hidden** (prompt-0 §3.10).
+1. Identify the last known-good production deployment (Vercel dashboard → Deployments → last `READY` production deploy with passing smoke).
+2. **Promote/rollback:** Vercel dashboard → that deployment → "Promote to Production" (or the Instant Rollback option). This repoints traffic without a rebuild.
+3. CLI equivalent: `vercel rollback <deployment-url> --prod` (or `vercel promote`, matching the current CLI — check `vercel --help` at the time of the incident).
+4. Verify the site renders correctly again; check that `/en` and `/ar` both work.
+5. **Content-cache check:** if the bad content was ISR-cached, run the targeted revalidation from `/admin` (publish an unchanged field on the affected record) or hit the revalidation path for the affected routes (`/[locale]`, `/[locale]/projects`, `/[locale]/projects/[slug]`). Revalidation failure must be **reported, never hidden** (prompt-0 §3.10).
 6. Fix forward on a branch → PR → CI → merge. Do not hot-patch production by hand.
 7. Log the incident in `.factory/RUN_LOG.md` (issue/SHA, what regressed, rollback time).
 
@@ -93,7 +93,7 @@ Supabase schema note: schema changes are forward-compatible (migrations only, no
 
 Run on the 1st of each month (calendar reminder). Record results as one line in `.factory/RUN_LOG.md`.
 
-1. **Netlify (primary host):** team → Usage — credits used vs the 300/mo cap (production deploys 15 credits each, bandwidth 20 credits/GB, deploy previews free/unlimited). Source: https://www.netlify.com/pricing (2026-11-08). Vercel mirror usage checked only while the transition fallback exists.
+1. **Vercel (primary host):** dashboard → Usage — build minutes, bandwidth, function usage, analytics events. **Free-tier limits recorded in §6 with source URL + date.** Hosting is Vercel Hobby with the terms risk explicitly accepted by the owner (ADR-0002 §Reversal, 2026-11-10) — the §11.4 runbook is the standing contingency.
 2. **Supabase:** dashboard → Usage/Reports — database size, storage used, egress, Edge Function invocations, Auth MAUs. **Free-tier limits: TO CAPTURE IN M1 (record with source URL + date: Supabase pricing page).**
 3. **Turnstile / Cloudflare:** widget request volume; **limits: TO CAPTURE IN M1 (record with source URL + date: Cloudflare Turnstile docs).**
 4. **Email provider (Resend, ADR-0008):** emails sent this month vs 3,000/mo free tier (100/day); until the M6 key is set this stays 0 (degraded mode — notify is log-only).
@@ -122,9 +122,9 @@ Captured from the vendors' own pages — **source URL + capture date** written i
 | Build time per deployment | Vercel Hobby | 45 minutes max; 1 concurrent build | https://vercel.com/docs/limits | 2026-11-06 |
 | Function duration (Fluid) | Vercel Hobby | 300 s default and max; 2 GB RAM / 1 vCPU | https://vercel.com/docs/limits | 2026-11-06 |
 | Billable-resource allotments | Vercel Hobby | monthly allotment per resource per fair-use guidelines (no single flat figure published on the limits page) | https://vercel.com/docs/limits/fair-use-guidelines | 2026-11-06 |
-| Hobby plan use terms | Vercel | **Non-commercial only — does NOT permit this portfolio.** Fair Use Guidelines: commercial usage requires Pro/Enterprise; "advertising the sale of a product or service" counts as commercial. Pro fallback priced at $20/mo per developer seat. | https://vercel.com/docs/limits/fair-use-guidelines | 2026-11-08 |
-| Free plan (credit system) | Netlify | 300 credits/month; production deploy = 15 credits; bandwidth = 20 credits/GB (≈ 15 GB/month if bandwidth-only); deploy previews unlimited. Migration pending the M6 spike (ADR-0002). | https://www.netlify.com/pricing | 2026-11-08 |
-| Commercial use on Free | Netlify | Explicitly permitted — "you can deploy commercial projects, no credit card required and no fees. Ever."; ToS/AUP restrict unlawful use and reselling only. | https://www.netlify.com/pricing · https://www.netlify.com/legal/terms-of-use | 2026-11-08 |
+| Hobby plan use terms | Vercel | **Non-commercial only — does NOT permit this portfolio.** Fair Use Guidelines: commercial usage requires Pro/Enterprise; "advertising the sale of a product or service" counts as commercial. **Owner accepted the risk explicitly on 2026-11-10 (ADR-0002 §Reversal)**; Pro at $20/mo/seat remains the clean alternative; §11.4 is the contingency runbook. | https://vercel.com/docs/limits/fair-use-guidelines | 2026-11-08 |
+| Free plan (credit system) | Netlify | *(Trial reverted 2026-11-10 — mandatory "Powered by Netlify" badge on live pages, hide toggle paid-only; see ADR-0002 §Reversal.)* 300 credits/month; production deploy 15 credits; bandwidth 20 credits/GB. | https://www.netlify.com/pricing | 2026-11-08 |
+| Commercial use on Free | Netlify | *(Trial reverted 2026-11-10.)* Explicitly permitted — "you can deploy commercial projects, no credit card required and no fees. Ever."; ToS/AUP restrict unlawful use and reselling only. | https://www.netlify.com/pricing · https://www.netlify.com/legal/terms-of-use | 2026-11-08 |
 | Turnstile plan | Cloudflare Free | **Unlimited challenges (traffic or verification requests)**; up to 20 widgets; 10 hostnames/widget; 7-day analytics | https://developers.cloudflare.com/turnstile/plans/ | 2026-11-06 |
 | Email sends | Resend (ADR-0008) | Free: **3,000 emails/month, 100/day** — currently in degraded mode (no key set; notify = log-only until M6) | https://resend.com/pricing | 2026-11-07 |
 
@@ -201,6 +201,18 @@ Symptom: a published edit shows wrong/broken content on the public site, or publ
 ### 11.3 Free-tier quota exhausted
 
 Writes fail closed; the public site stays cached and readable by design. Actions: open `[OPS]` issue per §5.6, decide (cleanup / upgrade / migrate) with Ahmed; until decided, the direct email fallback carries contact traffic.
+
+### 11.4 Hosting enforcement / Vercel account paused (standing contingency)
+
+Hosting is Vercel Hobby with the commercial-use terms risk explicitly accepted by the owner (ADR-0002 §Reversal, 2026-11-10). This runbook exists for the accepted tail risk: the account or deployments get paused/taken down.
+
+**Symptom:** `fotedev.me` stops resolving to Vercel / returns Vercel enforcement pages or 4xx; dashboard shows a policy/usage notice; deployments removed.
+
+1. **Confirm scope:** is it the whole account or just the project? Check the Vercel dashboard notice and email. Do **not** create replacement accounts to evade enforcement — that escalates and is itself a listed violation (ADR-0002 §Reversal).
+2. **Immediate DNS decision with Ahmed:** if restoration on Vercel is not immediate (e.g. upgrade to Pro resolves it — the pre-agreed first recovery path), repoint DNS to the emergency host.
+3. **Emergency migration — Cloudflare Pages (~½–1 day):** the M6 Netlify spike (CI run 42696417212, 2026-11-09) proved this migration class end-to-end: adapter install (`@cloudflare/next-on-pages` or the Workers/OpenNext path — pick per current docs), `revalidatePath`/`updateTag` semantics re-verified with the remote-target E2E dispatch job (`ci.yml` → `e2e-netlify`, input `remote_base_url`), env re-wiring (Supabase URL/anon + `NEXT_PUBLIC_SITE_URL`), Edge-Function `ALLOWED_ORIGINS` + Turnstile hostnames updated, DNS records repointed, smoke matrix re-run. Cloudflare Pages' free tier permits commercial use (re-verify terms at that moment).
+4. **DNS revert mechanics:** at the registrar (Namecheap), replace the apex A records and `www` CNAME with the emergency host's documented values; TTL is short by default — expect propagation within the hour.
+5. **After restoration:** re-run the production smoke matrix (§13 of the M6 evidence), record the incident in `.factory/RUN_LOG.md`, and re-open the hosting decision with Ahmed (Pro vs migration) so the site isn't left on a provider it was just forced off.
 
 ## 12. Admin & publish pipeline ops (M5)
 
