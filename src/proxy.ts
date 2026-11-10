@@ -81,9 +81,9 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  // Skip static assets, metadata routes (robots/sitemap), and the Supabase
-  // auth callback; everything else passes through.
+  // Skip static assets, metadata routes (robots/sitemap/manifest), and the
+  // Supabase auth callback; everything else passes through.
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|auth|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|webp|ico)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|auth|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|webp|ico)$).*)",
   ],
 };

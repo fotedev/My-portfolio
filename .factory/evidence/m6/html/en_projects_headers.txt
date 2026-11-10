@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Access-Control-Allow-Origin: *
+Age: 16298
+Cache-Control: public, max-age=0, must-revalidate
+Content-Disposition: inline
+Content-Length: 57078
+Content-Type: text/html; charset=utf-8
+Date: Tue, 10 Nov 2026 05:40:54 GMT
+Etag: "85a852ae896a3462de108ca642446b81"
+Link: <https://fotedev.me/en/projects>; rel="alternate"; hreflang="en", <https://fotedev.me/ar/projects>; rel="alternate"; hreflang="ar", <https://fotedev.me/projects>; rel="alternate"; hreflang="x-default"
+Server: Vercel
+Set-Cookie: NEXT_LOCALE=en; Path=/; SameSite=lax
+Strict-Transport-Security: max-age=63072000
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+X-Matched-Path: /en/projects
+X-Nextjs-Prerender: 1
+X-Nextjs-Stale-Time: 300
+X-Vercel-Cache: HIT
+X-Vercel-Id: fra1::5n48b-1794289254078-f4b37ab7eefe
+

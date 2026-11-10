@@ -41,7 +41,7 @@ export function LocaleSwitcher() {
             switchTo(l);
           }}
           className={`min-h-11 rounded-md border border-border-subtle px-2.5 text-sm transition-colors duration-150 ${
-            l === locale ? "bg-accent-strong text-white" : "bg-surface hover:bg-background"
+            l === locale ? "bg-accent-strong text-accent-foreground" : "bg-surface hover:bg-background"
           }`}
         >
           <span className="sr-only">{t("switchToAria", { name: localeNames[l] })}</span>

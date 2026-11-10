@@ -35,7 +35,7 @@ export default async function AdminCredentialsPage() {
         <h1 className="text-2xl font-semibold">Credentials</h1>
         <Link
           href="/admin/credentials/new"
-          className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-strong"
+          className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-strong"
         >
           New credential
         </Link>

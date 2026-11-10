@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { JsonLd } from "@/components/json-ld";
 import { Reveal } from "@/components/motion";
 import { btnSecondary } from "@/components/ui/cta";
+import { webPageJsonLd } from "@/lib/content/jsonld";
 import { getServices } from "@/lib/content/queries";
 import { Link } from "@/lib/i18n/navigation";
 import { isLocale, toLocale, type Locale } from "@/lib/i18n/routing";
@@ -54,6 +56,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
 
   return (
     <div className="container-site py-16 md:py-20">
+      <JsonLd
+        data={webPageJsonLd({
+          locale,
+          path: "/services",
+          title: t("title"),
+          description: t("subtitle"),
+        })}
+      />
       <h1 className="type-h1">{t("title")}</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
 

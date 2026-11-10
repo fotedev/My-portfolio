@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Access-Control-Allow-Origin: *
+Age: 16297
+Cache-Control: public, max-age=0, must-revalidate
+Content-Disposition: inline
+Content-Length: 56521
+Content-Type: text/html; charset=utf-8
+Date: Tue, 10 Nov 2026 05:40:57 GMT
+Etag: "88cf23af5d6db39acb7455c175377798"
+Link: <https://fotedev.me/en/contact>; rel="alternate"; hreflang="en", <https://fotedev.me/ar/contact>; rel="alternate"; hreflang="ar", <https://fotedev.me/contact>; rel="alternate"; hreflang="x-default"
+Server: Vercel
+Set-Cookie: NEXT_LOCALE=ar; Path=/; SameSite=lax
+Strict-Transport-Security: max-age=63072000
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+X-Matched-Path: /ar/contact
+X-Nextjs-Prerender: 1
+X-Nextjs-Stale-Time: 300
+X-Vercel-Cache: HIT
+X-Vercel-Id: fra1::zp7hj-1794289257480-995c85b464c9
+

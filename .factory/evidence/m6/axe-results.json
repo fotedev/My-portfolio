@@ -1,0 +1,53 @@
+[
+  {
+    "page": "home-en",
+    "url": "http://localhost:3000/en",
+    "blocking": [],
+    "violations": [],
+    "ts": "2026-11-10T06:55:49.646Z"
+  },
+  {
+    "page": "home-ar",
+    "url": "http://localhost:3000/ar",
+    "blocking": [],
+    "violations": [],
+    "ts": "2026-11-10T06:55:52.477Z"
+  },
+  {
+    "page": "contact-en",
+    "url": "http://localhost:3000/en/contact",
+    "blocking": [],
+    "violations": [],
+    "ts": "2026-11-10T06:55:54.907Z"
+  },
+  {
+    "page": "contact-ar",
+    "url": "http://localhost:3000/ar/contact",
+    "blocking": [],
+    "violations": [],
+    "ts": "2026-11-10T06:55:57.431Z"
+  },
+  {
+    "page": "admin-login",
+    "url": "http://localhost:3000/admin/login",
+    "blocking": [],
+    "violations": [],
+    "ts": "2026-11-10T06:55:59.564Z"
+  },
+  {
+    "page": "home-en-dark",
+    "isDark": true,
+    "url": "http://localhost:3000/en",
+    "blocking": [],
+    "violations": [],
+    "ts": "2026-11-10T06:56:02.212Z"
+  },
+  {
+    "page": "home-ar-dark",
+    "isDark": true,
+    "url": "http://localhost:3000/ar",
+    "blocking": [],
+    "violations": [],
+    "ts": "2026-11-10T06:56:04.811Z"
+  }
+]

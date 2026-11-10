@@ -77,7 +77,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <JsonLd data={personJsonLd({ sameAs: settings?.socials.map((s) => s.url) ?? [], locale })} />
       {settings && (
         <JsonLd
-          data={professionalServiceJsonLd({ description: settings.heroOffer, email: settings.contactEmail })}
+          data={professionalServiceJsonLd({ description: settings.heroOffer, email: settings.contactEmail, locale })}
         />
       )}
 

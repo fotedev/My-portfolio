@@ -3,7 +3,7 @@
  * section, hover = color only (no translate, no layout shift).
  */
 export const btnPrimary =
-  "inline-flex min-h-11 items-center justify-center rounded-md bg-accent-strong px-5 py-2.5 font-medium text-white transition-colors duration-150 hover:opacity-90";
+  "inline-flex min-h-11 items-center justify-center rounded-md bg-accent-strong px-5 py-2.5 font-medium text-accent-foreground transition-colors duration-150 hover:opacity-90";
 
 export const btnSecondary =
   "inline-flex min-h-11 items-center justify-center rounded-md border border-border-strong px-5 py-2.5 font-medium text-foreground transition-colors duration-150 hover:bg-surface";

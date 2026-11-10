@@ -47,8 +47,26 @@ export function routeMetadata(opts: {
       type: "website",
       siteName: "fotedev",
       locale: opts.locale === "ar" ? "ar_EG" : "en_US",
+      alternateLocale: opts.locale === "ar" ? ["en_US"] : ["ar_EG"],
       ...(opts.title ? { title: opts.title } : {}),
       description: opts.description,
+      // Every route shares the localized brand card rendered by the stable
+      // [locale]/og-image route. The file-convention opengraph-image route is
+      // not referenceable from metadata (Next serves it under an internal
+      // hashed path), and without explicit images page-level metadata dropped
+      // the card entirely (M6 SEO audit: og:image/twitter:image home-only).
+      images: [
+        {
+          url: `/${opts.locale}/og-image`,
+          width: 1200,
+          height: 630,
+          alt: "fotedev — Ahmed Aboalayoun, Full-Stack AI Engineer",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [`/${opts.locale}/og-image`],
     },
   };
 }

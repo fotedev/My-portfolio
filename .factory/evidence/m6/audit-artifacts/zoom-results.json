@@ -1,0 +1,64 @@
+[
+  {
+    "locale": "en",
+    "overflow": false,
+    "overflowDetail": {
+      "docOver": false,
+      "vw": 640,
+      "scrollWidth": 640,
+      "clientWidth": 640,
+      "offenders": []
+    },
+    "tabStops": 15,
+    "allFocusedVisible": true,
+    "sequence": [
+      "a \"Skip to content\"",
+      "a \"fotedev\"",
+      "button \"Switch language to English\nEN\"",
+      "button \"Switch language to العربية\nع\"",
+      "button \"Switch color theme\"",
+      "button \"Open navigation menu\"",
+      "a \"Discuss your project\"",
+      "a \"Explore selected work\"",
+      "a \"Case study\"",
+      "a \"Live demo\"",
+      "a \"Source code\"",
+      "a \"Case study\"",
+      "a \"Source code\"",
+      "a \"Case study\"",
+      "a \"All services\""
+    ],
+    "ts": "2026-11-10T05:52:14.147Z"
+  },
+  {
+    "locale": "ar",
+    "overflow": false,
+    "overflowDetail": {
+      "docOver": false,
+      "vw": 640,
+      "scrollWidth": 640,
+      "clientWidth": 640,
+      "offenders": []
+    },
+    "tabStops": 15,
+    "allFocusedVisible": true,
+    "sequence": [
+      "a \"تخطَّ إلى المحتوى\"",
+      "a \"fotedev\"",
+      "button \"التبديل إلى English\nEN\"",
+      "button \"التبديل إلى العربية\nع\"",
+      "button \"تبديل مظهر الألوان\"",
+      "button \"فتح قائمة التنقل\"",
+      "a \"ناقش مشروعك\"",
+      "a \"استعرض الأعمال المختارة\"",
+      "a \"دراسة حالة\"",
+      "a \"عرض مباشر\"",
+      "a \"الكود المصدري\"",
+      "a \"دراسة حالة\"",
+      "a \"الكود المصدري\"",
+      "a \"دراسة حالة\"",
+      "a \"كل الخدمات\""
+    ],
+    "ts": "2026-11-10T05:52:18.086Z"
+  }
+]

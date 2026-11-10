@@ -1,0 +1,1072 @@
+{
+ "en_home": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en",
+   "ar": "https://fotedev.me/ar",
+   "x-default": "https://fotedev.me/"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "Ahmed Aboalayoun — Full-Stack AI Engineer",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "Full-Stack AI Engineer building production web applications, RAG systems and AI tools around your business. Bilingual, evidence-backed, shipped through a deterministic software factory.",
+   "og:title": "Ahmed Aboalayoun — Full-Stack AI Engineer",
+   "og:description": "Full-Stack AI Engineer building production web applications, RAG systems and AI tools around your business. Bilingual, evidence-backed, shipped through a deterministic software factory.",
+   "og:url": "https://fotedev.me/en",
+   "og:site_name": "fotedev",
+   "og:locale": "en_US",
+   "og:image": "https://fotedev.me/en/opengraph-image-o1kegr?aeef8d68977f1871",
+   "og:image:type": "image/png",
+   "og:image:width": "1200",
+   "og:image:height": "630",
+   "og:image:alt": "fotedev — Ahmed Aboalayoun, Full-Stack AI Engineer",
+   "og:type": "website",
+   "twitter:card": "summary_large_image",
+   "twitter:title": "Ahmed Aboalayoun — Full-Stack AI Engineer",
+   "twitter:description": "Full-Stack AI Engineer building production web applications, RAG systems and AI tools around your business. Bilingual, evidence-backed, shipped through a deterministic software factory.",
+   "twitter:image": "https://fotedev.me/en/opengraph-image-o1kegr?aeef8d68977f1871",
+   "twitter:image:alt": "fotedev — Ahmed Aboalayoun, Full-Stack AI Engineer",
+   "twitter:image:type": "image/png",
+   "twitter:image:width": "1200",
+   "twitter:image:height": "630"
+  },
+  "canonical": [
+   "https://fotedev.me/en"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en"
+   ],
+   "ar": [
+    "https://fotedev.me/ar"
+   ],
+   "x-default": [
+    "https://fotedev.me/en"
+   ]
+  },
+  "jsonld": [
+   {
+    "ok": true,
+    "data": {
+     "@context": "https://schema.org",
+     "@type": "Person",
+     "name": "Ahmed Aboalayoun",
+     "alternateName": "fotedev",
+     "url": "https://fotedev.me/en",
+     "jobTitle": "Full-Stack AI Engineer",
+     "knowsLanguage": [
+      "en",
+      "ar"
+     ],
+     "sameAs": [
+      "https://github.com/fotedev",
+      "https://www.linkedin.com/in/fotedev",
+      "https://x.com/FoteTeam",
+      "https://t.me/ACYRO0016K",
+      "https://www.youtube.com/channel/UCmfp_B-hOFq4UW5g1T4LCvQ",
+      "https://www.facebook.com/profile.php?id=61558539080140",
+      "https://www.instagram.com/devtech.team/"
+     ],
+     "hasCredential": {
+      "@type": "EducationalOccupationalCredential",
+      "name": "1 MILLION PROMPTERS",
+      "url": "https://dub.ai/omp",
+      "credentialCategory": "certification"
+     }
+    }
+   },
+   {
+    "ok": true,
+    "data": {
+     "@context": "https://schema.org",
+     "@type": "ProfessionalService",
+     "name": "fotedev",
+     "url": "https://fotedev.me/en",
+     "description": "Web applications and AI tools built around your business.",
+     "email": "fote.engineer@gmail.com",
+     "areaServed": [
+      "Egypt",
+      "Gulf states",
+      "International"
+     ],
+     "knowsLanguage": [
+      "en",
+      "ar"
+     ],
+     "founder": {
+      "@type": "Person",
+      "name": "Ahmed Aboalayoun"
+     }
+    }
+   }
+  ],
+  "h1_count": 1,
+  "h1_texts": [
+   "Web applications and AI tools built around your business."
+  ],
+  "title_len": 41,
+  "desc_len": 185
+ },
+ "en_about": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/about",
+   "ar": "https://fotedev.me/ar/about",
+   "x-default": "https://fotedev.me/about"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "About | Ahmed Aboalayoun",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "I'm Ahmed Aboalayoun (fotedev), a Full-Stack AI Engineer based in Egypt, working in English and Arabic. I build web platforms, production RAG systems, and the automation and tooling around them.",
+   "og:title": "About",
+   "og:description": "I'm Ahmed Aboalayoun (fotedev), a Full-Stack AI Engineer based in Egypt, working in English and Arabic. I build web platforms, production RAG systems, and the automation and tooling around them.",
+   "og:url": "https://fotedev.me/en/about",
+   "og:site_name": "fotedev",
+   "og:locale": "en_US",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "About",
+   "twitter:description": "I'm Ahmed Aboalayoun (fotedev), a Full-Stack AI Engineer based in Egypt, working in English and Arabic. I build web platforms, production RAG systems, and the automation and tooling around them."
+  },
+  "canonical": [
+   "https://fotedev.me/en/about"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/about"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/about"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/about"
+   ]
+  },
+  "jsonld": [
+   {
+    "ok": true,
+    "data": {
+     "@context": "https://schema.org",
+     "@type": "Person",
+     "name": "Ahmed Aboalayoun",
+     "alternateName": "fotedev",
+     "url": "https://fotedev.me/en",
+     "jobTitle": "Full-Stack AI Engineer",
+     "knowsLanguage": [
+      "en",
+      "ar"
+     ],
+     "sameAs": [
+      "https://github.com/fotedev",
+      "https://www.linkedin.com/in/fotedev",
+      "https://x.com/FoteTeam",
+      "https://t.me/ACYRO0016K",
+      "https://www.youtube.com/channel/UCmfp_B-hOFq4UW5g1T4LCvQ",
+      "https://www.facebook.com/profile.php?id=61558539080140",
+      "https://www.instagram.com/devtech.team/"
+     ],
+     "hasCredential": {
+      "@type": "EducationalOccupationalCredential",
+      "name": "1 MILLION PROMPTERS",
+      "url": "https://dub.ai/omp",
+      "credentialCategory": "certification"
+     }
+    }
+   }
+  ],
+  "h1_count": 1,
+  "h1_texts": [
+   "About"
+  ],
+  "title_len": 24,
+  "desc_len": 194
+ },
+ "en_contact": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/contact",
+   "ar": "https://fotedev.me/ar/contact",
+   "x-default": "https://fotedev.me/contact"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "Contact | Ahmed Aboalayoun",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "Use the form below or email me directly — both land in the same place, and neither is shared with anyone else.",
+   "og:title": "Contact",
+   "og:description": "Use the form below or email me directly — both land in the same place, and neither is shared with anyone else.",
+   "og:url": "https://fotedev.me/en/contact",
+   "og:site_name": "fotedev",
+   "og:locale": "en_US",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "Contact",
+   "twitter:description": "Use the form below or email me directly — both land in the same place, and neither is shared with anyone else."
+  },
+  "canonical": [
+   "https://fotedev.me/en/contact"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/contact"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/contact"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/contact"
+   ]
+  },
+  "jsonld": [
+   {
+    "ok": true,
+    "data": {
+     "@context": "https://schema.org",
+     "@type": "ProfessionalService",
+     "name": "fotedev",
+     "url": "https://fotedev.me/en",
+     "description": "Web applications and AI tools built around your business.",
+     "email": "fote.engineer@gmail.com",
+     "areaServed": [
+      "Egypt",
+      "Gulf states",
+      "International"
+     ],
+     "knowsLanguage": [
+      "en",
+      "ar"
+     ],
+     "founder": {
+      "@type": "Person",
+      "name": "Ahmed Aboalayoun"
+     }
+    }
+   }
+  ],
+  "h1_count": 1,
+  "h1_texts": [
+   "Contact"
+  ],
+  "title_len": 26,
+  "desc_len": 110
+ },
+ "en_privacy": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/privacy",
+   "ar": "https://fotedev.me/ar/privacy",
+   "x-default": "https://fotedev.me/privacy"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "Privacy policy | Ahmed Aboalayoun",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "This policy explains what happens to data on fotedev.me. It is written to be read, not to hide behind.",
+   "og:title": "Privacy policy",
+   "og:description": "This policy explains what happens to data on fotedev.me. It is written to be read, not to hide behind.",
+   "og:url": "https://fotedev.me/en/privacy",
+   "og:site_name": "fotedev",
+   "og:locale": "en_US",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "Privacy policy",
+   "twitter:description": "This policy explains what happens to data on fotedev.me. It is written to be read, not to hide behind."
+  },
+  "canonical": [
+   "https://fotedev.me/en/privacy"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/privacy"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/privacy"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/privacy"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "Privacy policy"
+  ],
+  "title_len": 33,
+  "desc_len": 102
+ },
+ "en_projects": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/projects",
+   "ar": "https://fotedev.me/ar/projects",
+   "x-default": "https://fotedev.me/projects"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "Projects | Ahmed Aboalayoun",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "Selected case studies. Every claim on these pages has a dated source in the evidence log.",
+   "og:title": "Projects",
+   "og:description": "Selected case studies. Every claim on these pages has a dated source in the evidence log.",
+   "og:url": "https://fotedev.me/en/projects",
+   "og:site_name": "fotedev",
+   "og:locale": "en_US",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "Projects",
+   "twitter:description": "Selected case studies. Every claim on these pages has a dated source in the evidence log."
+  },
+  "canonical": [
+   "https://fotedev.me/en/projects"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/projects"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/projects"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/projects"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "Projects"
+  ],
+  "title_len": 27,
+  "desc_len": 89
+ },
+ "en_services": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/services",
+   "ar": "https://fotedev.me/ar/services",
+   "x-default": "https://fotedev.me/services"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "Services | Ahmed Aboalayoun",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "Three engagements, each ending in something you own: deployed software, documentation and a handover.",
+   "og:title": "Services",
+   "og:description": "Three engagements, each ending in something you own: deployed software, documentation and a handover.",
+   "og:url": "https://fotedev.me/en/services",
+   "og:site_name": "fotedev",
+   "og:locale": "en_US",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "Services",
+   "twitter:description": "Three engagements, each ending in something you own: deployed software, documentation and a handover."
+  },
+  "canonical": [
+   "https://fotedev.me/en/services"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/services"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/services"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/services"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "Services"
+  ],
+  "title_len": 27,
+  "desc_len": 101
+ },
+ "en_projects_masar-x": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/projects/masar-x",
+   "ar": "https://fotedev.me/ar/projects/masar-x",
+   "x-default": "https://fotedev.me/projects/masar-x"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "Masar X | Ahmed Aboalayoun",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "Bilingual AI study platform: semantic PDF search and vector document indexing across web, desktop, and mobile clients on a single Supabase backend.",
+   "og:title": "Masar X",
+   "og:description": "Bilingual AI study platform: semantic PDF search and vector document indexing across web, desktop, and mobile clients on a single Supabase backend.",
+   "og:url": "https://fotedev.me/en/projects/masar-x",
+   "og:site_name": "fotedev",
+   "og:locale": "en_US",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "Masar X",
+   "twitter:description": "Bilingual AI study platform: semantic PDF search and vector document indexing across web, desktop, and mobile clients on a single Supabase backend."
+  },
+  "canonical": [
+   "https://fotedev.me/en/projects/masar-x"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/projects/masar-x"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/projects/masar-x"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/projects/masar-x"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "Masar X"
+  ],
+  "title_len": 26,
+  "desc_len": 147
+ },
+ "en_projects_ghost": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/projects/ghost",
+   "ar": "https://fotedev.me/ar/projects/ghost",
+   "x-default": "https://fotedev.me/projects/ghost"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "ghost | Ahmed Aboalayoun",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "Open-source CLI (28 stars) that resets device and machine identifiers for AI coding IDEs, with guided flows, audit logs and restore scripts on Windows and Linux. Positioned as developer privacy hygiene; the project's own docs tell users to comply with each vendor's terms of service.",
+   "og:title": "ghost",
+   "og:description": "Open-source CLI (28 stars) that resets device and machine identifiers for AI coding IDEs, with guided flows, audit logs and restore scripts on Windows and Linux. Positioned as developer privacy hygiene; the project's own docs tell users to comply with each vendor's terms of service.",
+   "og:url": "https://fotedev.me/en/projects/ghost",
+   "og:site_name": "fotedev",
+   "og:locale": "en_US",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "ghost",
+   "twitter:description": "Open-source CLI (28 stars) that resets device and machine identifiers for AI coding IDEs, with guided flows, audit logs and restore scripts on Windows and Linux. Positioned as developer privacy hygiene; the project's own docs tell users to comply with each vendor's terms of service."
+  },
+  "canonical": [
+   "https://fotedev.me/en/projects/ghost"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/projects/ghost"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/projects/ghost"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/projects/ghost"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "ghost"
+  ],
+  "title_len": 24,
+  "desc_len": 283
+ },
+ "en_projects_khalat": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/projects/khalat",
+   "ar": "https://fotedev.me/ar/projects/khalat",
+   "x-default": "https://fotedev.me/projects/khalat"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "Khalat | Ahmed Aboalayoun",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "Production commerce and ordering web application, built and operated under a deterministic AI software-factory pipeline: locked specifications, milestone gates and CI-enforced quality checks. The source is private, so every statement on this page is owner-attested rather than publicly verifiable.",
+   "og:title": "Khalat",
+   "og:description": "Production commerce and ordering web application, built and operated under a deterministic AI software-factory pipeline: locked specifications, milestone gates and CI-enforced quality checks. The source is private, so every statement on this page is owner-attested rather than publicly verifiable.",
+   "og:url": "https://fotedev.me/en/projects/khalat",
+   "og:site_name": "fotedev",
+   "og:locale": "en_US",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "Khalat",
+   "twitter:description": "Production commerce and ordering web application, built and operated under a deterministic AI software-factory pipeline: locked specifications, milestone gates and CI-enforced quality checks. The source is private, so every statement on this page is owner-attested rather than publicly verifiable."
+  },
+  "canonical": [
+   "https://fotedev.me/en/projects/khalat"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/projects/khalat"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/projects/khalat"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/projects/khalat"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "Khalat"
+  ],
+  "title_len": 25,
+  "desc_len": 297
+ },
+ "ar_home": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en",
+   "ar": "https://fotedev.me/ar",
+   "x-default": "https://fotedev.me/"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "أحمد أبو العيون — مهندس ذكاء اصطناعي متكامل",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "مهندس ذكاء اصطناعي متكامل يبني تطبيقات ويب إنتاجية وأنظمة RAG وأدوات ذكاء اصطناعي حول عملك. ثنائي اللغة، مدعوم بالأدلة، ومُسلَّم عبر مصنع برمجيات حتمي.",
+   "og:title": "أحمد أبو العيون — مهندس ذكاء اصطناعي متكامل",
+   "og:description": "مهندس ذكاء اصطناعي متكامل يبني تطبيقات ويب إنتاجية وأنظمة RAG وأدوات ذكاء اصطناعي حول عملك. ثنائي اللغة، مدعوم بالأدلة، ومُسلَّم عبر مصنع برمجيات حتمي.",
+   "og:url": "https://fotedev.me/ar",
+   "og:site_name": "fotedev",
+   "og:locale": "ar_EG",
+   "og:image": "https://fotedev.me/ar/opengraph-image-o1kegr?aeef8d68977f1871",
+   "og:image:type": "image/png",
+   "og:image:width": "1200",
+   "og:image:height": "630",
+   "og:image:alt": "fotedev — Ahmed Aboalayoun, Full-Stack AI Engineer",
+   "og:type": "website",
+   "twitter:card": "summary_large_image",
+   "twitter:title": "أحمد أبو العيون — مهندس ذكاء اصطناعي متكامل",
+   "twitter:description": "مهندس ذكاء اصطناعي متكامل يبني تطبيقات ويب إنتاجية وأنظمة RAG وأدوات ذكاء اصطناعي حول عملك. ثنائي اللغة، مدعوم بالأدلة، ومُسلَّم عبر مصنع برمجيات حتمي.",
+   "twitter:image": "https://fotedev.me/ar/opengraph-image-o1kegr?aeef8d68977f1871",
+   "twitter:image:alt": "fotedev — Ahmed Aboalayoun, Full-Stack AI Engineer",
+   "twitter:image:type": "image/png",
+   "twitter:image:width": "1200",
+   "twitter:image:height": "630"
+  },
+  "canonical": [
+   "https://fotedev.me/ar"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en"
+   ],
+   "ar": [
+    "https://fotedev.me/ar"
+   ],
+   "x-default": [
+    "https://fotedev.me/en"
+   ]
+  },
+  "jsonld": [
+   {
+    "ok": true,
+    "data": {
+     "@context": "https://schema.org",
+     "@type": "Person",
+     "name": "Ahmed Aboalayoun",
+     "alternateName": "fotedev",
+     "url": "https://fotedev.me/en",
+     "jobTitle": "Full-Stack AI Engineer",
+     "knowsLanguage": [
+      "en",
+      "ar"
+     ],
+     "sameAs": [
+      "https://github.com/fotedev",
+      "https://www.linkedin.com/in/fotedev",
+      "https://x.com/FoteTeam",
+      "https://t.me/ACYRO0016K",
+      "https://www.youtube.com/channel/UCmfp_B-hOFq4UW5g1T4LCvQ",
+      "https://www.facebook.com/profile.php?id=61558539080140",
+      "https://www.instagram.com/devtech.team/"
+     ],
+     "hasCredential": {
+      "@type": "EducationalOccupationalCredential",
+      "name": "مليون خيّر لأوامر الذكاء الاصطناعي",
+      "url": "https://dub.ai/omp",
+      "credentialCategory": "certification"
+     }
+    }
+   },
+   {
+    "ok": true,
+    "data": {
+     "@context": "https://schema.org",
+     "@type": "ProfessionalService",
+     "name": "fotedev",
+     "url": "https://fotedev.me/en",
+     "description": "تطبيقات ويب وأدوات ذكاء اصطناعي مبنية حول عملك.",
+     "email": "fote.engineer@gmail.com",
+     "areaServed": [
+      "Egypt",
+      "Gulf states",
+      "International"
+     ],
+     "knowsLanguage": [
+      "en",
+      "ar"
+     ],
+     "founder": {
+      "@type": "Person",
+      "name": "Ahmed Aboalayoun"
+     }
+    }
+   }
+  ],
+  "h1_count": 1,
+  "h1_texts": [
+   "تطبيقات ويب وأدوات ذكاء اصطناعي مبنية حول عملك."
+  ],
+  "title_len": 43,
+  "desc_len": 151
+ },
+ "ar_about": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/about",
+   "ar": "https://fotedev.me/ar/about",
+   "x-default": "https://fotedev.me/about"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "نبذة | أحمد أبو العيون",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "أنا أحمد أبو العيون (fotedev)، مهندس ذكاء اصطناعي متكامل من مصر، أعمل بالعربية والإنجليزية. أبني منصات ويب وأنظمة RAG إنتاجية والأتمتة والأدوات المحيطة بها.",
+   "og:title": "نبذة",
+   "og:description": "أنا أحمد أبو العيون (fotedev)، مهندس ذكاء اصطناعي متكامل من مصر، أعمل بالعربية والإنجليزية. أبني منصات ويب وأنظمة RAG إنتاجية والأتمتة والأدوات المحيطة بها.",
+   "og:url": "https://fotedev.me/ar/about",
+   "og:site_name": "fotedev",
+   "og:locale": "ar_EG",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "نبذة",
+   "twitter:description": "أنا أحمد أبو العيون (fotedev)، مهندس ذكاء اصطناعي متكامل من مصر، أعمل بالعربية والإنجليزية. أبني منصات ويب وأنظمة RAG إنتاجية والأتمتة والأدوات المحيطة بها."
+  },
+  "canonical": [
+   "https://fotedev.me/ar/about"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/about"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/about"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/about"
+   ]
+  },
+  "jsonld": [
+   {
+    "ok": true,
+    "data": {
+     "@context": "https://schema.org",
+     "@type": "Person",
+     "name": "Ahmed Aboalayoun",
+     "alternateName": "fotedev",
+     "url": "https://fotedev.me/en",
+     "jobTitle": "Full-Stack AI Engineer",
+     "knowsLanguage": [
+      "en",
+      "ar"
+     ],
+     "sameAs": [
+      "https://github.com/fotedev",
+      "https://www.linkedin.com/in/fotedev",
+      "https://x.com/FoteTeam",
+      "https://t.me/ACYRO0016K",
+      "https://www.youtube.com/channel/UCmfp_B-hOFq4UW5g1T4LCvQ",
+      "https://www.facebook.com/profile.php?id=61558539080140",
+      "https://www.instagram.com/devtech.team/"
+     ],
+     "hasCredential": {
+      "@type": "EducationalOccupationalCredential",
+      "name": "مليون خيّر لأوامر الذكاء الاصطناعي",
+      "url": "https://dub.ai/omp",
+      "credentialCategory": "certification"
+     }
+    }
+   }
+  ],
+  "h1_count": 1,
+  "h1_texts": [
+   "نبذة"
+  ],
+  "title_len": 22,
+  "desc_len": 156
+ },
+ "ar_contact": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/contact",
+   "ar": "https://fotedev.me/ar/contact",
+   "x-default": "https://fotedev.me/contact"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "تواصل | أحمد أبو العيون",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "استخدم النموذج أدناه أو راسلني مباشرة — كلاهما يصل إلى المكان نفسه، ولا يُشارك أيٌّ منهما مع أي طرف آخر.",
+   "og:title": "تواصل",
+   "og:description": "استخدم النموذج أدناه أو راسلني مباشرة — كلاهما يصل إلى المكان نفسه، ولا يُشارك أيٌّ منهما مع أي طرف آخر.",
+   "og:url": "https://fotedev.me/ar/contact",
+   "og:site_name": "fotedev",
+   "og:locale": "ar_EG",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "تواصل",
+   "twitter:description": "استخدم النموذج أدناه أو راسلني مباشرة — كلاهما يصل إلى المكان نفسه، ولا يُشارك أيٌّ منهما مع أي طرف آخر."
+  },
+  "canonical": [
+   "https://fotedev.me/ar/contact"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/contact"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/contact"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/contact"
+   ]
+  },
+  "jsonld": [
+   {
+    "ok": true,
+    "data": {
+     "@context": "https://schema.org",
+     "@type": "ProfessionalService",
+     "name": "fotedev",
+     "url": "https://fotedev.me/en",
+     "description": "تطبيقات ويب وأدوات ذكاء اصطناعي مبنية حول عملك.",
+     "email": "fote.engineer@gmail.com",
+     "areaServed": [
+      "Egypt",
+      "Gulf states",
+      "International"
+     ],
+     "knowsLanguage": [
+      "en",
+      "ar"
+     ],
+     "founder": {
+      "@type": "Person",
+      "name": "Ahmed Aboalayoun"
+     }
+    }
+   }
+  ],
+  "h1_count": 1,
+  "h1_texts": [
+   "تواصل"
+  ],
+  "title_len": 23,
+  "desc_len": 104
+ },
+ "ar_privacy": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/privacy",
+   "ar": "https://fotedev.me/ar/privacy",
+   "x-default": "https://fotedev.me/privacy"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "سياسة الخصوصية | أحمد أبو العيون",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "تشرح هذه السياسة ما يحدث للبيانات على fotedev.me، وهي مكتوبة لتُقرأ لا للاختباء خلفها.",
+   "og:title": "سياسة الخصوصية",
+   "og:description": "تشرح هذه السياسة ما يحدث للبيانات على fotedev.me، وهي مكتوبة لتُقرأ لا للاختباء خلفها.",
+   "og:url": "https://fotedev.me/ar/privacy",
+   "og:site_name": "fotedev",
+   "og:locale": "ar_EG",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "سياسة الخصوصية",
+   "twitter:description": "تشرح هذه السياسة ما يحدث للبيانات على fotedev.me، وهي مكتوبة لتُقرأ لا للاختباء خلفها."
+  },
+  "canonical": [
+   "https://fotedev.me/ar/privacy"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/privacy"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/privacy"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/privacy"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "سياسة الخصوصية"
+  ],
+  "title_len": 32,
+  "desc_len": 86
+ },
+ "ar_projects": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/projects",
+   "ar": "https://fotedev.me/ar/projects",
+   "x-default": "https://fotedev.me/projects"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "المشاريع | أحمد أبو العيون",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "دراسات حالة مختارة. كل جملة على هذه الصفحات لها مصدر مؤرَّخ في سجل الأدلة.",
+   "og:title": "المشاريع",
+   "og:description": "دراسات حالة مختارة. كل جملة على هذه الصفحات لها مصدر مؤرَّخ في سجل الأدلة.",
+   "og:url": "https://fotedev.me/ar/projects",
+   "og:site_name": "fotedev",
+   "og:locale": "ar_EG",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "المشاريع",
+   "twitter:description": "دراسات حالة مختارة. كل جملة على هذه الصفحات لها مصدر مؤرَّخ في سجل الأدلة."
+  },
+  "canonical": [
+   "https://fotedev.me/ar/projects"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/projects"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/projects"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/projects"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "المشاريع"
+  ],
+  "title_len": 26,
+  "desc_len": 74
+ },
+ "ar_services": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/services",
+   "ar": "https://fotedev.me/ar/services",
+   "x-default": "https://fotedev.me/services"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "الخدمات | أحمد أبو العيون",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "ثلاثة أنواع تعاقد، كلٌّ منها ينتهي بشيء تملكه: برمجيات منشورة، وتوثيق، وتسليم.",
+   "og:title": "الخدمات",
+   "og:description": "ثلاثة أنواع تعاقد، كلٌّ منها ينتهي بشيء تملكه: برمجيات منشورة، وتوثيق، وتسليم.",
+   "og:url": "https://fotedev.me/ar/services",
+   "og:site_name": "fotedev",
+   "og:locale": "ar_EG",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "الخدمات",
+   "twitter:description": "ثلاثة أنواع تعاقد، كلٌّ منها ينتهي بشيء تملكه: برمجيات منشورة، وتوثيق، وتسليم."
+  },
+  "canonical": [
+   "https://fotedev.me/ar/services"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/services"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/services"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/services"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "الخدمات"
+  ],
+  "title_len": 25,
+  "desc_len": 78
+ },
+ "ar_projects_masar-x": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/projects/masar-x",
+   "ar": "https://fotedev.me/ar/projects/masar-x",
+   "x-default": "https://fotedev.me/projects/masar-x"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "Masar X | أحمد أبو العيون",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "منصة دراسية ذكية ثنائية اللغة: بحث دلالي في ملفات PDF وفهرسة متجهية للمستندات عبر تطبيقات الويب وسطح المكتب والجوال، على خلفية Supabase واحدة.",
+   "og:title": "Masar X",
+   "og:description": "منصة دراسية ذكية ثنائية اللغة: بحث دلالي في ملفات PDF وفهرسة متجهية للمستندات عبر تطبيقات الويب وسطح المكتب والجوال، على خلفية Supabase واحدة.",
+   "og:url": "https://fotedev.me/ar/projects/masar-x",
+   "og:site_name": "fotedev",
+   "og:locale": "ar_EG",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "Masar X",
+   "twitter:description": "منصة دراسية ذكية ثنائية اللغة: بحث دلالي في ملفات PDF وفهرسة متجهية للمستندات عبر تطبيقات الويب وسطح المكتب والجوال، على خلفية Supabase واحدة."
+  },
+  "canonical": [
+   "https://fotedev.me/ar/projects/masar-x"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/projects/masar-x"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/projects/masar-x"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/projects/masar-x"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "Masar X"
+  ],
+  "title_len": 25,
+  "desc_len": 142
+ },
+ "ar_projects_ghost": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/projects/ghost",
+   "ar": "https://fotedev.me/ar/projects/ghost",
+   "x-default": "https://fotedev.me/projects/ghost"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "ghost | أحمد أبو العيون",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "أداة سطر أوامر مفتوحة المصدر (28 نجمة) تعيد ضبط معرّفات الجهاز والنظام لبيئات التطوير المدعومة بالذكاء الاصطناعي، بمسارات موجّهة وسجلات تدقيق وسكربتات استرجاع على ويندوز ولينكس. تُقدَّم كنظافة خصوصية للمطوّر؛ وتنص وثائق المشروع نفسها على أن المستخدم مسؤول عن الالتزام بشروط كل مورّد.",
+   "og:title": "ghost",
+   "og:description": "أداة سطر أوامر مفتوحة المصدر (28 نجمة) تعيد ضبط معرّفات الجهاز والنظام لبيئات التطوير المدعومة بالذكاء الاصطناعي، بمسارات موجّهة وسجلات تدقيق وسكربتات استرجاع على ويندوز ولينكس. تُقدَّم كنظافة خصوصية للمطوّر؛ وتنص وثائق المشروع نفسها على أن المستخدم مسؤول عن الالتزام بشروط كل مورّد.",
+   "og:url": "https://fotedev.me/ar/projects/ghost",
+   "og:site_name": "fotedev",
+   "og:locale": "ar_EG",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "ghost",
+   "twitter:description": "أداة سطر أوامر مفتوحة المصدر (28 نجمة) تعيد ضبط معرّفات الجهاز والنظام لبيئات التطوير المدعومة بالذكاء الاصطناعي، بمسارات موجّهة وسجلات تدقيق وسكربتات استرجاع على ويندوز ولينكس. تُقدَّم كنظافة خصوصية للمطوّر؛ وتنص وثائق المشروع نفسها على أن المستخدم مسؤول عن الالتزام بشروط كل مورّد."
+  },
+  "canonical": [
+   "https://fotedev.me/ar/projects/ghost"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/projects/ghost"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/projects/ghost"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/projects/ghost"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "ghost"
+  ],
+  "title_len": 23,
+  "desc_len": 283
+ },
+ "ar_projects_khalat": {
+  "status": "HTTP/1.1 200 OK",
+  "http_link": {
+   "en": "https://fotedev.me/en/projects/khalat",
+   "ar": "https://fotedev.me/ar/projects/khalat",
+   "x-default": "https://fotedev.me/projects/khalat"
+  },
+  "html_lang": null,
+  "html_dir": null,
+  "title": "Khalat | أحمد أبو العيون",
+  "metas": {
+   "viewport": "width=device-width, initial-scale=1",
+   "next-size-adjust": "",
+   "description": "تطبيق ويب إنتاجي للتجارة والطلبات، بُني ويُشغَّل عبر خطّ مصنع برمجيات حتمي بالذكاء الاصطناعي: مواصفات مقفلة، وبوابات مراحل، وفحوص جودة يفرضها CI. المصدر خاص، لذا كل ما يُذكر هنا تصريحات موثّقة من المالك لا يمكن التحقق منها علنًا.",
+   "og:title": "Khalat",
+   "og:description": "تطبيق ويب إنتاجي للتجارة والطلبات، بُني ويُشغَّل عبر خطّ مصنع برمجيات حتمي بالذكاء الاصطناعي: مواصفات مقفلة، وبوابات مراحل، وفحوص جودة يفرضها CI. المصدر خاص، لذا كل ما يُذكر هنا تصريحات موثّقة من المالك لا يمكن التحقق منها علنًا.",
+   "og:url": "https://fotedev.me/ar/projects/khalat",
+   "og:site_name": "fotedev",
+   "og:locale": "ar_EG",
+   "og:type": "website",
+   "twitter:card": "summary",
+   "twitter:title": "Khalat",
+   "twitter:description": "تطبيق ويب إنتاجي للتجارة والطلبات، بُني ويُشغَّل عبر خطّ مصنع برمجيات حتمي بالذكاء الاصطناعي: مواصفات مقفلة، وبوابات مراحل، وفحوص جودة يفرضها CI. المصدر خاص، لذا كل ما يُذكر هنا تصريحات موثّقة من المالك لا يمكن التحقق منها علنًا."
+  },
+  "canonical": [
+   "https://fotedev.me/ar/projects/khalat"
+  ],
+  "hreflang": {
+   "en": [
+    "https://fotedev.me/en/projects/khalat"
+   ],
+   "ar": [
+    "https://fotedev.me/ar/projects/khalat"
+   ],
+   "x-default": [
+    "https://fotedev.me/en/projects/khalat"
+   ]
+  },
+  "jsonld": [],
+  "h1_count": 1,
+  "h1_texts": [
+   "Khalat"
+  ],
+  "title_len": 24,
+  "desc_len": 229
+ }
+}

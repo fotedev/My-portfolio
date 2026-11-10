@@ -1,0 +1,224 @@
+- document:
+  - link "Skip to content":
+    - /url: "#content"
+  - banner:
+    - navigation "Main":
+      - link "fotedev":
+        - /url: /en
+      - list:
+        - listitem:
+          - link "Home":
+            - /url: /en
+        - listitem:
+          - link "Projects":
+            - /url: /en/projects
+        - listitem:
+          - link "Services":
+            - /url: /en/services
+        - listitem:
+          - link "About":
+            - /url: /en/about
+        - listitem:
+          - link "Contact":
+            - /url: /en/contact
+      - group "Language":
+        - button "Switch language to English"
+        - button "Switch language to العربية"
+      - button "Switch color theme"
+  - main:
+    - text: Available for freelance projects
+    - heading "Web applications and AI tools built around your business." [level=1]
+    - paragraph: Ahmed Aboalayoun · Full-Stack AI Engineer
+    - list:
+      - listitem: Production AI & RAG systems
+      - listitem: OSS contributor — NousResearch
+      - listitem: Responsible security disclosure
+      - listitem: 1M Prompters certified
+    - link "Discuss your project":
+      - /url: /en/contact
+    - link "Explore selected work":
+      - /url: /en/projects
+    - region "Selected work":
+      - heading "Selected work" [level=2]
+      - paragraph: Production and open-source builds, each with its evidence on the page.
+      - article:
+        - paragraph: Case study
+        - heading "Masar X" [level=3]
+        - paragraph: "Bilingual AI study platform: semantic PDF search and vector document indexing across web, desktop, and mobile clients on a single Supabase backend."
+        - list "Stack":
+          - listitem: Next.js
+          - listitem: TypeScript
+          - listitem: Supabase
+          - listitem: pgvector
+          - listitem: Electron
+          - listitem: Expo
+        - link "Case study":
+          - /url: /en/projects/masar-x
+        - link "Live demo":
+          - /url: https://masarx.vercel.app
+        - link "Source code":
+          - /url: https://github.com/fotedev/Masar-x-next
+      - article:
+        - paragraph: Case study
+        - heading "ghost" [level=3]
+        - paragraph: Open-source CLI (28 stars) that resets device and machine identifiers for AI coding IDEs, with guided flows, audit logs and restore scripts on Windows and Linux. Positioned as developer privacy hygiene; the project's own docs tell users to comply with each vendor's terms of service.
+        - list "Stack":
+          - listitem: PowerShell
+          - listitem: Python
+        - link "Case study":
+          - /url: /en/projects/ghost
+        - link "Source code":
+          - /url: https://github.com/fotedev/ghost
+      - article:
+        - paragraph: Case study
+        - heading "Khalat" [level=3]
+        - paragraph: "Production commerce and ordering web application, built and operated under a deterministic AI software-factory pipeline: locked specifications, milestone gates and CI-enforced quality checks. The source is private, so every statement on this page is owner-attested rather than publicly verifiable."
+        - link "Case study":
+          - /url: /en/projects/khalat
+        - text: Private production repo
+    - region "Services":
+      - heading "Services" [level=2]
+      - paragraph: What I build for clients, from approved spec to handover.
+      - article:
+        - heading "High-performance web platforms (Next.js, TypeScript & Supabase)" [level=3]
+        - paragraph: "A production web application or dashboard — not a prototype: real data, user accounts with roles, and the views and reports your team uses daily. Deployed, documented, and handed over to you."
+        - link "All services":
+          - /url: /en/services
+      - article:
+        - heading "Full-stack AI & production RAG systems" [level=3]
+        - paragraph: "A tool that turns your documents into answers: semantic search and Q&A over your own files — PDFs, contracts, knowledge bases — with source citations and access control, instead of manual digging."
+        - link "All services":
+          - /url: /en/services
+      - article:
+        - heading "Agentic workflows, MCP tooling & deterministic CI pipelines" [level=3]
+        - paragraph: "Automations and agent tooling that connect the systems you already use: MCP servers, scheduled jobs, data sync between systems, and deterministic CI pipelines that make every change testable and reversible."
+        - link "All services":
+          - /url: /en/services
+    - region "How I work":
+      - heading "How I work" [level=2]
+      - paragraph: A deterministic factory, not improvised code.
+      - list:
+        - listitem:
+          - heading "Spec first" [level=3]
+          - paragraph: "Every build starts from a short written spec you approve: scope, constraints, and what \"done\" means, before any code exists."
+        - listitem:
+          - heading "Vertical slices" [level=3]
+          - paragraph: Work ships in thin, working slices you can open and use, not a big reveal at the end.
+        - listitem:
+          - heading "CI-enforced gates" [level=3]
+          - paragraph: Lint, types, tests and build run automatically on every change. Nothing merges without passing.
+        - listitem:
+          - heading "Handover" [level=3]
+          - paragraph: "You get documentation, deployment and the keys: a system you own and understand."
+    - region "Open-source and security engineering":
+      - heading "Open-source and security engineering" [level=2]
+      - paragraph: "Public record, verified and dated. Statuses stay honest: merged stays merged, open stays open, acknowledged stays acknowledged."
+      - list:
+        - listitem:
+          - text: Merged NousResearch/hermes-agent#114809
+          - 'heading "fix(config): malformed custom_providers no longer empties the providers view; config set refuses type mismatches; nested aliases keep key_env (#114605, #114471, salvage #45730, #109834)" [level=3]'
+          - paragraph: "Config-CLI hardening merged into hermes-agent main (2026-09-18). Includes the salvaged fix from PR #109834 (@fotedev) — credited in the PR body as \"source hunk, earliest filer\" — with an attributed commit; authorship preserved."
+          - paragraph: Verified on 2026-11-06
+          - link "View on GitHub":
+            - /url: https://github.com/NousResearch/hermes-agent/pull/114809
+        - listitem:
+          - text: Open PR NousResearch/hermes-agent#106626
+          - 'heading "fix(gateway): prefer session model override in /usage billing route" [level=3]'
+          - paragraph: "Open pull request (last updated 2026-10-17). Status: open — not merged."
+          - paragraph: Verified on 2026-11-06
+          - link "View on GitHub":
+            - /url: https://github.com/NousResearch/hermes-agent/pull/106626
+        - listitem:
+          - text: Open PR NousResearch/hermes-agent#122144
+          - 'heading "fix(windows): respawn gateway on the venv interpreter when captured argv leads with the base interpreter" [level=3]'
+          - paragraph: "Open pull request (last updated 2026-10-17). Status: open — not merged."
+          - paragraph: Verified on 2026-11-06
+          - link "View on GitHub":
+            - /url: https://github.com/NousResearch/hermes-agent/pull/122144
+        - listitem:
+          - text: Acknowledged disclosure MiniMax-AI/minimax-code#141
+          - heading "Insecure plaintext storage of Telegram bot tokens and Windows NTFS permission fallbacks in @mavis/local-runtime" [level=3]
+          - paragraph: Responsible security disclosure. Acknowledged by the vendor on 2026-09-21 ("Acknowledged on both counts… Forwarded to security review"). Issue closed 2026-10-19 as not_planned — no fix PR referenced; never labeled "fixed".
+          - paragraph: Verified on 2026-11-06
+          - link "View on GitHub":
+            - /url: https://github.com/MiniMax-AI/minimax-code/issues/141
+    - region "Verified credentials":
+      - heading "Verified credentials" [level=2]
+      - article:
+        - paragraph: Certificate
+        - heading "1 MILLION PROMPTERS — Certificate of Completion" [level=3]
+        - paragraph: Dubai Future Foundation · Dubai Centre for Artificial Intelligence
+        - paragraph: "Completion of the One Million Prompters initiative — a prompt-engineering training program. The certificate credits Dubai Future Foundation and the Dubai Centre for Artificial Intelligence. Program page: dub.ai/omp."
+        - paragraph: "Recipient: Ahmed Aboalyoun"
+        - link "View PDF (new tab)":
+          - /url: https://zfhfeiqdsugjqliufhke.supabase.co/storage/v1/object/public/public-assets/certificates/omp-certificate.pdf
+        - link "Download PDF":
+          - /url: https://zfhfeiqdsugjqliufhke.supabase.co/storage/v1/object/public/public-assets/certificates/omp-certificate.pdf?download=omp-certificate.pdf
+        - link "dub.ai/omp":
+          - /url: https://dub.ai/omp
+        - paragraph: The certificate PDF opens outside this site.
+    - region "About":
+      - heading "About" [level=2]
+      - paragraph: I'm Ahmed Aboalayoun (fotedev), a Full-Stack AI Engineer. I build web platforms, production RAG systems and the tooling around them, and I run my own work through a spec-gated software factory so every claim on this site can be traced to evidence.
+      - link "More about me":
+        - /url: /en/about
+    - region "Have a project in mind?":
+      - heading "Have a project in mind?" [level=2]
+      - paragraph: Email is the fastest way to reach me — or send the form on the contact page. Either way it lands straight in my inbox.
+      - link "Get in touch":
+        - /url: mailto:fote.engineer@gmail.com
+      - link "fote.engineer@gmail.com":
+        - /url: mailto:fote.engineer@gmail.com
+      - button "Copy email address"
+      - status
+  - contentinfo:
+    - paragraph: fotedev
+    - paragraph: Web applications and AI tools built around your business.
+    - navigation "Footer":
+      - heading "Pages" [level=2]
+      - list:
+        - listitem:
+          - link "Projects":
+            - /url: /en/projects
+        - listitem:
+          - link "Services":
+            - /url: /en/services
+        - listitem:
+          - link "About":
+            - /url: /en/about
+        - listitem:
+          - link "Contact":
+            - /url: /en/contact
+        - listitem:
+          - link "Privacy":
+            - /url: /en/privacy
+    - heading "Connect" [level=2]
+    - link "fote.engineer@gmail.com":
+      - /url: mailto:fote.engineer@gmail.com
+    - button "Copy email address"
+    - status
+    - list:
+      - listitem:
+        - link "GitHub":
+          - /url: https://github.com/fotedev
+      - listitem:
+        - link "LinkedIn":
+          - /url: https://www.linkedin.com/in/fotedev
+      - listitem:
+        - link "X (Twitter)":
+          - /url: https://x.com/FoteTeam
+      - listitem:
+        - link "Telegram":
+          - /url: https://t.me/ACYRO0016K
+      - listitem:
+        - link "YouTube":
+          - /url: https://www.youtube.com/channel/UCmfp_B-hOFq4UW5g1T4LCvQ
+      - listitem:
+        - link "Facebook":
+          - /url: https://www.facebook.com/profile.php?id=61558539080140
+      - listitem:
+        - link "Instagram":
+          - /url: https://www.instagram.com/devtech.team/
+    - paragraph: "© 2026 Ahmed Aboalayoun · Code: AGPL-3.0-only · Content & assets: all rights reserved."
+    - paragraph: Built in the open with a deterministic software factory.
+  - alert

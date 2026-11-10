@@ -31,7 +31,7 @@ export default async function AdminServicesPage() {
         <h1 className="text-2xl font-semibold">Services</h1>
         <Link
           href="/admin/services/new"
-          className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-strong"
+          className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-strong"
         >
           New service
         </Link>

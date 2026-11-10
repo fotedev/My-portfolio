@@ -42,7 +42,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
     <>
       {settings && (
         <JsonLd
-          data={professionalServiceJsonLd({ description: settings.heroOffer, email: settings.contactEmail })}
+          data={professionalServiceJsonLd({ description: settings.heroOffer, email: settings.contactEmail, locale })}
         />
       )}
 

@@ -16,6 +16,11 @@ export function generateStaticParams(): Array<{ locale: string }> {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// Unknown locale prefixes (e.g. /fr) must 404 immediately — without this they
+// fell into generateMetadata with an invalid locale and returned HTTP 500
+// (observed as /favicon.ico → 500 before the app favicon existed; M6 SEO audit).
+export const dynamicParams = false;
+
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
