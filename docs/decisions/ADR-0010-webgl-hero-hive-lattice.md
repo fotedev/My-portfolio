@@ -129,6 +129,7 @@ Measured against the production build of this branch (Turbopack, both locales). 
 | LCP / TBT / CLS, mobile                           | —                   | 0.7–0.9 s / 20–30 ms / 0                      | —                                               |
 | axe violations attributable to the layer          | —                   | **0**                                         | Identical violation set before and after        |
 | CSP violations                                    | —                   | **0**                                         | three.js needs neither `worker-src` nor `blob:` |
+| Kill switch (`NEXT_PUBLIC_HERO_HIVE=0`)           | —                   | layer absent, canvas absent, three.js chunk never fetched (11 JS files instead of 12), hero renders unchanged | Verified in a production build in **both** directions |
 
 The route's own blocking JavaScript grows by 1.9 KB; the effect's cost is a 150 KB chunk that arrives long after the page has painted, so it never competes with the LCP element. The full-route total (337.6 KB gzip) is above the §8.4 soft budget, which is why §8.4 records deferred chunks separately and why the hard gate is Lighthouse rather than a byte count.
 
