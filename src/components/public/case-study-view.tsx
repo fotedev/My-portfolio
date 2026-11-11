@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Reveal } from "@/components/motion";
 import { StatusPill } from "@/components/status-pill";
 import { TechPills } from "@/components/tech-pills";
+import { ExternalArrow, ForwardArrow } from "@/components/ui/arrows";
 import { externalLink } from "@/components/ui/cta";
 import type { CaseStudy } from "@/lib/content/queries";
 
@@ -38,24 +38,11 @@ export function CaseStudyView({
         href="/projects"
         className={`inline-flex min-h-11 items-center gap-1 text-muted-foreground transition-colors duration-150 hover:text-foreground ${externalLink}`}
       >
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="size-4 rtl:-scale-x-100"
-        >
-          <path d="M19 12H5" />
-          <path d="m12 19-7-7 7-7" />
-        </svg>
+        <ForwardArrow className="size-4 rotate-180" />
         {labels.backToProjects}
       </Link>
 
-      <p className="mt-8 type-caption text-muted-foreground">{labels.caseStudy}</p>
-      <h1 className="mt-1 type-h1">
+      <h1 className="mt-10 type-h1">
         <bdi>{study.title}</bdi>
       </h1>
       <p className="mt-4 text-muted-foreground type-body-lg">{study.summary}</p>
@@ -64,17 +51,13 @@ export function CaseStudyView({
         {study.liveUrl && (
           <a href={study.liveUrl} target="_blank" rel="noopener noreferrer" className={externalLink}>
             {labels.liveDemo}
-            <span aria-hidden="true" className="text-xs">
-              ↗
-            </span>
+            <ExternalArrow />
           </a>
         )}
         {study.repoUrl ? (
           <a href={study.repoUrl} target="_blank" rel="noopener noreferrer" className={externalLink}>
             {labels.sourceCode}
-            <span aria-hidden="true" className="text-xs">
-              ↗
-            </span>
+            <ExternalArrow />
           </a>
         ) : (
           <StatusPill kind="neutral">{labels.privateRepo}</StatusPill>
@@ -85,36 +68,30 @@ export function CaseStudyView({
         <TechPills items={study.techStack} label={labels.stack} />
       </div>
 
-      <section className="mt-12" aria-labelledby="study-problem">
-        <Reveal>
-          <h2 id="study-problem" className="type-h2">
-            {labels.problem}
-          </h2>
-          <p className="mt-3 type-body">{study.problem}</p>
-        </Reveal>
+      <section className="mt-14" aria-labelledby="study-problem">
+        <h2 id="study-problem" className="type-h2">
+          {labels.problem}
+        </h2>
+        <p className="mt-4 type-body">{study.problem}</p>
       </section>
 
-      <section className="mt-10" aria-labelledby="study-solution">
-        <Reveal>
-          <h2 id="study-solution" className="type-h2">
-            {labels.solution}
-          </h2>
-          <p className="mt-3 type-body">{study.solution}</p>
-        </Reveal>
+      <section className="mt-12" aria-labelledby="study-solution">
+        <h2 id="study-solution" className="type-h2">
+          {labels.solution}
+        </h2>
+        <p className="mt-4 type-body">{study.solution}</p>
       </section>
 
       {study.results && (
-        <section className="mt-10" aria-labelledby="study-results">
-          <Reveal>
-            <h2 id="study-results" className="type-h2">
-              {labels.results}
-            </h2>
-            <p className="mt-3 type-body">{study.results}</p>
-          </Reveal>
+        <section className="mt-12" aria-labelledby="study-results">
+          <h2 id="study-results" className="type-h2">
+            {labels.results}
+          </h2>
+          <p className="mt-4 type-body">{study.results}</p>
         </section>
       )}
 
-      <p className="mt-12 border-t border-border-subtle pt-6 type-caption text-muted-foreground">
+      <p className="mt-14 border-t border-border-subtle pt-6 type-mono-sm text-muted-foreground tabular-nums">
         {labels.lastUpdated}
       </p>
     </div>

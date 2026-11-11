@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CredentialCard } from "@/components/credential-card";
 import { JsonLd } from "@/components/json-ld";
-import { Reveal } from "@/components/motion";
 import { OssContributionItem } from "@/components/oss-contributions";
 import { btnPrimary } from "@/components/ui/cta";
 import { personJsonLd } from "@/lib/content/jsonld";
@@ -58,48 +57,45 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
     <>
       <JsonLd data={personJsonLd({ sameAs: settings?.socials.map((s) => s.url) ?? [], locale })} />
 
-      <div className="container-site py-16 md:py-20">
+      <div className="container-site py-16 md:py-24">
         <div className="container-reading">
           <h1 className="type-h1">{t("title")}</h1>
-          <p className="mt-4 type-body-lg">{t("intro1")}</p>
+          <p className="mt-6 type-body-lg">{t("intro1")}</p>
           <p className="mt-4 type-body">{t("intro2")}</p>
 
-          <section className="mt-12" aria-labelledby="about-factory">
-            <Reveal>
-              <h2 id="about-factory" className="type-h2">
-                {t("factoryTitle")}
-              </h2>
-              <p className="mt-3 type-body">{t("factoryBody")}</p>
-            </Reveal>
+          <section className="mt-14" aria-labelledby="about-factory">
+            <h2 id="about-factory" className="type-h2">
+              {t("factoryTitle")}
+            </h2>
+            <p className="mt-3 type-body">{t("factoryBody")}</p>
           </section>
 
-          <section className="mt-12" aria-labelledby="about-arsenal">
-            <Reveal>
-              <h2 id="about-arsenal" className="type-h2">
-                {t("arsenalTitle")}
-              </h2>
-              <dl className="mt-4 space-y-4">
-                {ARSENAL.map((group) => (
-                  <div key={group.labelKey} className="rounded-xl border border-border-subtle bg-surface p-5">
-                    <dt className="type-caption text-muted-foreground">{t(group.labelKey)}</dt>
-                    <dd className="mt-1.5 type-body-sm">{t(group.itemsKey)}</dd>
-                  </div>
-                ))}
-              </dl>
-            </Reveal>
+          <section className="mt-14" aria-labelledby="about-arsenal">
+            <h2 id="about-arsenal" className="type-h2">
+              {t("arsenalTitle")}
+            </h2>
+            <dl className="mt-6 border-t border-border-subtle">
+              {ARSENAL.map((group) => (
+                <div
+                  key={group.labelKey}
+                  className="grid gap-1 border-b border-border-subtle py-5 md:grid-cols-[10rem_1fr] md:gap-6"
+                >
+                  <dt className="text-sm font-medium">{t(group.labelKey)}</dt>
+                  <dd className="text-muted-foreground type-body-sm">{t(group.itemsKey)}</dd>
+                </div>
+              ))}
+            </dl>
           </section>
         </div>
 
-        <section className="mt-12" aria-labelledby="about-oss">
-          <Reveal>
-            <div className="container-reading">
-              <h2 id="about-oss" className="type-h2">
-                {t("ossTitle")}
-              </h2>
-              <p className="mt-3 type-body">{t("ossBody")}</p>
-            </div>
-          </Reveal>
-          <ul className="mt-6 grid gap-6 lg:grid-cols-2">
+        <section className="mt-14" aria-labelledby="about-oss">
+          <div className="container-reading">
+            <h2 id="about-oss" className="type-h2">
+              {t("ossTitle")}
+            </h2>
+            <p className="mt-3 type-body">{t("ossBody")}</p>
+          </div>
+          <ul className="mt-8 border-t border-border-subtle">
             {contributions.map((contribution) => (
               <OssContributionItem
                 key={`${contribution.repo}-${contribution.number}`}
@@ -110,7 +106,6 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                     if (status === "acknowledged") return ossT("acknowledged");
                     return ossT("open");
                   },
-                  viewOnGithub: ossT("viewOnGithub"),
                   verifiedOn: (date) => ossT("verifiedOn", { date }),
                 }}
               />
@@ -119,20 +114,17 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </section>
 
         {credential && (
-          <section className="mt-12" aria-labelledby="about-cert">
-            <Reveal>
-              <div className="container-reading">
-                <h2 id="about-cert" className="type-h2">
-                  {t("certTitle")}
-                </h2>
-                <p className="mt-3 type-body">{t("certBody")}</p>
-              </div>
-            </Reveal>
-            <div className="container-reading mt-6">
+          <section className="mt-14" aria-labelledby="about-cert">
+            <div className="container-reading">
+              <h2 id="about-cert" className="type-h2">
+                {t("certTitle")}
+              </h2>
+              <p className="mt-3 type-body">{t("certBody")}</p>
+            </div>
+            <div className="container-reading mt-8">
               <CredentialCard
                 credential={credential}
                 labels={{
-                  eyebrow: t("certTitle"),
                   recipient: credT("recipient"),
                   viewPdf: credT("viewPdf"),
                   downloadPdf: credT("downloadPdf"),
@@ -143,7 +135,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </section>
         )}
 
-        <div className="container-reading mt-12 border-t border-border-subtle pt-10">
+        <div className="container-reading mt-14 border-t border-border-subtle pt-10">
           {settings && (
             <Link href="/contact" className={btnPrimary}>
               {contactT("title")}

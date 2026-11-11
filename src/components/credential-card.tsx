@@ -1,8 +1,8 @@
+import { ExternalArrow } from "@/components/ui/arrows";
 import { btnPrimary, btnSecondary, externalLink } from "@/components/ui/cta";
 import type { Credential } from "@/lib/content/queries";
 
 export type CredentialCardLabels = {
-  eyebrow: string;
   recipient: string;
   viewPdf: string;
   downloadPdf: string;
@@ -10,24 +10,25 @@ export type CredentialCardLabels = {
 };
 
 /**
- * Certificate card. Publication rules (CONTENT-EVIDENCE.md): program name +
- * recipient + issuer logo credits only; date/ID/verify-URL are TO VERIFY and
- * stay omitted. The PDF is linked, never embedded (prompt-4 §2).
+ * Certificate artifact. Publication rules (CONTENT-EVIDENCE.md): program name
+ * + recipient + issuer display line only; date/ID/verify-URL are TO VERIFY
+ * and stay omitted. The PDF is linked, never embedded (prompt-4 §2).
  */
 export function CredentialCard({ credential, labels }: { credential: Credential; labels: CredentialCardLabels }) {
   return (
-    <article className="rounded-xl border border-border-subtle bg-surface p-6">
-      <p className="type-caption text-muted-foreground">{labels.eyebrow}</p>
-      <h3 className="mt-1 type-h3">
-        <bdi>{credential.title}</bdi>
-      </h3>
-      <p className="mt-1 text-muted-foreground type-body-sm">{credential.issuerDisplay}</p>
-      <p className="mt-2 type-body-sm">{credential.summary}</p>
-      <p className="mt-2 type-body-sm text-muted-foreground">
-        {labels.recipient}: <bdi>{credential.recipientName}</bdi>
-      </p>
+    <article className="grid gap-6 rounded-xl border border-border-subtle bg-surface p-6 md:grid-cols-[1fr_auto] md:gap-10 md:p-8">
+      <div>
+        <h3 className="type-h3">
+          <bdi>{credential.title}</bdi>
+        </h3>
+        <p className="mt-1.5 text-muted-foreground type-body-sm">{credential.issuerDisplay}</p>
+        <p className="mt-4 max-w-2xl type-body-sm">{credential.summary}</p>
+        <p className="mt-4 type-body-sm text-muted-foreground">
+          {labels.recipient}: <bdi className="text-foreground">{credential.recipientName}</bdi>
+        </p>
+      </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3 md:flex-col md:items-stretch">
         {credential.pdfUrl && (
           <a href={credential.pdfUrl} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
             {labels.viewPdf}
@@ -38,14 +39,17 @@ export function CredentialCard({ credential, labels }: { credential: Credential;
             {labels.downloadPdf}
           </a>
         )}
-        <a href={credential.proofUrl} target="_blank" rel="noopener noreferrer" className={externalLink}>
+        <a
+          href={credential.proofUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`${externalLink} justify-center`}
+        >
           dub.ai/omp
-          <span aria-hidden="true" className="text-xs">
-            ↗
-          </span>
+          <ExternalArrow />
         </a>
       </div>
-      <p className="mt-3 type-caption text-muted-foreground">{labels.pdfNote}</p>
+      <p className="type-body-sm text-muted-foreground md:col-start-1">{labels.pdfNote}</p>
     </article>
   );
 }

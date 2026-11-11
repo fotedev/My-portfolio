@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Product** | fotedev portfolio (`fotedev.me`) — public identity: **Ahmed Aboalayoun** |
-| **Status** | **Binding design contract for Milestone 2 (M2) implementation.** All visual, motion, typography, RTL and accessibility decisions below are locked. Changes require an ADR or explicit owner approval at a gate. |
+| **Status** | **Binding design contract for Milestone 2 (M2) implementation.** All visual, motion, typography, RTL and accessibility decisions below are locked. Changes require an ADR or explicit owner approval at a gate. **Amendment:** ADR-0009 (2026-11-11, M2.1 design enhancement pass) adjusts the display scale, pill typography, motion set and section layouts; the affected entries below reflect it. |
 | **Applies to** | `/en` and `/ar` public routes, admin surface styling, all shared components |
 | **Direction** | Calm, technical, credible. Neutral surfaces, one blue/cyan accent family. **Not** a neon terminal. No streak counters, no badge walls. |
 | **Authority** | `prompt-0.md` §2 (locked decisions), `prompt-1.md` §5.1 |
@@ -203,6 +203,8 @@ Allowed motion patterns (Framer Motion, `MotionConfig reducedMotion="user"`):
 - Hover feedback: color/shadow/border via CSS transitions (not JS animation).
 - Skeleton pulse: opacity 0.5→1 loop, ONLY while loading, removed on load.
 
+Implementation note (ADR-0009): the shipped site uses exactly one entrance — the hero's CSS `rise-in` on mount (200ms, transform-only, works without JS) — plus CSS hover transitions. Scroll-triggered section reveals and stagger are removed.
+
 Forbidden: parallax, scroll-jacking, autoplaying carousels/video, typewriter loops, bouncing springs (spring damping ≥ stiff or use tween), scale-on-scroll, rotating badges, ambient background animation, hover motion that moves layout (transform only, never layout properties).
 
 `prefers-reduced-motion: reduce` (mandatory global rule):
@@ -244,7 +246,7 @@ Applied via `:lang(ar)` / `[dir="rtl"]` selector, or per-locale `className` from
 
 | Token | Size mobile | Size desktop | Weight | Line-height | Tracking | Use |
 |---|---|---|---|---|---|---|
-| `text-display` | 36px / 2.25rem | 48px / 3rem | 700 | 1.15 | −0.02em | Hero headline |
+| `text-display` | 40px / 2.5rem (fluid floor) | 68px / 4.25rem (fluid cap) — `clamp(2.5rem, 1.7rem + 3.2vw, 4.25rem)` | 700 | 1.08 | −0.025em | Hero headline (ADR-0009) |
 | `text-h1` | 30px / 1.875rem | 36px / 2.25rem | 700 | 1.2 | −0.02em | Page titles |
 | `text-h2` | 24px / 1.5rem | 28px / 1.75rem | 600 | 1.3 | −0.01em | Section titles |
 | `text-h3` | 20px / 1.25rem | 22px / 1.375rem | 600 | 1.4 | 0 | Card/section sub-titles |
@@ -449,7 +451,7 @@ Used for: contributions list (OSS credibility), admin inbox (M5), metrics.
 
 ### 10.5 Chips & status pills
 
-Rounded-full, `text-caption` weight 600, padding 2px 10px, `--radius-full`.
+Rounded-full, `type-pill` — sentence case, 12–13px / weight 500, letter-spacing 0.01em (0 in AR) per ADR-0009 — padding 2px 10px, `--radius-full`.
 
 | Pill | Dark (bg / text) | Light (bg / text) |
 |---|---|---|

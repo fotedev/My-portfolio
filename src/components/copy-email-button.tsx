@@ -3,20 +3,23 @@
 import { useRef, useState } from "react";
 
 /**
- * Clipboard copy with a polite live-region confirmation (DESIGN §10.7).
- * Labels come from the caller so the footer and the contact page can use
- * their own namespaces. Clipboard failures are silent — the adjacent mailto
- * link always works.
+ * The email address itself is the copy control (owner request, 2026-11-11):
+ * click to copy, a native hover/focus tooltip carries the hint, and success
+ * flashes the success color while a polite live region announces it (DESIGN
+ * §10.7). The adjacent explicit mailto CTA ("Get in touch" / "Write an
+ * email") remains the open-in-mail-app path (ADR-0004 email-first).
  */
 export function CopyEmailButton({
   email,
   label,
   copiedLabel,
+  hintLabel,
   className,
 }: {
   email: string;
   label: string;
   copiedLabel: string;
+  hintLabel: string;
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -31,27 +34,20 @@ export function CopyEmailButton({
       }
       timer.current = setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Clipboard unavailable (permissions / http): mailto fallback still works.
+      // Clipboard unavailable (permissions / http): the adjacent mailto CTA works.
     }
   }
 
   return (
     <>
-      <button type="button" onClick={copy} className={className} aria-label={label}>
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="size-4"
-        >
-          <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-        </svg>
-        <span className="type-body-sm">{copied ? copiedLabel : label}</span>
+      <button
+        type="button"
+        onClick={copy}
+        className={className}
+        aria-label={label}
+        title={copied ? copiedLabel : hintLabel}
+      >
+        <span className={copied ? "text-success-text" : undefined}>{email}</span>
       </button>
       <span role="status" aria-live="polite" className="sr-only">
         {copied ? copiedLabel : ""}
