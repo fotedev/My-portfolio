@@ -67,7 +67,14 @@ export default function HiveCanvas() {
     };
 
     const onScroll = (): void => {
-      if (!hero) return;
+      if (!hero) {
+        // No hero element to track (the layer was mounted somewhere else).
+        // Show it in full rather than leaving it stuck at the CSS default of
+        // zero opacity, where it would render for nothing.
+        container.style.opacity = "1";
+        renderer.start();
+        return;
+      }
       const rect = hero.getBoundingClientRect();
 
       // Convergence: 0 while the hero is in place, 1 once the reader has
