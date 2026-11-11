@@ -72,29 +72,46 @@ test.describe("hero lattice", () => {
 
     if (!(await hasWebGL(page))) return;
 
-    await expect(page.locator(".hero-hive__canvas")).toHaveCount(1);
+    const canvas = page.locator(".hero-hive__canvas");
+    await expect(canvas).toHaveCount(1);
 
-    // With reduced motion the field must not animate: two samples of the
-    // canvas pixels taken a moment apart have to be identical.
-    const sample = async (): Promise<string> =>
-      page.evaluate(() => {
-        const canvas = document.querySelector<HTMLCanvasElement>(".hero-hive__canvas");
-        if (!canvas) return "";
-        const scratch = document.createElement("canvas");
-        scratch.width = 64;
-        scratch.height = 64;
-        const context = scratch.getContext("2d");
-        if (!context) return "";
-        context.drawImage(canvas, 0, 0, 64, 64);
-        return scratch.toDataURL();
-      });
+    // The renderer publishes its frame count on the canvas. Under reduced
+    // motion it must stop at the single static frame it drew on mount.
+    //
+    // Comparing rendered pixels instead would be unreliable - GPU
+    // rasterisation is not bit-identical between frames, so two captures of
+    // the same static scene can still differ.
+    const frames = async (): Promise<number> => {
+      const raw = await canvas.getAttribute("data-hive-frames");
+      return Number.parseInt(raw ?? "0", 10) || 0;
+    };
 
-    const first = await sample();
-    await page.waitForTimeout(900);
-    const second = await sample();
+    const first = await frames();
+    await page.waitForTimeout(1200);
+    const second = await frames();
 
-    expect(first).not.toBe("");
+    expect(first).toBeGreaterThan(0);
     expect(second).toBe(first);
+  });
+
+  test("animates when motion is allowed", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/en");
+    await page.waitForTimeout(1500);
+
+    if (!(await hasWebGL(page))) return;
+
+    const canvas = page.locator(".hero-hive__canvas");
+    const frames = async (): Promise<number> => {
+      const raw = await canvas.getAttribute("data-hive-frames");
+      return Number.parseInt(raw ?? "0", 10) || 0;
+    };
+
+    const first = await frames();
+    await page.waitForTimeout(1200);
+    const second = await frames();
+
+    expect(second).toBeGreaterThan(first);
   });
 
   test("introduces no accessibility violations of its own", async ({ page }) => {

@@ -113,6 +113,7 @@ export interface HiveRendererState {
  */
 export class HiveRenderer {
   private readonly renderer: WebGLRenderer;
+  private readonly canvas: HTMLCanvasElement;
   private readonly scene = new Scene();
   private readonly camera: PerspectiveCamera;
   private readonly group = new Object3D();
@@ -150,6 +151,7 @@ export class HiveRenderer {
   private started = false;
   private frameHandle: number | null = null;
   private frameCount = 0;
+  private lastFramePublish = 0;
   private running = false;
   private disposed = false;
 
@@ -165,6 +167,7 @@ export class HiveRenderer {
       powerPreference: "high-performance",
     });
     this.renderer.setClearColor(0x000000, 0);
+    this.canvas = canvas;
 
     this.camera = new PerspectiveCamera(CAMERA_FOV, 1, CAMERA_NEAR, CAMERA_FAR);
 
@@ -328,6 +331,7 @@ export class HiveRenderer {
     if (this.reducedMotion) {
       this.updateField(1, 0);
       this.renderFrame(0);
+      this.publishFrameCount(performance.now());
       return;
     }
 
@@ -346,10 +350,26 @@ export class HiveRenderer {
       const elapsed = now - this.startedAt;
       const entrance = easeOutCubic(Math.min(1, elapsed / ENTRANCE_MS));
 
+      this.frameCount += 1;
       this.updateField(entrance, elapsed / 1000);
       this.renderFrame(delta);
+      this.publishFrameCount(now);
     };
     this.frameHandle = requestAnimationFrame(loop);
+  }
+
+  /**
+   * Publishes the frame count on the canvas, at most twice a second.
+   *
+   * It makes the render loop observable from outside, which is how the E2E
+   * suite proves that the loop is not running under `prefers-reduced-motion`.
+   * Comparing rendered pixels instead would be unreliable: GPU rasterisation
+   * is not bit-identical between frames.
+   */
+  private publishFrameCount(now: number): void {
+    if (now - this.lastFramePublish < 500) return;
+    this.lastFramePublish = now;
+    this.canvas.dataset.hiveFrames = String(this.frameCount);
   }
 
   /** Stops the animation loop. */
