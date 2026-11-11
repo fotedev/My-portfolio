@@ -63,7 +63,7 @@ The effect is loaded with `next/dynamic` (`ssr: false`) and mounted only after f
 - Amber appears **only** inside the canvas. No DOM element, no text, no icon, no border, no focus ring takes the amber hue.
 - All UI and content remain strictly on the blue/cyan accent family. The amber is not a second _decorative_ hue on the page; it is the canvas's own material, like the colour of a photograph.
 - The canvas is transparent. It paints no background, so the page's own surface tokens are untouched in both themes.
-- The layer is decorative and `aria-hidden`, so it is excluded from contrast requirements (WCAG 1.4.3 applies to text and meaningful graphics; this is neither). Body copy still sits on the page's own background, never on the canvas, because the canvas renders behind content and the hero's text sits on an opaque-enough surface.
+- The layer is decorative and `aria-hidden`, so it is excluded from contrast requirements (WCAG 1.4.3 applies to text and meaningful graphics; this is neither). The hero copy sits directly on the page's own background, with the canvas painting behind it - the node radius and link opacity are capped so that the mesh behind the headline never competes with the text.
 
 Theme behaviour differs, because bloom cannot survive a light ground:
 
@@ -81,13 +81,13 @@ The 200 ms cap, the ease-out tokens and the `prefers-reduced-motion` global rule
 
 What the canvas does, and how each is bounded:
 
-| Behaviour        | Bound                                                                                                           |
-| ---------------- | --------------------------------------------------------------------------------------------------------------- |
-| Entrance         | One staggered grow-in over ~1.8 s, per-node thresholds, no loop after                                           |
-| Idle drift       | Slow per-node sine, amplitude ≤ 0.3 units                                                                       |
-| Pointer parallax | Group rotation, ±0.12 rad, eased at 0.05 lerp - spatial, not directional, so RTL needs no mirroring             |
-| Convergence      | Nodes lerp toward the honeycomb core over the first fifth of the hero's scroll range, 0 → 1, eased in-out cubic |
-| Scroll-jacking   | **None.** The page scrolls normally; the canvas only reads scroll position                                      |
+| Behaviour        | Bound                                                                                                                                     |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Entrance         | One staggered grow-in over ~1.8 s, per-node thresholds; one-shot, after which the loop continues with the idle drift and the pointer tilt |
+| Idle drift       | Slow per-node sine, amplitude ≤ 0.3 units                                                                                                 |
+| Pointer parallax | Group rotation, ±0.12 rad, eased at 0.05 lerp - spatial, not directional, so RTL needs no mirroring                                       |
+| Convergence      | Nodes lerp toward the honeycomb core over the first fifth of the hero's scroll range, 0 → 1, eased in-out cubic                           |
+| Scroll-jacking   | **None.** The page scrolls normally; the canvas only reads scroll position                                                                |
 
 The convergence range is deliberately short. The reference drives it across
 the whole document, which only works because its layer is fixed for the whole
@@ -111,7 +111,7 @@ screen, which is where the payoff belongs.
 - `aria-hidden="true"`, `pointer-events: none`, and no text in the layer — it is invisible to the accessibility tree and cannot be focused.
 - The layer never overlaps content in a way that reduces text contrast: the hero copy sits on the page background, and the node radius and link opacity are capped so that the mesh behind the headline stays below the contrast floor.
 - The canvas is `position: absolute` inside the hero, with the hero's own content at `z-index: 10` above it.
-- `axe-core` must remain clean on `/en` and `/ar` in both themes.
+- `axe-core` must not gain a violation of its own on `/en` or `/ar`, in either theme. The pages carry pre-existing findings unrelated to this layer (the warning status pill's contrast, and the copy-email button's label-in-name); the layer's contribution to the violation set is zero.
 
 ### 7. Budget and measured results
 
@@ -119,16 +119,16 @@ screen, which is where the payoff belongs.
 
 Measured against the production build of this branch (Turbopack, both locales). "Critical" means the chunks whose response finished before First Contentful Paint — the static graph that blocks rendering:
 
-| Measurement                                       | Before              | After                                         | Verdict                                         |
-| ------------------------------------------------- | ------------------- | --------------------------------------------- | ----------------------------------------------- |
-| Critical JS on `/en` (blocks rendering)           | 152.7 KB gzip       | **154.6 KB gzip**                             | +1.9 KB — the loader component                  |
-| Deferred canvas chunk                             | —                   | **150.1 KB gzip**, arriving ~250 ms after FCP | Not in the critical path                        |
-| Total JS for the route, deferred chunk included   | 185.5 KB gzip       | 337.6 KB gzip                                 | +152.1 KB — the cost of the effect              |
-| Lighthouse Performance, mobile                    | 99 / 100 (two runs) | **99 / 100**                                  | Gate is ≥ 90 — passes                           |
-| Lighthouse Accessibility / Best Practices, mobile | 100 / 100           | **100 / 100**                                 | —                                               |
-| LCP / TBT / CLS, mobile                           | —                   | 0.7–0.9 s / 20–30 ms / 0                      | —                                               |
-| axe violations attributable to the layer          | —                   | **0**                                         | Identical violation set before and after        |
-| CSP violations                                    | —                   | **0**                                         | three.js needs neither `worker-src` nor `blob:` |
+| Measurement                                       | Before              | After                                                                                                         | Verdict                                               |
+| ------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Critical JS on `/en` (blocks rendering)           | 152.7 KB gzip       | **154.6 KB gzip**                                                                                             | +1.9 KB — the loader component                        |
+| Deferred canvas chunk                             | —                   | **150.1 KB gzip**, arriving ~250 ms after FCP                                                                 | Not in the critical path                              |
+| Total JS for the route, deferred chunk included   | 185.5 KB gzip       | 337.6 KB gzip                                                                                                 | +152.1 KB — the cost of the effect                    |
+| Lighthouse Performance, mobile                    | 99 / 100 (two runs) | **99 / 100**                                                                                                  | Gate is ≥ 90 — passes                                 |
+| Lighthouse Accessibility / Best Practices, mobile | 100 / 100           | **100 / 100**                                                                                                 | —                                                     |
+| LCP / TBT / CLS, mobile                           | —                   | 0.7–0.9 s / 20–30 ms / 0                                                                                      | —                                                     |
+| axe violations attributable to the layer          | —                   | **0**                                                                                                         | Identical violation set before and after              |
+| CSP violations                                    | —                   | **0**                                                                                                         | three.js needs neither `worker-src` nor `blob:`       |
 | Kill switch (`NEXT_PUBLIC_HERO_HIVE=0`)           | —                   | layer absent, canvas absent, three.js chunk never fetched (11 JS files instead of 12), hero renders unchanged | Verified in a production build in **both** directions |
 
 The route's own blocking JavaScript grows by 1.9 KB; the effect's cost is a 150 KB chunk that arrives long after the page has painted, so it never competes with the LCP element. The full-route total (337.6 KB gzip) is above the §8.4 soft budget, which is why §8.4 records deferred chunks separately and why the hard gate is Lighthouse rather than a byte count.
