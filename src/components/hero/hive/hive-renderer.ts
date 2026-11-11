@@ -332,15 +332,22 @@ export class HiveRenderer {
     }
 
     this.running = true;
+    let previous = performance.now();
     const loop = (): void => {
       if (this.disposed || !this.running) return;
       this.frameHandle = requestAnimationFrame(loop);
 
-      const elapsed = performance.now() - this.startedAt;
+      const now = performance.now();
+      // Delta time, clamped so a background tab or a stalled frame cannot
+      // hand the postprocessing pass a huge step.
+      const delta = Math.min(0.1, (now - previous) / 1000);
+      previous = now;
+
+      const elapsed = now - this.startedAt;
       const entrance = easeOutCubic(Math.min(1, elapsed / ENTRANCE_MS));
 
       this.updateField(entrance, elapsed / 1000);
-      this.renderFrame(Math.min(0.1, (elapsed % 100) / 100));
+      this.renderFrame(delta);
     };
     this.frameHandle = requestAnimationFrame(loop);
   }
