@@ -147,10 +147,17 @@ export function computeLinks(
   return buffer;
 }
 
-/** Allocates a link buffer large enough for the given node count. */
+/**
+ * Allocates a link buffer large enough for the given node count.
+ *
+ * Every node contributes up to `maxPerNode` directed edges, so the union of
+ * those choices can reach `nodeCount * maxPerNode` unique pairs. The buffer
+ * is allocated at twice that, so a denser field than the current one cannot
+ * silently truncate the mesh.
+ */
 export function createLinkBuffer(nodeCount: number, maxPerNode: number): LinkBuffer {
   return {
-    indices: new Int32Array(nodeCount * maxPerNode * 2),
+    indices: new Int32Array(nodeCount * maxPerNode * 4),
     count: 0,
   };
 }

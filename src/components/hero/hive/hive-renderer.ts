@@ -176,7 +176,9 @@ export class HiveRenderer {
     const nodeCount = this.nodes.length;
     this.positions = new Float32Array(nodeCount * 3);
     this.linkBuffer = createLinkBuffer(nodeCount, LINK_MAX_PER_NODE);
-    this.linePositions = new Float32Array(nodeCount * LINK_MAX_PER_NODE * 2 * 3);
+    // Sized to match the link buffer: two vertices per pair, three floats per
+    // vertex.
+    this.linePositions = new Float32Array(nodeCount * LINK_MAX_PER_NODE * 4 * 3);
 
     // --- nodes -------------------------------------------------------------
     const nodeGeometry = new ShapeGeometry(hexagonShape(1));
