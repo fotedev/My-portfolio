@@ -20,7 +20,25 @@ const nextConfig: NextConfig = {
   //     'unsafe-inline' next to 'self' and the Turnstile script origin.
   // (b) The Turnstile widget needs its script origin and its iframe origin
   //     in frame-src (DESIGN.md §Turnstile).
+  // (c) Development only: React requires eval() in dev mode (debug call
+  //     stacks) and Turbopack HMR uses same-origin websockets — 'unsafe-eval'
+  //     and ws: are added to script-src/connect-src when NODE_ENV is
+  //     "development". The production policy (next build / next start and
+  //     Vercel) never includes them.
   async headers() {
+    const isDev = process.env.NODE_ENV === "development";
+    const scriptSrc = ["'self'", "'unsafe-inline'", "https://challenges.cloudflare.com"];
+    const connectSrc = [
+      "'self'",
+      "https://*.supabase.co",
+      "wss://*.supabase.co",
+      "https://challenges.cloudflare.com",
+    ];
+    if (isDev) {
+      scriptSrc.push("'unsafe-eval'");
+      connectSrc.push("ws:");
+    }
+
     return [
       {
         source: "/:path*",
@@ -29,11 +47,11 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+              `script-src ${scriptSrc.join(" ")}`,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https://*.supabase.co",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com",
+              `connect-src ${connectSrc.join(" ")}`,
               "frame-src https://challenges.cloudflare.com",
               "object-src 'none'",
               "base-uri 'self'",
