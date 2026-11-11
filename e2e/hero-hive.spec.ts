@@ -11,6 +11,14 @@ import { expect, test } from "@playwright/test";
 
 const GL_DRIVER_WARNING = /GL Driver Message|GPU stall|WebGL-0x/i;
 
+/** Whether this browser can give us a WebGL context at all. */
+async function hasWebGL(page: import("@playwright/test").Page): Promise<boolean> {
+  return page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    return Boolean(canvas.getContext("webgl2") ?? canvas.getContext("webgl"));
+  });
+}
+
 test.describe("hero lattice", () => {
   test("renders behind the hero, hidden from assistive technology", async ({ page }) => {
     await page.goto("/en");
@@ -48,8 +56,12 @@ test.describe("hero lattice", () => {
     await page.goto("/en");
     await page.waitForTimeout(2500);
 
-    const canvas = page.locator(".hero-hive__canvas");
-    await expect(canvas).toHaveCount(1);
+    // Where WebGL is unavailable the documented fallback is to remove the
+    // canvas entirely (ADR-0010 section 5), so its absence is a pass, not a
+    // failure. What must never happen is an error either way.
+    if (await hasWebGL(page)) {
+      await expect(page.locator(".hero-hive__canvas")).toHaveCount(1);
+    }
     expect(errors).toEqual([]);
   });
 
@@ -57,6 +69,8 @@ test.describe("hero lattice", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/en");
     await page.waitForTimeout(1500);
+
+    if (!(await hasWebGL(page))) return;
 
     await expect(page.locator(".hero-hive__canvas")).toHaveCount(1);
 
