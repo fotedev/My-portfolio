@@ -136,9 +136,10 @@ Every surface ships with all four states designed (`DESIGN.md` component states)
 Public pages must stay fast and mostly-static. Concrete rules:
 
 1. **No client-side data fetching on public routes.** All page content is server-rendered static/ISR (locked caching decision). Supabase reads happen at build/revalidate time only.
-2. **Allowed client islands** (and effectively only these on public routes): theme init/toggle, mobile navigation toggle, contact form + Turnstile widget, language switcher (server-rendered links preferred), light Framer Motion entrances. The theme init is a tiny blocking inline script (zero-FOUC, per `DESIGN.md`).
+2. **Allowed client islands** (and effectively only these on public routes): theme init/toggle, mobile navigation toggle, contact form + Turnstile widget, language switcher (server-rendered links preferred), light Framer Motion entrances, and **the hero WebGL lattice on the home route (ADR-0010)** - a deferred, `aria-hidden`, decorative canvas bound to the hero box. The theme init is a tiny blocking inline script (zero-FOUC, per `DESIGN.md`).
 3. No animation library wrapping whole route trees; motion is per-element and disabled under `prefers-reduced-motion`.
-4. **Soft budget:** first-load JS ≤ ~200 KB gzip on Home / Projects / Project detail (measured from `next build`'s first-load report). Soft target reviewed at GATE 2 — the **hard gate is Lighthouse Performance ≥ 90 mobile** (`docs/SEO-I18N.md` §9).
+4. **Soft budget:** first-load JS ≤ ~200 KB gzip on Home / Projects / Project detail (measured from `next build`'s first-load report). Soft target reviewed at GATE 2 - the **hard gate is Lighthouse Performance ≥ 90 mobile** (`docs/SEO-I18N.md` §9).
+   - **Deferred chunks (ADR-0010):** the hero lattice's WebGL chunk (~150 KB gzip) is fetched after first paint and is **not** part of the route's blocking JavaScript. Measured on the production build: the chunks that block rendering went from **152.7 KB gzip to 154.6 KB gzip** (the loader component), and the deferred chunk adds 150.1 KB on top of a 185.5 KB baseline. The soft budget therefore applies to the blocking graph; the deferred chunk is measured and reported separately, and the hard gate (Lighthouse) is what governs the trade - it measures 99.
 5. No third-party scripts on public pages beyond what is functionally required (Turnstile on contact only; Vercel Analytics/Speed Insights as configured).
 
 ---

@@ -296,6 +296,8 @@ The invariant, from the locked decisions and R12 in `docs/CONTENT-MODEL.md`: **w
 
 Locked stack: **Next.js App Router + TypeScript strict (zero `any`) + Tailwind CSS + shadcn/ui + Framer Motion + next-intl (EN default + AR RTL)**. This is the target layout the milestones build toward; milestones may add files but must not restructure these top-level concerns.
 
+One runtime dependency was added after the stack was locked: **three.js** (with `postprocessing` for the bloom pass), used only by the hero lattice (ADR-0010). It is a deferred client island, not part of the server graph.
+
 ```
 src/
 ├── app/
@@ -321,7 +323,10 @@ src/
 │   ├── layout/                    # header, footer, nav, locale switcher, theme toggle
 │   ├── sections/                  # hero, work grid, services, credibility, about preview
 │   ├── forms/                     # contact form, Turnstile wrapper, inline-error fields
-│   └── motion/                    # Framer Motion wrappers (reduced-motion aware, ≤200ms)
+│   ├── motion/                    # Framer Motion wrappers (reduced-motion aware, ≤200ms)
+│   └── hero/hive/                 # hero lattice (ADR-0010): deferred three.js canvas,
+│                                  #   aria-hidden, bound to the hero box, kill-switched
+│                                  #   by NEXT_PUBLIC_HERO_HIVE=0
 ├── lib/
 │   ├── supabase/                  # browser client (anon) · server client (anon) ·
 │   │                              # admin client (service role — server-only import)
@@ -358,6 +363,8 @@ Layout rules:
 | ADR-0003 license (AGPL-3.0-only + ARR assets) | Locked — `docs/decisions/ADR-0003-license-agpl-plus-all-rights-reserved.md` |
 | ADR-0004 email-first contact, no booking | Locked — `docs/decisions/ADR-0004-email-first-contact-no-booking.md` |
 | ADR-0005 single admin, no page builder | Locked — `docs/decisions/ADR-0005-single-admin-no-page-builder.md` |
+| ADR-0009 design enhancement pass (working-document layout) | Accepted — `docs/decisions/ADR-0009-design-enhancement-pass.md` |
+| ADR-0010 hero WebGL lattice (bounded exception to the motion/accent contract) | Accepted — `docs/decisions/ADR-0010-webgl-hero-hive-lattice.md`; amends `DESIGN.md` §1.5/§2.2/§6/§12 and `docs/QUALITY.md` §8 |
 | Admin identity mechanism (`admin_users` vs `auth.uid()`) | ADR-0007 in M1 |
 | Email provider | Chosen in M4 after current pricing check |
 | Quota numbers | `TO CAPTURE IN M1` / `TO CAPTURE IN M4` with source URL + date (§7.4) |

@@ -19,7 +19,7 @@ M2 MUST implement every token and rule in this file. Where a third-party library
 2. **One accent family.** Blue/cyan only. Success/warning/danger are functional colors, never decoration. No second decorative hue anywhere.
 3. **Dark-first, light-equal.** Dark is the default theme pair (designed first, fallback theme); light is equally polished, never a degraded afterthought.
 4. **Accent budget.** Accent color covers ≤ 10% of any viewport at rest (text links, one primary CTA per view, focus rings, active indicators). Never used for full-page backgrounds, large filled sections, or glowing text.
-5. **Motion is a cue, not a show.** Animation confirms user action or reveals content once. No ambient loops, no parallax, no autoplay.
+5. **Motion is a cue, not a show.** Animation confirms user action or reveals content once. No ambient loops, no parallax, no autoplay. **Exception (ADR-0010):** the hero's WebGL lattice is a bounded, decorative layer allowed to drift, tilt with the pointer, and run continuously. It is `aria-hidden`, carries no text, and is the only such exception.
 6. **Bilingual by construction.** Every component is designed LTR and RTL simultaneously. Logical CSS properties are mandatory; directional assumptions are defects.
 7. **Accessibility is a floor, not a goal.** WCAG 2.1 AA is the minimum shipped state (see §11).
 
@@ -58,7 +58,9 @@ Tokens are CSS custom properties on `:root` (light values) overridden by `.dark`
 | `--accent-subtle` | `rgba(34, 211, 238, 0.10)` | `rgba(37, 99, 235, 0.08)` | Active nav pill, selected row, tag chips |
 | `--accent-border` | `rgba(34, 211, 238, 0.45)` | `rgba(37, 99, 235, 0.45)` | Hover border of interactive cards |
 
-The accent hue pair is fixed. Do not introduce violet, pink, green-as-accent, or gradient text on body copy. The only permitted gradient is the hero decorative wash: `linear-gradient(135deg, rgba(34,211,238,0.06), rgba(59,130,246,0.06))` dark / `linear-gradient(135deg, rgba(37,99,235,0.04), rgba(14,116,144,0.04))` light — flat wash, no animated shimmer.
+The accent hue pair is fixed. Do not introduce violet, pink, green-as-accent, or gradient text on body copy. The only permitted gradient is the hero decorative wash: `linear-gradient(135deg, rgba(34,211,238,0.06), rgba(59,130,246,0.06))` dark / `linear-gradient(135deg, rgba(37,99,235,0.04), rgba(14,116,144,0.04))` light - flat wash, no animated shimmer.
+
+**Exception (ADR-0010 §3) — the hero lattice's own material.** The WebGL layer behind the hero may use one amber hue (`--hive-node` / `--hive-link`, defined per theme). The exception is bounded: amber appears **only inside the canvas** - never on a DOM element, text, icon, border or focus ring - the canvas paints no background, and the layer is decorative and `aria-hidden`, so it is excluded from contrast requirements. All UI and content stay strictly on the blue/cyan accent family.
 
 ### 2.3 Functional colors (success / warning / danger)
 
@@ -206,6 +208,8 @@ Allowed motion patterns (Framer Motion, `MotionConfig reducedMotion="user"`):
 Implementation note (ADR-0009): the shipped site uses exactly one entrance — the hero's CSS `rise-in` on mount (200ms, transform-only, works without JS) — plus CSS hover transitions. Scroll-triggered section reveals and stagger are removed.
 
 Forbidden: parallax, scroll-jacking, autoplaying carousels/video, typewriter loops, bouncing springs (spring damping ≥ stiff or use tween), scale-on-scroll, rotating badges, ambient background animation, hover motion that moves layout (transform only, never layout properties).
+
+**Exception (ADR-0010) — the hero lattice.** The 200 ms cap, the ease tokens and the `prefers-reduced-motion` rule govern every DOM animation on the site without exception. They do not govern the hero's WebGL canvas, which is not a transition between two states and has no meaningful duration. Inside that one layer the allowed behaviours are: a staggered grow-in (~1.8 s), a slow idle drift (≤ 0.3 units), a pointer tilt (±0.12 rad, eased at 0.05 lerp, spatial rather than directional so RTL needs no mirroring), and a convergence over the first fifth of the hero's scroll range. No scroll-jacking: the page scrolls normally and the canvas only reads scroll position. Under `prefers-reduced-motion: reduce` the layer renders **one static frame** and never starts its loop. See ADR-0010 §4.
 
 `prefers-reduced-motion: reduce` (mandatory global rule):
 ```css
@@ -531,10 +535,10 @@ This floor is enforced in M6 audit; components that violate it do not pass M2 re
 - Wrap mixed-direction tokens in `<bdi>`; test every AR page with real Arabic content, not translated placeholders.
 
 **Don't**
-- No neon-terminal aesthetics: no glow text, no scanlines/grid overlays, no CRT noise, no blinking cursors in headings, no terminal-style chrome around ordinary sections.
+- No neon-terminal aesthetics: no glow text, no scanlines/grid overlays, no CRT noise, no blinking cursors in headings, no terminal-style chrome around ordinary sections. (The hero lattice's amber bloom is exempt - ADR-0010 §3 - and is the only such treatment on the site.)
 - No streak counters, contribution-graph widgets, badge walls, star-history charts, or "visitor counters" anywhere on the site (locked decision).
 - No second decorative hue; no gradient text on body; no rainbow tags.
-- No parallax, autoplay media, ambient loops, scroll-jacking, or > 200ms animations.
+- No parallax, autoplay media, ambient loops, scroll-jacking, or > 200ms animations. (The hero lattice is the sole exception, and its scroll coupling is read-only - ADR-0010 §4.)
 - No letter-spacing, text-transform, or negative tracking on Arabic.
 - No physical-direction CSS (`pl/pr/ml/mr/left/right`) in components; no `flex-row-reverse` for RTL compensation.
 - No placeholder-as-label; no color-only status; no contrast exemptions for "decorative" text.

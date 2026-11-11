@@ -1,0 +1,23 @@
+{
+  "url": "http://localhost:3200/en",
+  "fetchedAt": "2026-11-11T13:53:23.060Z",
+  "lighthouseVersion": "13.6.0",
+  "formFactor": "mobile",
+  "throttlingMethod": "simulate",
+  "categories": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 66,
+    "agentic-browsing": 67
+  },
+  "metrics": {
+    "first-contentful-paint": "0.4 s",
+    "largest-contentful-paint": "0.7 s",
+    "total-blocking-time": "20 ms",
+    "cumulative-layout-shift": "0",
+    "speed-index": "1.4 s",
+    "interactive": "1.7 s",
+    "total-byte-weight": "Total size was 661 KiB"
+  }
+}
