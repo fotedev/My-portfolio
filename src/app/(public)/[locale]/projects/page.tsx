@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CaseStudyCard } from "@/components/case-study-card";
-import { Reveal } from "@/components/motion";
+import { JsonLd } from "@/components/json-ld";
+import { webPageJsonLd } from "@/lib/content/jsonld";
 import { getPublishedProjects } from "@/lib/content/queries";
 import { isLocale, toLocale, type Locale } from "@/lib/i18n/routing";
 import { routeMetadata } from "@/lib/seo";
@@ -35,24 +36,33 @@ export default async function ProjectsPage({ params }: { params: Promise<{ local
   const projects = await getPublishedProjects(locale);
 
   return (
-    <div className="container-site py-16 md:py-20">
+    <div className="container-site py-16 md:py-24">
+      <JsonLd
+        data={webPageJsonLd({
+          locale,
+          path: "/projects",
+          title: t("title"),
+          description: t("subtitle"),
+        })}
+      />
       <h1 className="type-h1">{t("title")}</h1>
-      <p className="mt-3 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
+      <p className="mt-4 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
 
-      <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {/* The anchor case study leads, full row; the rest follow in the grid. */}
+      <div className="mt-12 grid gap-6 lg:grid-cols-2">
         {projects.map((project, index) => (
-          <Reveal key={project.slug} delay={Math.min(index, 2) * 0.04}>
-            <CaseStudyCard
-              project={project}
-              labels={{
-                caseStudy: t("caseStudy"),
-                liveDemo: t("liveDemo"),
-                sourceCode: t("sourceCode"),
-                privateRepo: t("privateRepo"),
-                stack: t("stack"),
-              }}
-            />
-          </Reveal>
+          <CaseStudyCard
+            key={project.slug}
+            project={project}
+            featured={index === 0}
+            labels={{
+              caseStudy: t("caseStudy"),
+              liveDemo: t("liveDemo"),
+              sourceCode: t("sourceCode"),
+              privateRepo: t("privateRepo"),
+              stack: t("stack"),
+            }}
+          />
         ))}
       </div>
     </div>

@@ -1,0 +1,224 @@
+- document:
+  - link "تخطَّ إلى المحتوى":
+    - /url: "#content"
+  - banner:
+    - navigation "Main":
+      - link "fotedev":
+        - /url: /ar
+      - list:
+        - listitem:
+          - link "الرئيسية":
+            - /url: /ar
+        - listitem:
+          - link "المشاريع":
+            - /url: /ar/projects
+        - listitem:
+          - link "الخدمات":
+            - /url: /ar/services
+        - listitem:
+          - link "نبذة":
+            - /url: /ar/about
+        - listitem:
+          - link "تواصل":
+            - /url: /ar/contact
+      - group "اللغة":
+        - button "التبديل إلى English"
+        - button "التبديل إلى العربية"
+      - button "تبديل مظهر الألوان"
+  - main:
+    - text: متاح لمشاريع العمل الحر
+    - heading "تطبيقات ويب وأدوات ذكاء اصطناعي مبنية حول عملك." [level=1]
+    - paragraph: Ahmed Aboalayoun · مهندس ذكاء اصطناعي متكامل
+    - list:
+      - listitem: أنظمة RAG وذكاء اصطناعي إنتاجية
+      - listitem: مساهم مفتوح المصدر في NousResearch
+      - listitem: إفصاح أمني مسؤول
+      - listitem: معتمد من مبادرة مليون خبير
+    - link "ناقش مشروعك":
+      - /url: /ar/contact
+    - link "استعرض الأعمال المختارة":
+      - /url: /ar/projects
+    - region "أعمال مختارة":
+      - heading "أعمال مختارة" [level=2]
+      - paragraph: أعمال إنتاجية ومفتوحة المصدر، ولكلٍّ منها أدلتها على الصفحة نفسها.
+      - article:
+        - paragraph: دراسة حالة
+        - heading "Masar X" [level=3]
+        - paragraph: "منصة دراسية ذكية ثنائية اللغة: بحث دلالي في ملفات PDF وفهرسة متجهية للمستندات عبر تطبيقات الويب وسطح المكتب والجوال، على خلفية Supabase واحدة."
+        - list "التقنيات":
+          - listitem: Next.js
+          - listitem: TypeScript
+          - listitem: Supabase
+          - listitem: pgvector
+          - listitem: Electron
+          - listitem: Expo
+        - link "دراسة حالة":
+          - /url: /ar/projects/masar-x
+        - link "عرض مباشر":
+          - /url: https://masarx.vercel.app
+        - link "الكود المصدري":
+          - /url: https://github.com/fotedev/Masar-x-next
+      - article:
+        - paragraph: دراسة حالة
+        - heading "ghost" [level=3]
+        - paragraph: أداة سطر أوامر مفتوحة المصدر (28 نجمة) تعيد ضبط معرّفات الجهاز والنظام لبيئات التطوير المدعومة بالذكاء الاصطناعي، بمسارات موجّهة وسجلات تدقيق وسكربتات استرجاع على ويندوز ولينكس. تُقدَّم كنظافة خصوصية للمطوّر؛ وتنص وثائق المشروع نفسها على أن المستخدم مسؤول عن الالتزام بشروط كل مورّد.
+        - list "التقنيات":
+          - listitem: PowerShell
+          - listitem: Python
+        - link "دراسة حالة":
+          - /url: /ar/projects/ghost
+        - link "الكود المصدري":
+          - /url: https://github.com/fotedev/ghost
+      - article:
+        - paragraph: دراسة حالة
+        - heading "Khalat" [level=3]
+        - paragraph: "تطبيق ويب إنتاجي للتجارة والطلبات، بُني ويُشغَّل عبر خطّ مصنع برمجيات حتمي بالذكاء الاصطناعي: مواصفات مقفلة، وبوابات مراحل، وفحوص جودة يفرضها CI. المصدر خاص، لذا كل ما يُذكر هنا تصريحات موثّقة من المالك لا يمكن التحقق منها علنًا."
+        - link "دراسة حالة":
+          - /url: /ar/projects/khalat
+        - text: مستودع إنتاجي خاص
+    - region "الخدمات":
+      - heading "الخدمات" [level=2]
+      - paragraph: ما أبنيه للعملاء، من مواصفة معتمدة إلى التسليم.
+      - article:
+        - heading "تطبيقات ويب ولوحات تحكم" [level=3]
+        - paragraph: "نظام ويب أو لوحة تحكم جاهز للعمل منذ اليوم الأول: بيانات حقيقية، حسابات مستخدمين بصلاحيات، شاشات وتقارير يستخدمها فريقك يوميًا — منشور وموثّق ومُسلَّم إليك."
+        - link "كل الخدمات":
+          - /url: /ar/services
+      - article:
+        - heading "أنظمة RAG إنتاجية وحلول ذكاء اصطناعي متكاملة" [level=3]
+        - paragraph: "أداة تحوّل مستنداتك إلى إجابات: بحث دلالي وأسئلة وأجوبة على ملفاتك الخاصة — ملفات PDF وعقود وقواعد معرفة — مع الاستشهاد بالمصادر وصلاحيات الوصول، بدل البحث اليدوي في الملفات."
+        - link "كل الخدمات":
+          - /url: /ar/services
+      - article:
+        - heading "سير عمل وكيلي وأدوات MCP وخطوط CI حتمية" [level=3]
+        - paragraph: "أتمتة وأدوات وكلاء تربط الأنظمة التي تستخدمها فعلًا: خوادم MCP، مهام مجدولة، مزامنة بيانات بين الأنظمة، وخطوط CI حتمية تجعل كل تغيير قابلًا للاختبار والتراجع."
+        - link "كل الخدمات":
+          - /url: /ar/services
+    - region "كيف أعمل":
+      - heading "كيف أعمل" [level=2]
+      - paragraph: مصنع حتمي، لا كودٌ مرتجل.
+      - list:
+        - listitem:
+          - heading "المواصفة أولًا" [level=3]
+          - paragraph: "كل بناء يبدأ من مواصفة مكتوبة مختصرة توافق عليها: النطاق، والقيود، ومعنى «انتهى»، قبل كتابة أي سطر كود."
+        - listitem:
+          - heading "شرائح عمودية" [level=3]
+          - paragraph: يُسلَّم العمل في شرائح رقيقة تعمل فعلًا وتستطيع فتحها واستخدامها، لا في كشف واحد كبير في النهاية.
+        - listitem:
+          - heading "بوابات يفرضها CI" [level=3]
+          - paragraph: فحص الكود والأنواع والاختبارات والبناء تعمل تلقائيًا مع كل تغيير. لا يُدمج شيء دون اجتيازها.
+        - listitem:
+          - heading "التسليم" [level=3]
+          - paragraph: "تحصل على التوثيق والنشر والمفاتيح: نظام تملكه وتفهمه."
+    - region "هندسة مفتوحة المصدر والأمن":
+      - heading "هندسة مفتوحة المصدر والأمن" [level=2]
+      - paragraph: "سجلّ عام، مُدقَّق ومؤرَّخ. الحالات تبقى صادقة: المدموج يبقى مدموجًا، والمفتوح يبقى مفتوحًا، والمُقرّ به يبقى مُقرًّا به."
+      - list:
+        - listitem:
+          - text: مدموج NousResearch/hermes-agent#114809
+          - 'heading "fix(config): malformed custom_providers no longer empties the providers view; config set refuses type mismatches; nested aliases keep key_env (#114605, #114471, salvage #45730, #109834)" [level=3]'
+          - paragraph: "تحصين واجهة إعداد الأوامر مدموج في hermes-agent (18 سبتمبر 2026). يتضمن الإصلاح المنقذ من الطلب #109834 (@fotedev) — مُشاد به في نص الطلب بأنه «صاحب المصدر الأول» — مع حفظ النسبة للعمل عبر commit باسمه."
+          - paragraph: تم التحقق في 2026-11-06
+          - link "عرض على GitHub":
+            - /url: https://github.com/NousResearch/hermes-agent/pull/114809
+        - listitem:
+          - text: طلب دمج مفتوح NousResearch/hermes-agent#106626
+          - 'heading "fix(gateway): prefer session model override in /usage billing route" [level=3]'
+          - paragraph: "طلب دمج مفتوح (آخر تحديث 17 أكتوبر 2026). الحالة: مفتوح — غير مدموج."
+          - paragraph: تم التحقق في 2026-11-06
+          - link "عرض على GitHub":
+            - /url: https://github.com/NousResearch/hermes-agent/pull/106626
+        - listitem:
+          - text: طلب دمج مفتوح NousResearch/hermes-agent#122144
+          - 'heading "fix(windows): respawn gateway on the venv interpreter when captured argv leads with the base interpreter" [level=3]'
+          - paragraph: "طلب دمج مفتوح (آخر تحديث 17 أكتوبر 2026). الحالة: مفتوح — غير مدموج."
+          - paragraph: تم التحقق في 2026-11-06
+          - link "عرض على GitHub":
+            - /url: https://github.com/NousResearch/hermes-agent/pull/122144
+        - listitem:
+          - text: إفصاح مُقرّ به MiniMax-AI/minimax-code#141
+          - heading "Insecure plaintext storage of Telegram bot tokens and Windows NTFS permission fallbacks in @mavis/local-runtime" [level=3]
+          - paragraph: إفصاح أمني مسؤول. أقرّ به المورّد في 21 سبتمبر 2026 («Acknowledged on both counts… Forwarded to security review»). أُغلق البلاغ في 19 أكتوبر 2026 كـ not_planned — دون PR لإصلاح مُشار إليه؛ لا يُوصف أبدًا بأنه «مُصلح».
+          - paragraph: تم التحقق في 2026-11-06
+          - link "عرض على GitHub":
+            - /url: https://github.com/MiniMax-AI/minimax-code/issues/141
+    - region "اعتمادات مُوثّقة":
+      - heading "اعتمادات مُوثّقة" [level=2]
+      - article:
+        - paragraph: الشهادة
+        - heading "شهادة إتمام — مبادرة مليون خيّر لأوامر الذكاء الاصطناعي (1 Million Prompters)" [level=3]
+        - paragraph: مؤسسة دبي للمستقبل · مركز دبي للذكاء الاصطناعي
+        - paragraph: "إتمام مبادرة «مليون خيّر لأوامر الذكاء الاصطناعي» (1 Million Prompters) — برنامج تدريبي في هندسة الأوامر. تحمل الشهادة شعارَي مؤسسة دبي للمستقبل ومركز دبي للذكاء الاصطناعي. صفحة البرنامج: dub.ai/omp."
+        - paragraph: "المُستلِم: Ahmed Aboalyoun"
+        - link "عرض PDF (تبويب جديد)":
+          - /url: https://zfhfeiqdsugjqliufhke.supabase.co/storage/v1/object/public/public-assets/certificates/omp-certificate.pdf
+        - link "تنزيل PDF":
+          - /url: https://zfhfeiqdsugjqliufhke.supabase.co/storage/v1/object/public/public-assets/certificates/omp-certificate.pdf?download=omp-certificate.pdf
+        - link "dub.ai/omp":
+          - /url: https://dub.ai/omp
+        - paragraph: يُفتح ملف الشهادة خارج هذا الموقع.
+    - region "نبذة":
+      - heading "نبذة" [level=2]
+      - paragraph: أنا أحمد أبو العيون (fotedev)، مهندس ذكاء اصطناعي متكامل. أبني منصات ويب وأنظمة RAG إنتاجية والأدوات المحيطة بها، وأمرّر عملي الخاص عبر مصنع برمجيات ذي بوابات مواصفات حتى تكون كل جملة على هذا الموقع قابلة للتتبع إلى مصدرها.
+      - link "المزيد عني":
+        - /url: /ar/about
+    - region "لديك مشروع في ذهنك؟":
+      - heading "لديك مشروع في ذهنك؟" [level=2]
+      - paragraph: البريد الإلكتروني أسرع وسيلة للوصول إليّ — أو أرسل النموذج من صفحة التواصل. كلاهما يصل إلى بريدي مباشرة.
+      - link "تواصل معي":
+        - /url: mailto:fote.engineer@gmail.com
+      - link "fote.engineer@gmail.com":
+        - /url: mailto:fote.engineer@gmail.com
+      - button "نسخ عنوان البريد"
+      - status
+  - contentinfo:
+    - paragraph: fotedev
+    - paragraph: تطبيقات ويب وأدوات ذكاء اصطناعي مبنية حول عملك.
+    - navigation "تذييل الصفحة":
+      - heading "الصفحات" [level=2]
+      - list:
+        - listitem:
+          - link "المشاريع":
+            - /url: /ar/projects
+        - listitem:
+          - link "الخدمات":
+            - /url: /ar/services
+        - listitem:
+          - link "نبذة":
+            - /url: /ar/about
+        - listitem:
+          - link "تواصل":
+            - /url: /ar/contact
+        - listitem:
+          - link "الخصوصية":
+            - /url: /ar/privacy
+    - heading "تواصل" [level=2]
+    - link "fote.engineer@gmail.com":
+      - /url: mailto:fote.engineer@gmail.com
+    - button "نسخ عنوان البريد"
+    - status
+    - list:
+      - listitem:
+        - link "GitHub":
+          - /url: https://github.com/fotedev
+      - listitem:
+        - link "LinkedIn":
+          - /url: https://www.linkedin.com/in/fotedev
+      - listitem:
+        - link "X (Twitter)":
+          - /url: https://x.com/FoteTeam
+      - listitem:
+        - link "Telegram":
+          - /url: https://t.me/ACYRO0016K
+      - listitem:
+        - link "YouTube":
+          - /url: https://www.youtube.com/channel/UCmfp_B-hOFq4UW5g1T4LCvQ
+      - listitem:
+        - link "Facebook":
+          - /url: https://www.facebook.com/profile.php?id=61558539080140
+      - listitem:
+        - link "Instagram":
+          - /url: https://www.instagram.com/devtech.team/
+    - paragraph: "© 2026 أحمد أبو العيون · الكود: AGPL-3.0-only · المحتوى والأصول: جميع الحقوق محفوظة."
+    - paragraph: بُني علنًا عبر مصنع برمجيات حتمي.
+  - alert

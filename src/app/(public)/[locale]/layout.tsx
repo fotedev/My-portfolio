@@ -16,10 +16,24 @@ export function generateStaticParams(): Array<{ locale: string }> {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// Unknown locale prefixes (e.g. /fr) must 404, not 500: they fell into
+// generateMetadata with an invalid locale and next-intl threw
+// (observed as /favicon.ico → 500 before the app favicon existed; M6 SEO
+// audit).
+//
+// The fix is the guard inside generateMetadata below, NOT `dynamicParams =
+// false`. That segment option also 404s every dynamic segment that is not
+// in generateStaticParams — which includes a project slug published after
+// the build, so a newly published case study was permanently unreachable
+// (the admin publish round-trip timed out at 404). The guard keeps the
+// unknown-locale behaviour without disabling on-demand rendering.
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await props.params;
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
   const t = await getTranslations({ locale, namespace: "meta" });
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://fotedev.me"),

@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Access-Control-Allow-Origin: *
+Age: 16300
+Cache-Control: public, max-age=0, must-revalidate
+Content-Disposition: inline
+Content-Length: 49702
+Content-Type: text/html; charset=utf-8
+Date: Tue, 10 Nov 2026 05:40:56 GMT
+Etag: "bb0686a5b13bc0695d6ff37f95854b13"
+Link: <https://fotedev.me/en/projects/khalat>; rel="alternate"; hreflang="en", <https://fotedev.me/ar/projects/khalat>; rel="alternate"; hreflang="ar", <https://fotedev.me/projects/khalat>; rel="alternate"; hreflang="x-default"
+Server: Vercel
+Set-Cookie: NEXT_LOCALE=en; Path=/; SameSite=lax
+Strict-Transport-Security: max-age=63072000
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+X-Matched-Path: /en/projects/khalat
+X-Nextjs-Prerender: 1
+X-Nextjs-Stale-Time: 300
+X-Vercel-Cache: HIT
+X-Vercel-Id: fra1::7nwqb-1794289256097-c2507a59a88b
+

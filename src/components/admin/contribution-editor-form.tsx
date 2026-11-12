@@ -287,7 +287,7 @@ export function ContributionEditorForm({
           onClick={() => {
             void submit();
           }}
-          className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-strong disabled:opacity-60"
+          className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-strong disabled:opacity-60"
         >
           {pending === "save" ? "Saving…" : "Save"}
         </button>

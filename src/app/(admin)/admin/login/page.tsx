@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="mx-auto max-w-sm">
+    <main className="mx-auto max-w-sm">
       <h1 className="mb-6 text-xl font-semibold">Admin sign-in</h1>
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <div>
@@ -80,11 +80,11 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="min-h-11 w-full rounded-md bg-accent-strong px-4 py-2 font-medium text-white disabled:opacity-60"
+          className="min-h-11 w-full rounded-md bg-accent-strong px-4 py-2 font-medium text-accent-foreground disabled:opacity-60"
         >
           {isSubmitting ? "Signing in…" : "Sign in"}
         </button>
       </form>
-    </div>
+    </main>
   );
 }

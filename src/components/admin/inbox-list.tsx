@@ -168,7 +168,7 @@ export function InboxList({ rows }: { rows: InboxRow[] }) {
             onClick={() => {
               void onBulkArchive();
             }}
-            className="ms-auto min-h-9 rounded-md bg-accent px-3 py-1.5 text-sm text-white hover:bg-accent-strong disabled:opacity-50"
+            className="ms-auto min-h-9 rounded-md bg-accent px-3 py-1.5 text-sm text-accent-foreground hover:bg-accent-strong disabled:opacity-50"
           >
             Archive selected ({selected.size})
           </button>

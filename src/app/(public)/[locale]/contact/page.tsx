@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ContactForm } from "@/components/contact/contact-form";
 import { CopyEmailButton } from "@/components/copy-email-button";
 import { JsonLd } from "@/components/json-ld";
-import { btnPrimary, btnSecondary } from "@/components/ui/cta";
+import { btnPrimary } from "@/components/ui/cta";
 import { professionalServiceJsonLd } from "@/lib/content/jsonld";
 import { getSiteSettings } from "@/lib/content/queries";
 import { isLocale, toLocale, type Locale } from "@/lib/i18n/routing";
@@ -42,7 +42,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
     <>
       {settings && (
         <JsonLd
-          data={professionalServiceJsonLd({ description: settings.heroOffer, email: settings.contactEmail })}
+          data={professionalServiceJsonLd({ description: settings.heroOffer, email: settings.contactEmail, locale })}
         />
       )}
 
@@ -53,24 +53,18 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
 
           {email && (
             <div className="mt-8 rounded-xl border border-border-subtle bg-surface p-6">
-              <p className="type-caption text-muted-foreground">{t("emailLabel")}</p>
-              <a
-                href={`mailto:${email}`}
-                dir="ltr"
+              <p className="text-sm font-medium text-foreground">{t("emailLabel")}</p>
+              <CopyEmailButton
+                email={email}
+                label={t("copyEmail")}
+                copiedLabel={t("copied")}
+                hintLabel={t("copyHint")}
                 className="mt-2 inline-flex min-h-11 items-center font-mono text-lg text-accent underline-offset-4 hover:underline"
-              >
-                {email}
-              </a>
-              <div className="mt-4 flex flex-wrap gap-3">
+              />
+              <div className="mt-4">
                 <a href={`mailto:${email}`} className={btnPrimary}>
                   {t("mailto")}
                 </a>
-                <CopyEmailButton
-                  email={email}
-                  label={t("copyEmail")}
-                  copiedLabel={t("copied")}
-                  className={btnSecondary}
-                />
               </div>
             </div>
           )}

@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Access-Control-Allow-Origin: *
+Age: 16297
+Cache-Control: public, max-age=0, must-revalidate
+Content-Disposition: inline
+Content-Length: 46785
+Content-Type: text/html; charset=utf-8
+Date: Tue, 10 Nov 2026 05:40:53 GMT
+Etag: "05be8ddd13df9bcc2d99983cb8f1ef2f"
+Link: <https://fotedev.me/en/privacy>; rel="alternate"; hreflang="en", <https://fotedev.me/ar/privacy>; rel="alternate"; hreflang="ar", <https://fotedev.me/privacy>; rel="alternate"; hreflang="x-default"
+Server: Vercel
+Set-Cookie: NEXT_LOCALE=en; Path=/; SameSite=lax
+Strict-Transport-Security: max-age=63072000
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+X-Matched-Path: /en/privacy
+X-Nextjs-Prerender: 1
+X-Nextjs-Stale-Time: 300
+X-Vercel-Cache: HIT
+X-Vercel-Id: fra1::4l6zt-1794289253574-574a544ca77c
+

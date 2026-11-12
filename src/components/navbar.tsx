@@ -31,7 +31,7 @@ export function Navbar() {
   return (
     <header className="site-header border-b border-border-subtle">
       <nav className="container-site flex items-center justify-between gap-4 py-2" aria-label="Main">
-        <Link href="/" className="font-semibold text-foreground">
+        <Link href="/" className="font-mono font-medium text-foreground">
           fotedev
         </Link>
 

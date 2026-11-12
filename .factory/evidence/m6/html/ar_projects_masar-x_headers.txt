@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Access-Control-Allow-Origin: *
+Age: 16299
+Cache-Control: public, max-age=0, must-revalidate
+Content-Disposition: inline
+Content-Length: 55727
+Content-Type: text/html; charset=utf-8
+Date: Tue, 10 Nov 2026 05:40:59 GMT
+Etag: "20c02d9dd8492ec350a04de06a3f9e48"
+Link: <https://fotedev.me/en/projects/masar-x>; rel="alternate"; hreflang="en", <https://fotedev.me/ar/projects/masar-x>; rel="alternate"; hreflang="ar", <https://fotedev.me/projects/masar-x>; rel="alternate"; hreflang="x-default"
+Server: Vercel
+Set-Cookie: NEXT_LOCALE=ar; Path=/; SameSite=lax
+Strict-Transport-Security: max-age=63072000
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+X-Matched-Path: /ar/projects/masar-x
+X-Nextjs-Prerender: 1
+X-Nextjs-Stale-Time: 300
+X-Vercel-Cache: HIT
+X-Vercel-Id: fra1::fl5gp-1794289259547-e27afb8ff66d
+

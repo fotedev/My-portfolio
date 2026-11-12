@@ -1,0 +1,17 @@
+HTTP/1.1 404 Not Found
+Age: 0
+Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate
+Content-Type: text/html; charset=utf-8
+Date: Tue, 10 Nov 2026 05:41:48 GMT
+Link: <https://fotedev.me/en/nonexistent-page-xyz>; rel="alternate"; hreflang="en", <https://fotedev.me/ar/nonexistent-page-xyz>; rel="alternate"; hreflang="ar", <https://fotedev.me/nonexistent-page-xyz>; rel="alternate"; hreflang="x-default"
+Link: </_next/static/immutable/media/07c7676b89ed2778-s.p.45535valc9rzk.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/356810c1c81c4d60-s.p.1mao1hin7sitq.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/420d6ef977b34540-s.p.0zeo54vr6bp6h.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/861d9be630ba44be-s.p.2kfcf8ox-s2t2.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/8a0c322f60e47dd1-s.p.3vz72b7p-u7db.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/941d061a2bd9e7fe-s.p.04otpyah9cwvk.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/chunks/3ojqx6x2hexze.css>; rel=preload; as="style"
+Server: Vercel
+Set-Cookie: NEXT_LOCALE=ar; Path=/; SameSite=lax
+Strict-Transport-Security: max-age=63072000
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+X-Matched-Path: /[locale]/[...rest]
+X-Powered-By: Next.js
+X-Vercel-Cache: MISS
+X-Vercel-Id: fra1::iad1::mdjp4-1794289308358-4f4c0573b3a1
+Transfer-Encoding: chunked
+

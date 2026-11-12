@@ -277,7 +277,7 @@ The invariant, from the locked decisions and R12 in `docs/CONTENT-MODEL.md`: **w
 | **`ip_hash`, never raw IPs** | The visitor IP is hashed with **salted SHA-256** (salt in server env, 64-hex-char column check). The raw IP exists transiently in memory only (for the optional Turnstile `remoteip` field and the hash) and is **never persisted** in the DB, logs, or analytics. No `ip` or `user_agent` columns exist. |
 | **No anonymous inserts** | Anonymous users can never insert into `inquiries` (or any table) — RLS denies it; the only write path is the Edge Function with the service role after Turnstile + rate limit. This is a locked decision, verified by SQL in M1. |
 | **Admin routes: noindex + auth** | `/admin` and all admin/preview routes are excluded in `robots.txt`, carry `noindex` robots meta, and are auth-gated server-side (session check in the admin layout + per-action guard). Preview routes for drafts are additionally uncached and force-dynamic. Session expiry mid-edit shows an unsaved-changes guard. |
-| **CSP-compatible headers** | Security headers (`Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`) are defined in `next.config` headers so they work on Vercel and are portable to the fallback hosts. CSP must remain compatible with: (a) the blocking inline theme-init script — handled via a hash/nonce, not blanket `unsafe-inline` where avoidable; (b) the Turnstile widget — `frame-src https://challenges.cloudflare.com` and its script origin; (c) Next.js hydration scripts. The exact CSP is finalized in M2 and must not break EN/AR public pages or the admin. |
+| **CSP-compatible headers** | Security headers (`Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`) are defined in `next.config` headers so they work on Vercel and are portable to the fallback hosts. CSP must remain compatible with: (a) the blocking inline theme-init script — handled via a hash/nonce, not blanket `unsafe-inline` where avoidable; (b) the Turnstile widget — `frame-src https://challenges.cloudflare.com` and its script origin; (c) Next.js hydration scripts. The exact CSP is finalized in M2 and must not break EN/AR public pages or the admin. **Development exception:** `next dev` adds `'unsafe-eval'` (React dev-mode call-stack reconstruction) and `ws:` (Turbopack HMR) to the policy; `next build`/`next start` and Vercel never include them. |
 | **Prompt-injection containment** | Inquiry `message` is data. It is stored verbatim and rendered as text (escaped) in the admin inbox. No agent summarizes or acts on inquiry content unsupervised. |
 | **No secrets in repo** | `.env.example` only; `.env.local` gitignored; Edge Function secrets managed in Supabase; CI never needs production secrets. |
 
@@ -295,6 +295,8 @@ The invariant, from the locked decisions and R12 in `docs/CONTENT-MODEL.md`: **w
 ## 10. Source layout preview (`src/`)
 
 Locked stack: **Next.js App Router + TypeScript strict (zero `any`) + Tailwind CSS + shadcn/ui + Framer Motion + next-intl (EN default + AR RTL)**. This is the target layout the milestones build toward; milestones may add files but must not restructure these top-level concerns.
+
+One runtime dependency was added after the stack was locked: **three.js** (with `postprocessing` for the bloom pass), used only by the hero lattice (ADR-0010). It is a deferred client island, not part of the server graph.
 
 ```
 src/
@@ -321,7 +323,10 @@ src/
 │   ├── layout/                    # header, footer, nav, locale switcher, theme toggle
 │   ├── sections/                  # hero, work grid, services, credibility, about preview
 │   ├── forms/                     # contact form, Turnstile wrapper, inline-error fields
-│   └── motion/                    # Framer Motion wrappers (reduced-motion aware, ≤200ms)
+│   ├── motion/                    # Framer Motion wrappers (reduced-motion aware, ≤200ms)
+│   └── hero/hive/                 # hero lattice (ADR-0010): deferred three.js canvas,
+│                                  #   aria-hidden, bound to the hero box, kill-switched
+│                                  #   by NEXT_PUBLIC_HERO_HIVE=0
 ├── lib/
 │   ├── supabase/                  # browser client (anon) · server client (anon) ·
 │   │                              # admin client (service role — server-only import)
@@ -358,6 +363,8 @@ Layout rules:
 | ADR-0003 license (AGPL-3.0-only + ARR assets) | Locked — `docs/decisions/ADR-0003-license-agpl-plus-all-rights-reserved.md` |
 | ADR-0004 email-first contact, no booking | Locked — `docs/decisions/ADR-0004-email-first-contact-no-booking.md` |
 | ADR-0005 single admin, no page builder | Locked — `docs/decisions/ADR-0005-single-admin-no-page-builder.md` |
+| ADR-0009 design enhancement pass (working-document layout) | Accepted — `docs/decisions/ADR-0009-design-enhancement-pass.md` |
+| ADR-0010 hero WebGL lattice (bounded exception to the motion/accent contract) | Accepted — `docs/decisions/ADR-0010-webgl-hero-hive-lattice.md`; amends `DESIGN.md` §1.5/§2.2/§6/§12 and `docs/QUALITY.md` §8 |
 | Admin identity mechanism (`admin_users` vs `auth.uid()`) | ADR-0007 in M1 |
 | Email provider | Chosen in M4 after current pricing check |
 | Quota numbers | `TO CAPTURE IN M1` / `TO CAPTURE IN M4` with source URL + date (§7.4) |

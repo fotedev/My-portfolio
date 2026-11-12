@@ -1,0 +1,226 @@
+{
+  "measuredAt": "2026-11-11T13:55:54.438Z",
+  "method": "Playwright + Chromium against the production build. gzip size computed with zlib level 9. \"criticalJs\" = chunks whose response finished before First Contentful Paint (the static graph that blocks rendering); \"deferredJs\" = everything after it.",
+  "softBudget": "QUALITY.md 8.4 - first-load JS <= ~200 KB gzip",
+  "hardGate": "QUALITY.md AC-9 - Lighthouse Performance >= 90 mobile",
+  "withHive": {
+    "label": "home (hero lattice enabled)",
+    "url": "http://localhost:3200/en",
+    "firstContentfulPaintMs": 152,
+    "criticalJs": {
+      "files": 10,
+      "gzipBytes": 158282,
+      "rawBytes": 527864
+    },
+    "deferredJs": {
+      "files": 2,
+      "gzipBytes": 187388,
+      "rawBytes": 746228
+    },
+    "totalJs": {
+      "files": 12,
+      "gzipBytes": 345670,
+      "rawBytes": 1274092
+    },
+    "files": [
+      {
+        "file": "2xm_a3zf_fz2m.js",
+        "url": "http://localhost:3200/_next/static/chunks/2xm_a3zf_fz2m.js",
+        "endMs": 224,
+        "status": 200,
+        "rawBytes": 629006,
+        "gzipBytes": 153738
+      },
+      {
+        "file": "3siopd9dz28cl.js",
+        "url": "http://localhost:3200/_next/static/chunks/3siopd9dz28cl.js",
+        "endMs": 36,
+        "status": 200,
+        "rawBytes": 229276,
+        "gzipBytes": 71582
+      },
+      {
+        "file": "1vr91amt75po1.js",
+        "url": "http://localhost:3200/_next/static/chunks/1vr91amt75po1.js",
+        "endMs": 32,
+        "status": 200,
+        "rawBytes": 132367,
+        "gzipBytes": 35678
+      },
+      {
+        "file": "13famn3s-dy42.js",
+        "url": "http://localhost:3200/_next/static/chunks/13famn3s-dy42.js",
+        "endMs": 226,
+        "status": 200,
+        "rawBytes": 117222,
+        "gzipBytes": 33650
+      },
+      {
+        "file": "08r7s-tt7fb-h.js",
+        "url": "http://localhost:3200/_next/static/chunks/08r7s-tt7fb-h.js",
+        "endMs": 35,
+        "status": 200,
+        "rawBytes": 39769,
+        "gzipBytes": 12021
+      },
+      {
+        "file": "1mcqo63qid-qd.js",
+        "url": "http://localhost:3200/_next/static/chunks/1mcqo63qid-qd.js",
+        "endMs": 35,
+        "status": 200,
+        "rawBytes": 31782,
+        "gzipBytes": 9645
+      },
+      {
+        "file": "1w_m6m2-it4rn.js",
+        "url": "http://localhost:3200/_next/static/chunks/1w_m6m2-it4rn.js",
+        "endMs": 35,
+        "status": 200,
+        "rawBytes": 24056,
+        "gzipBytes": 8824
+      },
+      {
+        "file": "1g267itbuomfl.js",
+        "url": "http://localhost:3200/_next/static/chunks/1g267itbuomfl.js",
+        "endMs": 32,
+        "status": 200,
+        "rawBytes": 34667,
+        "gzipBytes": 8742
+      },
+      {
+        "file": "turbopack-077hmtqrhcoji.js",
+        "url": "http://localhost:3200/_next/static/chunks/turbopack-077hmtqrhcoji.js",
+        "endMs": 34,
+        "status": 200,
+        "rawBytes": 11199,
+        "gzipBytes": 4354
+      },
+      {
+        "file": "2x32zo4jso0ij.js",
+        "url": "http://localhost:3200/_next/static/chunks/2x32zo4jso0ij.js",
+        "endMs": 35,
+        "status": 200,
+        "rawBytes": 14001,
+        "gzipBytes": 3507
+      },
+      {
+        "file": "2tqol7uars8nq.js",
+        "url": "http://localhost:3200/_next/static/chunks/2tqol7uars8nq.js",
+        "endMs": 30,
+        "status": 200,
+        "rawBytes": 5364,
+        "gzipBytes": 1967
+      },
+      {
+        "file": "42kipg33qnmtr.js",
+        "url": "http://localhost:3200/_next/static/chunks/42kipg33qnmtr.js",
+        "endMs": 37,
+        "status": 200,
+        "rawBytes": 5383,
+        "gzipBytes": 1962
+      }
+    ]
+  },
+  "baseline": {
+    "label": "home (baseline, no hero lattice)",
+    "url": "http://localhost:3300/en",
+    "firstContentfulPaintMs": 160,
+    "criticalJs": {
+      "files": 9,
+      "gzipBytes": 156320,
+      "rawBytes": 522481
+    },
+    "deferredJs": {
+      "files": 1,
+      "gzipBytes": 33650,
+      "rawBytes": 117222
+    },
+    "totalJs": {
+      "files": 10,
+      "gzipBytes": 189970,
+      "rawBytes": 639703
+    },
+    "files": [
+      {
+        "file": "3siopd9dz28cl.js",
+        "url": "http://localhost:3300/_next/static/chunks/3siopd9dz28cl.js",
+        "endMs": 42,
+        "status": 200,
+        "rawBytes": 229276,
+        "gzipBytes": 71582
+      },
+      {
+        "file": "1vr91amt75po1.js",
+        "url": "http://localhost:3300/_next/static/chunks/1vr91amt75po1.js",
+        "endMs": 36,
+        "status": 200,
+        "rawBytes": 132367,
+        "gzipBytes": 35678
+      },
+      {
+        "file": "13famn3s-dy42.js",
+        "url": "http://localhost:3300/_next/static/chunks/13famn3s-dy42.js",
+        "endMs": 222,
+        "status": 200,
+        "rawBytes": 117222,
+        "gzipBytes": 33650
+      },
+      {
+        "file": "08r7s-tt7fb-h.js",
+        "url": "http://localhost:3300/_next/static/chunks/08r7s-tt7fb-h.js",
+        "endMs": 38,
+        "status": 200,
+        "rawBytes": 39769,
+        "gzipBytes": 12021
+      },
+      {
+        "file": "1mcqo63qid-qd.js",
+        "url": "http://localhost:3300/_next/static/chunks/1mcqo63qid-qd.js",
+        "endMs": 35,
+        "status": 200,
+        "rawBytes": 31782,
+        "gzipBytes": 9645
+      },
+      {
+        "file": "1w_m6m2-it4rn.js",
+        "url": "http://localhost:3300/_next/static/chunks/1w_m6m2-it4rn.js",
+        "endMs": 36,
+        "status": 200,
+        "rawBytes": 24056,
+        "gzipBytes": 8824
+      },
+      {
+        "file": "1g267itbuomfl.js",
+        "url": "http://localhost:3300/_next/static/chunks/1g267itbuomfl.js",
+        "endMs": 30,
+        "status": 200,
+        "rawBytes": 34667,
+        "gzipBytes": 8742
+      },
+      {
+        "file": "turbopack-077hmtqrhcoji.js",
+        "url": "http://localhost:3300/_next/static/chunks/turbopack-077hmtqrhcoji.js",
+        "endMs": 33,
+        "status": 200,
+        "rawBytes": 11199,
+        "gzipBytes": 4354
+      },
+      {
+        "file": "2x32zo4jso0ij.js",
+        "url": "http://localhost:3300/_next/static/chunks/2x32zo4jso0ij.js",
+        "endMs": 35,
+        "status": 200,
+        "rawBytes": 14001,
+        "gzipBytes": 3507
+      },
+      {
+        "file": "2tqol7uars8nq.js",
+        "url": "http://localhost:3300/_next/static/chunks/2tqol7uars8nq.js",
+        "endMs": 30,
+        "status": 200,
+        "rawBytes": 5364,
+        "gzipBytes": 1967
+      }
+    ]
+  }
+}

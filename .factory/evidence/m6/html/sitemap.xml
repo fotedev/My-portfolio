@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<url>
+<loc>https://fotedev.me/en</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://fotedev.me/ar</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://fotedev.me/en/projects</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/projects" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/projects" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/projects" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/ar/projects</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/projects" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/projects" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/projects" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/en/services</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/services" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/services" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/services" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/ar/services</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/services" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/services" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/services" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/en/about</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/about" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/about" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/about" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/ar/about</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/about" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/about" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/about" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/en/contact</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/contact" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/contact" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/contact" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/ar/contact</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/contact" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/contact" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/contact" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/en/privacy</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/privacy" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/privacy" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/privacy" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/ar/privacy</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/privacy" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/privacy" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/privacy" />
+<lastmod>2026-11-10T00:53:04.377Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://fotedev.me/en/projects/masar-x</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/projects/masar-x" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/projects/masar-x" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/projects/masar-x" />
+<lastmod>2026-11-07T14:12:43.576Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://fotedev.me/ar/projects/masar-x</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/projects/masar-x" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/projects/masar-x" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/projects/masar-x" />
+<lastmod>2026-11-07T14:12:43.576Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://fotedev.me/en/projects/ghost</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/projects/ghost" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/projects/ghost" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/projects/ghost" />
+<lastmod>2026-11-07T14:12:43.576Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://fotedev.me/ar/projects/ghost</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/projects/ghost" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/projects/ghost" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/projects/ghost" />
+<lastmod>2026-11-07T14:12:43.576Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://fotedev.me/en/projects/khalat</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/projects/khalat" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/projects/khalat" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/projects/khalat" />
+<lastmod>2026-11-07T14:12:43.576Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://fotedev.me/ar/projects/khalat</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://fotedev.me/en/projects/khalat" />
+<xhtml:link rel="alternate" hreflang="ar" href="https://fotedev.me/ar/projects/khalat" />
+<xhtml:link rel="alternate" hreflang="x-default" href="https://fotedev.me/en/projects/khalat" />
+<lastmod>2026-11-07T14:12:43.576Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.8</priority>
+</url>
+</urlset>

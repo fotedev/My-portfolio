@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { CopyEmailButton } from "@/components/copy-email-button";
 import { ThemeReset } from "@/components/theme-reset";
+import { brandIcons } from "@/components/ui/brand-icons";
 import type { SiteSettings } from "@/lib/content/queries";
 import { Link } from "@/lib/i18n/navigation";
 
@@ -24,7 +25,9 @@ const socialLabels: Record<string, string> = {
 
 /**
  * Footer (DESIGN §10.7): identity + offer, page links, connect column with the
- * copy-email button and verified socials. No badge walls, no stat widgets.
+ * click-to-copy email and brand-icon social links (owner request, 2026-11-11 —
+ * icons replace the text list; aria-labels carry the names). No badge walls,
+ * no stat widgets.
  */
 export function Footer({ settings }: { settings: SiteSettings | null }) {
   const t = useTranslations("footer");
@@ -36,12 +39,12 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
     <footer className="border-t border-border-subtle">
       <div className="container-site grid gap-10 py-12 md:grid-cols-3">
         <div>
-          <p className="font-semibold text-foreground">fotedev</p>
+          <p className="font-mono font-medium text-foreground">fotedev</p>
           <p className="mt-2 max-w-xs text-muted-foreground type-body-sm">{t("tagline")}</p>
         </div>
 
         <nav aria-label={t("navLabel")}>
-          <h2 className="type-caption text-muted-foreground">{t("pagesLabel")}</h2>
+          <h2 className="text-sm font-medium text-foreground">{t("pagesLabel")}</h2>
           <ul className="mt-3 space-y-1">
             {footerPages.map((page) => (
               <li key={page.href}>
@@ -57,41 +60,46 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
         </nav>
 
         <div>
-          <h2 className="type-caption text-muted-foreground">{t("connectLabel")}</h2>
+          <h2 className="text-sm font-medium text-foreground">{t("connectLabel")}</h2>
           {email && (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <a
-                href={`mailto:${email}`}
-                dir="ltr"
-                className="inline-flex min-h-11 items-center font-mono text-xs text-accent underline-offset-4 hover:underline"
-              >
-                {email}
-              </a>
-              <CopyEmailButton
-                email={email}
-                label={t("copyEmail")}
-                copiedLabel={t("copied")}
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-subtle bg-surface px-3 text-muted-foreground transition-colors duration-150 hover:text-foreground"
-              />
-            </div>
+            <CopyEmailButton
+              email={email}
+              label={t("copyEmail")}
+              copiedLabel={t("copied")}
+              hintLabel={t("copyHint")}
+              className="mt-3 inline-flex min-h-11 items-center font-mono text-sm text-accent underline-offset-4 transition-colors duration-150 hover:underline"
+            />
           )}
           {settings && settings.socials.length > 0 && (
-            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
-              {settings.socials.map((social) => (
-                <li key={social.platform}>
-                  <a
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center text-muted-foreground transition-colors duration-150 hover:text-foreground type-body-sm"
-                  >
-                    {socialLabels[social.platform] ?? social.platform}
-                    <span aria-hidden="true" className="ms-1 text-xs">
-                      ↗
-                    </span>
-                  </a>
-                </li>
-              ))}
+            <ul className="mt-3 flex flex-wrap gap-x-1 gap-y-1">
+              {settings.socials.map((social) => {
+                const name = socialLabels[social.platform] ?? social.platform;
+                const icon = brandIcons[social.platform];
+                return (
+                  <li key={social.platform}>
+                    <a
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={name}
+                      title={name}
+                      className={
+                        icon
+                          ? "inline-flex size-11 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 hover:bg-surface hover:text-foreground"
+                          : "inline-flex min-h-11 items-center text-muted-foreground transition-colors duration-150 hover:text-foreground type-body-sm"
+                      }
+                    >
+                      {icon ? (
+                        <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-current">
+                          <path d={icon.path} />
+                        </svg>
+                      ) : (
+                        <span className="type-body-sm">{name}</span>
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           )}
           <div className="mt-3">

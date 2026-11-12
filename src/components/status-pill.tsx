@@ -14,7 +14,7 @@ const pillClasses: Record<PillKind, string> = {
 export function StatusPill({ kind, children }: { kind: PillKind; children: ReactNode }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 type-caption ${pillClasses[kind]}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 type-pill ${pillClasses[kind]}`}
     >
       {children}
     </span>

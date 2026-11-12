@@ -34,8 +34,19 @@
   --danger-text: #b91c1c;
   --ring: #2563eb;
   --code-background: #f1f5f9;
+  --selection-bg: rgba(37, 99, 235, 0.18);
   /* The ONLY permitted gradient — hero decorative wash (DESIGN §2.2) */
   --hero-wash: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(14, 116, 144, 0.04));
+  /* Hero lattice (ADR-0010 §3) — the canvas layer's own material. The amber is
+     the single exception to the one-accent-family rule, and it exists only
+     inside the WebGL canvas. Never used by a DOM element. */
+  --hive-node: #c2410c;
+  --hive-link: #ea580c;
+  --hive-additive: 0;
+  --hive-bloom: 0;
+  --hive-node-opacity: 0.62;
+  --hive-link-opacity: 0.11;
+  color-scheme: light;
 }
 
 .dark {
@@ -62,7 +73,15 @@
   --danger-text: #f87171;
   --ring: #22d3ee;
   --code-background: #0d1424;
+  --selection-bg: rgba(34, 211, 238, 0.25);
   --hero-wash: linear-gradient(135deg, rgba(34, 211, 238, 0.06), rgba(59, 130, 246, 0.06));
+  --hive-node: #ff6b35;
+  --hive-link: #ff8c42;
+  --hive-additive: 1;
+  --hive-bloom: 1;
+  --hive-node-opacity: 1;
+  --hive-link-opacity: 0.18;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -98,11 +117,47 @@
   --motion-ease: cubic-bezier(0, 0, 0.2, 1);
 }
 
+/* One orchestrated entrance — the hero, on page load (DESIGN §6 content
+   fade-in on mount: ≤200ms, transform-only). CSS-only, so it renders without
+   JS; disabled under prefers-reduced-motion below. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-in {
+  animation: rise-in 200ms cubic-bezier(0, 0, 0.2, 1) backwards;
+}
+
+.rise-in-1 {
+  animation-delay: 40ms;
+}
+
+.rise-in-2 {
+  animation-delay: 80ms;
+}
+
+.rise-in-3 {
+  animation-delay: 120ms;
+}
+
+.rise-in-4 {
+  animation-delay: 160ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
@@ -125,6 +180,11 @@ kbd {
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+/* Text selection carries the accent hue (DESIGN §2.4) */
+::selection {
+  background-color: var(--selection-bg);
 }
 
 /* Skip link — visible on keyboard focus only */
@@ -168,9 +228,35 @@ kbd {
   max-width: 45rem;
 }
 
-/* Hero decorative wash — the only permitted gradient (DESIGN §2.2) */
+/* Hero decorative wash - the only permitted gradient (DESIGN §2.2) */
 .hero-wash {
   background-image: var(--hero-wash);
+}
+
+/* ============================================================================
+   Hero lattice - the WebGL layer behind the hero (ADR-0010).
+
+   Decorative only: aria-hidden, pointer-events none, no text. It is bound to
+   the hero box rather than to the viewport, so it never bleeds into the
+   sections below it. The canvas is transparent - the page's own surface
+   tokens are never replaced.
+
+   The opacity transition is capped at 200ms like every other transition on
+   the site (DESIGN §6), and the global reduced-motion rule neutralises it.
+   ========================================================================== */
+.hero-hive {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-hive__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* ============================================================================
@@ -178,10 +264,11 @@ kbd {
    taller line-height, zero letter-spacing, no uppercase on [dir="rtl"].
    ========================================================================== */
 .type-display {
-  font-size: 2.25rem;
-  line-height: 1.15;
+  /* Fluid display scale (ADR-0009): 40px at 390px → 68px at ≥1440px. */
+  font-size: clamp(2.5rem, 1.7rem + 3.2vw, 4.25rem);
+  line-height: 1.08;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 .type-h1 {
@@ -227,6 +314,15 @@ kbd {
   text-transform: uppercase;
 }
 
+/* Status/label pills: sentence case at rest (ADR-0009) — caps are reserved
+   for genuinely tabular headers, not every label. */
+.type-pill {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
 .type-mono-sm {
   font-size: 0.8125rem;
   line-height: 1.6;
@@ -234,10 +330,6 @@ kbd {
 }
 
 @media (min-width: 768px) {
-  .type-display {
-    font-size: 3rem;
-  }
-
   .type-h1 {
     font-size: 2.25rem;
   }
@@ -255,6 +347,10 @@ kbd {
   }
 
   .type-caption {
+    font-size: 0.8125rem;
+  }
+
+  .type-pill {
     font-size: 0.8125rem;
   }
 
@@ -298,6 +394,10 @@ kbd {
   text-transform: none;
   letter-spacing: 0;
   font-weight: 600;
+}
+
+[dir="rtl"] .type-pill {
+  letter-spacing: 0;
 }
 
 /* Sticky header blur (DESIGN §10.6) */

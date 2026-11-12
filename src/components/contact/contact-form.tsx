@@ -149,7 +149,13 @@ export function ContactForm({ email }: { email: string }) {
           <a href={`mailto:${email}`} className={btnPrimary}>
             {t("mailto")}
           </a>
-          <CopyEmailButton email={email} label={t("copyEmail")} copiedLabel={t("copied")} className={btnSecondary} />
+          <CopyEmailButton
+            email={email}
+            label={t("copyEmail")}
+            copiedLabel={t("copied")}
+            hintLabel={t("copyHint")}
+            className="inline-flex min-h-11 items-center font-mono text-sm text-accent underline-offset-4 hover:underline"
+          />
         </div>
       </div>
     );
@@ -358,10 +364,16 @@ export function ContactForm({ email }: { email: string }) {
       <div className="mt-6 border-t border-border-subtle pt-4">
         <p className="type-body-sm text-muted-foreground">{t("formFallbackNote")}</p>
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <a href={`mailto:${email}`} dir="ltr" className="inline-flex min-h-11 items-center font-mono text-sm text-accent underline-offset-4 hover:underline">
-            {email}
+          <CopyEmailButton
+            email={email}
+            label={t("copyEmail")}
+            copiedLabel={t("copied")}
+            hintLabel={t("copyHint")}
+            className="inline-flex min-h-11 items-center font-mono text-sm text-accent underline-offset-4 hover:underline"
+          />
+          <a href={`mailto:${email}`} className={btnSecondary}>
+            {t("mailto")}
           </a>
-          <CopyEmailButton email={email} label={t("copyEmail")} copiedLabel={t("copied")} className={btnSecondary} />
         </div>
       </div>
     </form>

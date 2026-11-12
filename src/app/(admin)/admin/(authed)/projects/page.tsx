@@ -44,7 +44,7 @@ export default async function AdminProjectsPage() {
         <h1 className="text-2xl font-semibold">Projects</h1>
         <Link
           href="/admin/projects/new"
-          className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-strong"
+          className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-strong"
         >
           New project
         </Link>

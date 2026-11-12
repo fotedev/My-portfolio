@@ -1,0 +1,52 @@
+[
+  {
+    "locale": "en",
+    "htmlClass": "dark",
+    "hasDarkClass": true,
+    "dir": "ltr",
+    "bodyBg": "rgb(10, 14, 26)",
+    "bodyColor": "rgb(248, 250, 252)",
+    "h1Color": "rgb(248, 250, 252)",
+    "h1Size": "36px",
+    "pColor": "rgb(148, 163, 184)",
+    "pSize": "17px",
+    "linkColor": "rgb(248, 250, 252)",
+    "ctaBg": "rgb(59, 130, 246)",
+    "ctaColor": "rgb(255, 255, 255)",
+    "overflow": false,
+    "consoleErrors": [],
+    "toggleResult": "flips-to-light",
+    "contrast": {
+      "body": 18.403173426389227,
+      "h1_vs_bodyBg": 18.403173426389227,
+      "p_vs_bodyBg": 7.509549240527915,
+      "ctaText_vs_ctaBg": 3.6779011537825332
+    },
+    "ts": "2026-11-10T05:50:29.209Z"
+  },
+  {
+    "locale": "ar",
+    "htmlClass": "dark",
+    "hasDarkClass": true,
+    "dir": "rtl",
+    "bodyBg": "rgb(10, 14, 26)",
+    "bodyColor": "rgb(248, 250, 252)",
+    "h1Color": "rgb(248, 250, 252)",
+    "h1Size": "36px",
+    "pColor": "rgb(148, 163, 184)",
+    "pSize": "17px",
+    "linkColor": "rgb(248, 250, 252)",
+    "ctaBg": "rgb(59, 130, 246)",
+    "ctaColor": "rgb(255, 255, 255)",
+    "overflow": false,
+    "consoleErrors": [],
+    "toggleResult": "flips-to-light",
+    "contrast": {
+      "body": 18.403173426389227,
+      "h1_vs_bodyBg": 18.403173426389227,
+      "p_vs_bodyBg": 7.509549240527915,
+      "ctaText_vs_ctaBg": 3.6779011537825332
+    },
+    "ts": "2026-11-10T05:50:32.686Z"
+  }
+]

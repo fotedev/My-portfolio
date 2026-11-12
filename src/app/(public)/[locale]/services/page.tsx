@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Reveal } from "@/components/motion";
-import { btnSecondary } from "@/components/ui/cta";
+import { JsonLd } from "@/components/json-ld";
+import { ForwardArrow } from "@/components/ui/arrows";
+import { externalLink } from "@/components/ui/cta";
+import { webPageJsonLd } from "@/lib/content/jsonld";
 import { getServices } from "@/lib/content/queries";
 import { Link } from "@/lib/i18n/navigation";
 import { isLocale, toLocale, type Locale } from "@/lib/i18n/routing";
@@ -53,18 +55,31 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
   const services = await getServices(locale);
 
   return (
-    <div className="container-site py-16 md:py-20">
+    <div className="container-site py-16 md:py-24">
+      <JsonLd
+        data={webPageJsonLd({
+          locale,
+          path: "/services",
+          title: t("title"),
+          description: t("subtitle"),
+        })}
+      />
       <h1 className="type-h1">{t("title")}</h1>
-      <p className="mt-3 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
+      <p className="mt-4 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-3">
-        {services.map((service, index) => (
-          <Reveal key={service.key} delay={Math.min(index, 2) * 0.04}>
-            <article className="flex h-full flex-col rounded-xl border border-border-subtle bg-surface p-6">
-              <h2 className="type-h3">{service.title}</h2>
-              <p className="mt-2 text-muted-foreground type-body-sm">{service.summary}</p>
-              <h3 className="mt-6 type-caption text-muted-foreground">{t("deliverables")}</h3>
-              <ul className="mt-3 space-y-2">
+      {/* Deliverables-first index rows (ADR-0009): one engagement per row,
+          what you get on the inline-end column. */}
+      <ul className="mt-12 border-t border-border-subtle">
+        {services.map((service) => (
+          <li
+            key={service.key}
+            className="grid gap-4 border-b border-border-subtle py-10 md:grid-cols-[1fr_1.75fr] md:gap-10"
+          >
+            <h2 className="type-h3 md:pt-1">{service.title}</h2>
+            <div>
+              <p className="max-w-2xl text-muted-foreground">{service.summary}</p>
+              <h3 className="mt-7 text-sm font-medium text-foreground">{t("deliverables")}</h3>
+              <ul className="mt-3 max-w-2xl space-y-2">
                 {service.deliverables.map((item) => (
                   <li key={item} className="flex gap-2 type-body-sm">
                     <CheckIcon />
@@ -72,13 +87,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
                   </li>
                 ))}
               </ul>
-              <Link href="/contact" className={`mt-auto pt-6 ${btnSecondary}`}>
+              <Link href="/contact" className={`mt-8 inline-flex font-medium ${externalLink}`}>
                 {t("cta")}
+                <ForwardArrow />
               </Link>
-            </article>
-          </Reveal>
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

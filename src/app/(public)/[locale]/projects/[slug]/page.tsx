@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { JsonLd } from "@/components/json-ld";
 import { CaseStudyView } from "@/components/public/case-study-view";
+import { breadcrumbJsonLd, webPageJsonLd } from "@/lib/content/jsonld";
 import { formatDate } from "@/lib/content/localize";
 import { getCaseStudy, getPublishedSlugs } from "@/lib/content/queries";
 import { isLocale, locales, toLocale, type Locale } from "@/lib/i18n/routing";
@@ -53,6 +55,24 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="container-site py-16 md:py-20">
+      <JsonLd
+        data={webPageJsonLd({
+          locale,
+          path: `/projects/${slug}`,
+          title: study.title,
+          description: study.summary,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd({
+          locale,
+          items: [
+            { name: "fotedev", path: "" },
+            { name: t("title"), path: "/projects" },
+            { name: study.title, path: `/projects/${slug}` },
+          ],
+        })}
+      />
       <CaseStudyView
         study={study}
         labels={{

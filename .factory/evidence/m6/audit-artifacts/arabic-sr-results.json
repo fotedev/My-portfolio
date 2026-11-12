@@ -1,0 +1,409 @@
+{
+  "ar": {
+    "attrs": {
+      "lang": "ar",
+      "dir": "rtl",
+      "bodyDir": "rtl",
+      "title": "أحمد أبو العيون — مهندس ذكاء اصطناعي متكامل"
+    },
+    "order": [
+      {
+        "kind": "header",
+        "tag": "header",
+        "label": "",
+        "text": "fotedev\nالرئيسية\nالمشاريع\nالخدمات\nنبذة\nت"
+      },
+      {
+        "kind": "nav",
+        "tag": "nav",
+        "label": "Main",
+        "text": "fotedev\nالرئيسية\nالمشاريع\nالخدمات\nنبذة\nت"
+      },
+      {
+        "kind": "main",
+        "tag": "main",
+        "label": "content",
+        "text": "متاح لمشاريع العمل الحر\nتطبيقات ويب وأدو"
+      },
+      {
+        "kind": "h1",
+        "tag": "h1",
+        "label": "",
+        "text": "تطبيقات ويب وأدوات ذكاء اصطناعي مبنية حو"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-work",
+        "text": "أعمال مختارة"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Masar X"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "ghost"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Khalat"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-services",
+        "text": "الخدمات"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "تطبيقات ويب ولوحات تحكم"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "أنظمة RAG إنتاجية وحلول ذكاء اصطناعي متك"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "سير عمل وكيلي وأدوات MCP وخطوط CI حتمية"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-how",
+        "text": "كيف أعمل"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "المواصفة أولًا"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "شرائح عمودية"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "بوابات يفرضها CI"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "التسليم"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-oss",
+        "text": "هندسة مفتوحة المصدر والأمن"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "fix(config): malformed custom_providers "
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "fix(gateway): prefer session model overr"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "fix(windows): respawn gateway on the ven"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Insecure plaintext storage of Telegram b"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-credentials",
+        "text": "اعتمادات مُوثّقة"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "شهادة إتمام — مبادرة مليون خيّر لأوامر ا"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-about",
+        "text": "نبذة"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-contact",
+        "text": "لديك مشروع في ذهنك؟"
+      },
+      {
+        "kind": "footer",
+        "tag": "footer",
+        "label": "",
+        "text": "fotedev\n\nتطبيقات ويب وأدوات ذكاء اصطناعي"
+      },
+      {
+        "kind": "nav",
+        "tag": "nav",
+        "label": "تذييل الصفحة",
+        "text": "الصفحات\nالمشاريع\nالخدمات\nنبذة\nتواصل\nالخص"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "",
+        "text": "الصفحات"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "",
+        "text": "تواصل"
+      }
+    ],
+    "flags": [
+      "heading-with-latin-no-bdi: H3 \"أنظمة RAG إنتاجية وحلول ذكاء اصطناعي متك\" latin=\"RAG\"",
+      "heading-with-latin-no-bdi: H3 \"سير عمل وكيلي وأدوات MCP وخطوط CI حتمية\" latin=\"MCP\""
+    ],
+    "snapshotSaved": true,
+    "ts": "2026-11-10T05:52:20.982Z"
+  },
+  "en": {
+    "attrs": {
+      "lang": "en",
+      "dir": "ltr",
+      "bodyDir": "ltr",
+      "title": "Ahmed Aboalayoun — Full-Stack AI Engineer"
+    },
+    "order": [
+      {
+        "kind": "header",
+        "tag": "header",
+        "label": "",
+        "text": "fotedev\nHome\nProjects\nServices\nAbout\nCon"
+      },
+      {
+        "kind": "nav",
+        "tag": "nav",
+        "label": "Main",
+        "text": "fotedev\nHome\nProjects\nServices\nAbout\nCon"
+      },
+      {
+        "kind": "main",
+        "tag": "main",
+        "label": "content",
+        "text": "AVAILABLE FOR FREELANCE PROJECTS\nWeb app"
+      },
+      {
+        "kind": "h1",
+        "tag": "h1",
+        "label": "",
+        "text": "Web applications and AI tools built arou"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-work",
+        "text": "Selected work"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Masar X"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "ghost"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Khalat"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-services",
+        "text": "Services"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "High-performance web platforms (Next.js,"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Full-stack AI & production RAG systems"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Agentic workflows, MCP tooling & determi"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-how",
+        "text": "How I work"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Spec first"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Vertical slices"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "CI-enforced gates"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Handover"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-oss",
+        "text": "Open-source and security engineering"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "fix(config): malformed custom_providers "
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "fix(gateway): prefer session model overr"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "fix(windows): respawn gateway on the ven"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "Insecure plaintext storage of Telegram b"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-credentials",
+        "text": "Verified credentials"
+      },
+      {
+        "kind": "h3",
+        "tag": "h3",
+        "label": "",
+        "text": "1 MILLION PROMPTERS — Certificate of Com"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-about",
+        "text": "About"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "home-contact",
+        "text": "Have a project in mind?"
+      },
+      {
+        "kind": "footer",
+        "tag": "footer",
+        "label": "",
+        "text": "fotedev\n\nWeb applications and AI tools b"
+      },
+      {
+        "kind": "nav",
+        "tag": "nav",
+        "label": "Footer",
+        "text": "PAGES\nProjects\nServices\nAbout\nContact\nPr"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "",
+        "text": "PAGES"
+      },
+      {
+        "kind": "h2",
+        "tag": "h2",
+        "label": "",
+        "text": "CONNECT"
+      }
+    ],
+    "flags": [
+      "heading-with-latin-no-bdi: H1 \"Web applications and AI tools built arou\" latin=\"Web,applications,and\"",
+      "heading-with-latin-no-bdi: H2 \"Selected work\" latin=\"Selected,work\"",
+      "heading-with-latin-no-bdi: H2 \"Services\" latin=\"Services\"",
+      "heading-with-latin-no-bdi: H3 \"High-performance web platforms (Next.js,\" latin=\"High-performance,web,platforms\"",
+      "heading-with-latin-no-bdi: H3 \"Full-stack AI & production RAG systems\" latin=\"Full-stack,production,RAG\"",
+      "heading-with-latin-no-bdi: H3 \"Agentic workflows, MCP tooling & determi\" latin=\"Agentic,workflows,MCP\"",
+      "heading-with-latin-no-bdi: H2 \"How I work\" latin=\"How,work\"",
+      "heading-with-latin-no-bdi: H3 \"Spec first\" latin=\"Spec,first\"",
+      "heading-with-latin-no-bdi: H3 \"Vertical slices\" latin=\"Vertical,slices\"",
+      "heading-with-latin-no-bdi: H3 \"CI-enforced gates\" latin=\"CI-enforced,gates\"",
+      "heading-with-latin-no-bdi: H3 \"Handover\" latin=\"Handover\"",
+      "heading-with-latin-no-bdi: H2 \"Open-source and security engineering\" latin=\"Open-source,and,security\"",
+      "heading-with-latin-no-bdi: H2 \"Verified credentials\" latin=\"Verified,credentials\"",
+      "heading-with-latin-no-bdi: H2 \"About\" latin=\"About\"",
+      "heading-with-latin-no-bdi: H2 \"Have a project in mind?\" latin=\"Have,project,mind\"",
+      "heading-with-latin-no-bdi: H2 \"Pages\" latin=\"Pages\"",
+      "heading-with-latin-no-bdi: H2 \"Connect\" latin=\"Connect\""
+    ],
+    "snapshotSaved": true,
+    "ts": "2026-11-10T05:52:22.668Z"
+  }
+}

@@ -45,7 +45,7 @@ export function AdminSidebar({ unreadCount }: { unreadCount: number }) {
         >
           <span>{item.label}</span>
           {item.href === "/admin/inquiries" && unreadCount > 0 && (
-            <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white">
+            <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-accent-foreground">
               {unreadCount}
             </span>
           )}

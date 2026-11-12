@@ -17,7 +17,7 @@ export function personJsonLd(opts: { sameAs: string[]; locale: Locale }): Record
     "@type": "Person",
     name: "Ahmed Aboalayoun",
     alternateName: "fotedev",
-    url: localeUrl("en"),
+    url: localeUrl(opts.locale),
     jobTitle: "Full-Stack AI Engineer",
     knowsLanguage: ["en", "ar"],
     sameAs: opts.sameAs,
@@ -33,16 +33,54 @@ export function personJsonLd(opts: { sameAs: string[]; locale: Locale }): Record
 export function professionalServiceJsonLd(opts: {
   description: string;
   email: string;
+  locale: Locale;
 }): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     name: "fotedev",
-    url: localeUrl("en"),
+    url: localeUrl(opts.locale),
     description: opts.description,
     email: opts.email,
     areaServed: ["Egypt", "Gulf states", "International"],
     knowsLanguage: ["en", "ar"],
     founder: { "@type": "Person", name: "Ahmed Aboalayoun" },
+  };
+}
+
+/** Structural page metadata — carries only the page's own title/description
+ * and the canonical localized URL; no content facts. Used on routes without
+ * entity data (privacy, projects index, services index; M6 SEO audit). */
+export function webPageJsonLd(opts: {
+  locale: Locale;
+  path: string;
+  title: string;
+  description: string;
+}): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    url: localeUrl(opts.locale, opts.path),
+    name: opts.title,
+    description: opts.description,
+    inLanguage: opts.locale,
+    isPartOf: { "@type": "WebSite", name: "fotedev", url: localeUrl(opts.locale) },
+  };
+}
+
+/** Breadcrumb trail for nested pages — structural navigation only. */
+export function breadcrumbJsonLd(opts: {
+  locale: Locale;
+  items: Array<{ name: string; path: string }>;
+}): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: opts.items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: localeUrl(opts.locale, item.path),
+    })),
   };
 }
