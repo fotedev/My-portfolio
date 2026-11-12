@@ -40,11 +40,13 @@ export function CopyEmailButton({
 
   return (
     <>
+      {/* 2.5.3 Label in Name: the accessible name must contain the visible
+          text (the address), so the instruction is prefixed with it. */}
       <button
         type="button"
         onClick={copy}
         className={className}
-        aria-label={label}
+        aria-label={`${label} ${email}`}
         title={copied ? copiedLabel : hintLabel}
       >
         <span className={copied ? "text-success-text" : undefined}>{email}</span>
