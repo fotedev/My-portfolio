@@ -1,51 +1,35 @@
 import { describe, expect, it } from "vitest";
 import { assignTargets, buildRosette, ringNodeCount, rosetteNodeCount } from "./assembly";
-import { buildSwarm, hexDistance, hexRingCoordinates, swarmBounds } from "./lattice";
+import { buildSwarm, swarmBounds, type LatticeNode } from "./lattice";
 import { computeLinks, createLinkBuffer } from "./links";
 import { createRandom } from "./random";
 
 const SWARM = {
-  rings: 6,
-  cellSize: 1,
+  nodeCount: rosetteNodeCount(3),
+  clusterCount: 3,
+  clusterSpread: 1,
+  ambientRatio: 0.18,
+  fieldExtent: 5,
   zJitter: 0.15,
   immediateRatio: 0.18,
   seed: 0x5eed1234,
 };
 
-describe("hexDistance", () => {
-  it("is zero at the origin", () => {
-    expect(hexDistance(0, 0)).toBe(0);
-  });
-
-  it("counts steps along a straight line", () => {
-    expect(hexDistance(3, 0)).toBe(3);
-    expect(hexDistance(0, -4)).toBe(4);
-  });
-
-  it("is symmetric", () => {
-    expect(hexDistance(2, -3)).toBe(hexDistance(-2, 3));
-  });
-});
-
-describe("hexRingCoordinates", () => {
-  it("enumerates a full hexagon of cells", () => {
-    for (const rings of [1, 2, 3, 6, 9]) {
-      const cells = hexRingCoordinates(rings);
-      expect(cells).toHaveLength(1 + 3 * rings * (rings + 1));
+/** Median nearest-neighbour distance, the clumping signature of the field. */
+function medianNearestNeighbour(nodes: LatticeNode[]): number {
+  const distances: number[] = [];
+  for (const node of nodes) {
+    let nearest = Infinity;
+    for (const other of nodes) {
+      if (other.index === node.index) continue;
+      const distance = Math.hypot(node.x - other.x, node.y - other.y);
+      if (distance < nearest) nearest = distance;
     }
-  });
-
-  it("keeps every cell within the ring distance", () => {
-    const rings = 5;
-    for (const cell of hexRingCoordinates(rings)) {
-      expect(hexDistance(cell.q, cell.r)).toBeLessThanOrEqual(rings);
-    }
-  });
-
-  it("produces a stable order for a given ring count", () => {
-    expect(hexRingCoordinates(3)).toEqual(hexRingCoordinates(3));
-  });
-});
+    distances.push(nearest);
+  }
+  distances.sort((a, b) => a - b);
+  return distances[Math.floor(distances.length / 2)] ?? Infinity;
+}
 
 describe("buildSwarm", () => {
   it("is deterministic for a given seed", () => {
@@ -56,9 +40,9 @@ describe("buildSwarm", () => {
     expect(buildSwarm(SWARM)).not.toEqual(buildSwarm({ ...SWARM, seed: SWARM.seed + 1 }));
   });
 
-  it("produces one node per cell, in order", () => {
+  it("produces exactly the requested node count, in order", () => {
     const nodes = buildSwarm(SWARM);
-    expect(nodes).toHaveLength(1 + 3 * SWARM.rings * (SWARM.rings + 1));
+    expect(nodes).toHaveLength(SWARM.nodeCount);
     expect(nodes.map((node) => node.index)).toEqual(nodes.map((_, index) => index));
   });
 
@@ -81,7 +65,7 @@ describe("buildSwarm", () => {
     expect(share).toBeLessThan(0.4);
   });
 
-  it("keeps the remaining thresholds inside the entrance window", () => {
+  it("keeps the remaining thresholds inside the reveal window", () => {
     const nodes = buildSwarm(SWARM);
     const waiting = nodes.filter((node) => node.threshold >= 0);
     expect(waiting.length).toBeGreaterThan(0);
@@ -96,6 +80,27 @@ describe("buildSwarm", () => {
       expect(Math.abs(node.z)).toBeLessThanOrEqual(SWARM.zJitter / 2 + 1e-9);
     }
   });
+
+  it("keeps every node inside the field plus cluster slack", () => {
+    // Cluster clouds are gaussian, so a node can sit a few sigmas outside its
+    // centre; three sigmas past the extent is already extraordinary.
+    const slack = SWARM.clusterSpread * 3;
+    for (const node of buildSwarm(SWARM)) {
+      expect(Math.abs(node.x)).toBeLessThanOrEqual(SWARM.fieldExtent + slack);
+      expect(Math.abs(node.y)).toBeLessThanOrEqual(SWARM.fieldExtent + slack);
+    }
+  });
+
+  it("clusters the field instead of spreading it uniformly", () => {
+    // The signature of the reference technique is contrast: dense clumps and
+    // empty voids. A uniform scatter of this many nodes over this area would
+    // put the median nearest-neighbour distance near the mean spacing; a
+    // clustered field packs many nodes far closer together.
+    const nodes = buildSwarm(SWARM);
+    const median = medianNearestNeighbour(nodes);
+    const meanSpacing = (SWARM.fieldExtent * 2) / Math.sqrt(nodes.length);
+    expect(median).toBeLessThan(meanSpacing * 0.5);
+  });
 });
 
 describe("swarmBounds", () => {
@@ -107,12 +112,6 @@ describe("swarmBounds", () => {
     expect(bounds.maxX - bounds.minX).toBeCloseTo(bounds.width, 10);
     expect(bounds.maxY - bounds.minY).toBeCloseTo(bounds.height, 10);
   });
-
-  it("is centred on the origin", () => {
-    const bounds = swarmBounds(buildSwarm(SWARM));
-    expect((bounds.minX + bounds.maxX) / 2).toBeCloseTo(0, 6);
-    expect((bounds.minY + bounds.maxY) / 2).toBeCloseTo(0, 6);
-  });
 });
 
 describe("buildRosette", () => {
@@ -123,7 +122,7 @@ describe("buildRosette", () => {
     expect(rosetteNodeCount(4)).toBe(1 + 6 + 12 + 18 + 24);
   });
 
-  it("has the same node count as the lattice it collapses from", () => {
+  it("has the same node count as the field it collapses from", () => {
     for (const rings of [3, 5, 7]) {
       expect(rosetteNodeCount(rings)).toBe(1 + 3 * rings * (rings + 1));
     }
@@ -172,6 +171,7 @@ describe("assignTargets", () => {
     { x: 0, y: 2 },
     { x: 5, y: 5 },
     { x: -5, y: 5 },
+    { x: 3, y: -4 },
   ];
 
   it("returns one target per node", () => {
@@ -185,6 +185,19 @@ describe("assignTargets", () => {
     const assigned = assignTargets(positions, targets, 0, 1);
     const centre = assigned[0];
     expect(centre?.radius).toBeLessThanOrEqual(Math.min(...targets.map((t) => t.radius)));
+  });
+
+  it("is a bijection when the counts match", () => {
+    // The field's node count is fixed to the rosette's slot count in
+    // production; the collapse must then visit every slot exactly once, or
+    // the assembled form clumps instead of reading as a honeycomb.
+    const targets = buildRosette({ rings: 1, ringGap: 2, depth: 0.6, seed: 1 });
+    expect(targets).toHaveLength(positions.length);
+
+    const assigned = assignTargets(positions, targets, 0, 1);
+    const assignedRadii = assigned.map((target) => target.radius).sort((a, b) => a - b);
+    const targetRadii = targets.map((target) => target.radius).sort((a, b) => a - b);
+    expect(assignedRadii).toEqual(targetRadii);
   });
 
   it("keeps every assigned target finite", () => {

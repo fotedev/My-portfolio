@@ -18,21 +18,35 @@ import {
   ShapeGeometry,
   WebGLRenderer,
 } from "three";
-import { assignTargets, buildRosette, type AssemblyTarget } from "./assembly";
 import {
+  assignTargets,
+  buildRosette,
+  rosetteNodeCount,
+  type AssemblyTarget,
+} from "./assembly";
+import {
+  AMBIENT_RATIO,
   ASSEMBLY_GAP,
   ASSEMBLY_JITTER,
+  ASSEMBLY_RINGS,
+  BLOOM_INTENSITY,
+  BLOOM_RADIUS,
+  BLOOM_SMOOTHING,
+  BLOOM_THRESHOLD,
   CAMERA_FAR,
   CAMERA_FOV,
   CAMERA_NEAR,
   CAMERA_Z_LANDSCAPE,
   CAMERA_Z_PORTRAIT,
-  CELL_SIZE,
+  CLUSTER_COUNT,
+  CLUSTER_SPREAD,
   DRIFT_AMPLITUDE,
   ENTRANCE_MS,
+  FIELD_EXTENT,
   HIVE_SEED,
   IMMEDIATE_RATIO,
-  LINK_DISTANCE_CELLS,
+  LINK_DISTANCE_ASSEMBLED,
+  LINK_DISTANCE_REST,
   LINK_MAX_PER_NODE,
   LINK_RECOMPUTE_FRAMES,
   MAX_PIXEL_RATIO,
@@ -90,8 +104,6 @@ function hexagonShape(radius: number): Shape {
 export interface HiveRendererOptions {
   /** Render a single static frame instead of animating. */
   reducedMotion: boolean;
-  /** Number of hex rings in the field. */
-  rings: number;
   palette: HivePalette;
 }
 
@@ -99,6 +111,8 @@ export interface HiveRendererState {
   /** Pointer position, normalized to -1..1 on both axes. */
   pointerX: number;
   pointerY: number;
+  /** Scroll-reveal progress, 0 = rest (a minority of nodes), 1 = fully revealed. */
+  growth: number;
   /** Convergence progress, 0 = scattered field, 1 = fully assembled. */
   assembly: number;
 }
@@ -127,25 +141,25 @@ export class HiveRenderer {
   private nodes: LatticeNode[] = [];
   private targets: AssemblyTarget[] = [];
   private readonly positions: Float32Array;
+  /** Per-node reveal factor (0..1), written during the node pass and read by the link pass. */
+  private readonly appears: Float32Array;
   private readonly linkBuffer: LinkBuffer;
 
   private palette: HivePalette;
   private readonly reducedMotion: boolean;
-  private readonly rings: number;
 
   private width = 1;
   private height = 1;
   private pixelRatio = 1;
   /** Scale that fits the field to the viewport width. */
   private worldScale = 1;
-  /** World-space spacing between adjacent nodes of the field. */
-  private cellSpacing = 1;
 
   private pointerX = 0;
   private pointerY = 0;
   private targetPointerX = 0;
   private targetPointerY = 0;
   private assembly = 0;
+  private growth = 0;
 
   private startedAt = 0;
   private started = false;
@@ -162,7 +176,6 @@ export class HiveRenderer {
   constructor(canvas: HTMLCanvasElement, options: HiveRendererOptions) {
     this.palette = options.palette;
     this.reducedMotion = options.reducedMotion;
-    this.rings = options.rings;
 
     this.renderer = new WebGLRenderer({
       canvas,
@@ -179,6 +192,7 @@ export class HiveRenderer {
 
     const nodeCount = this.nodes.length;
     this.positions = new Float32Array(nodeCount * 3);
+    this.appears = new Float32Array(nodeCount);
     this.linkBuffer = createLinkBuffer(nodeCount, LINK_MAX_PER_NODE);
     // Sized to match the link buffer: two vertices per pair, three floats per
     // vertex.
@@ -226,11 +240,11 @@ export class HiveRenderer {
     const composer = new EffectComposer(this.renderer, { multisampling: 0 });
     composer.addPass(new RenderPass(this.scene, this.camera));
     const bloom = new BloomEffect({
-      luminanceThreshold: 0.65,
-      luminanceSmoothing: 0.5,
+      luminanceThreshold: BLOOM_THRESHOLD,
+      luminanceSmoothing: BLOOM_SMOOTHING,
       mipmapBlur: true,
-      intensity: 0.6,
-      radius: 0.4,
+      intensity: BLOOM_INTENSITY,
+      radius: BLOOM_RADIUS,
       kernelSize: KernelSize.LARGE,
     });
     composer.addPass(new EffectPass(this.camera, bloom));
@@ -240,15 +254,18 @@ export class HiveRenderer {
   /** Builds the field: the node lattice and the assembly targets. */
   private buildField(): void {
     this.nodes = buildSwarm({
-      rings: this.rings,
-      cellSize: CELL_SIZE,
+      nodeCount: rosetteNodeCount(ASSEMBLY_RINGS),
+      clusterCount: CLUSTER_COUNT,
+      clusterSpread: CLUSTER_SPREAD,
+      ambientRatio: AMBIENT_RATIO,
+      fieldExtent: FIELD_EXTENT,
       zJitter: Z_JITTER,
       immediateRatio: IMMEDIATE_RATIO,
       seed: HIVE_SEED,
     });
 
     const rosette = buildRosette({
-      rings: this.rings,
+      rings: ASSEMBLY_RINGS,
       ringGap: ASSEMBLY_GAP,
       depth: 0.4,
       seed: HIVE_SEED ^ 0x9e3779b9,
@@ -292,7 +309,6 @@ export class HiveRenderer {
     const visibleHeight = 2 * this.camera.position.z * Math.tan(((CAMERA_FOV / 2) * Math.PI) / 180);
 
     this.worldScale = Math.max(visibleWidth / bounds.width, visibleHeight / bounds.height);
-    this.cellSpacing = Math.sqrt(3) * CELL_SIZE * this.worldScale;
   }
 
   /** Applies a new palette (used when the theme changes). */
@@ -322,6 +338,11 @@ export class HiveRenderer {
     this.assembly = Math.min(1, Math.max(0, progress));
   }
 
+  /** Updates the scroll-reveal progress, 0 (rest) .. 1 (fully revealed). */
+  setGrowth(progress: number): void {
+    this.growth = Math.min(1, Math.max(0, progress));
+  }
+
   /** Starts the animation loop, or renders a single static frame. */
   start(): void {
     if (this.disposed || this.running) return;
@@ -335,6 +356,9 @@ export class HiveRenderer {
     }
 
     if (this.reducedMotion) {
+      // The static frame shows the whole mesh: a mostly empty emblem would
+      // read as a bug, not as reduced motion.
+      this.growth = 1;
       this.updateField(1, 0);
       this.renderFrame(0);
       this.publishFrameCount(performance.now());
@@ -418,9 +442,12 @@ export class HiveRenderer {
       this.positions[i * 3] = x;
       this.positions[i * 3 + 1] = y;
       this.positions[i * 3 + 2] = z;
-      // Grow-in: a node appears once the entrance passes its threshold.
-      const progress = Math.min(1, Math.max(0, (entrance - node.threshold) / NODE_APPEAR_WIDTH));
+      // Reveal: a node appears once the scroll-driven growth passes its
+      // threshold (the entrance no longer gates visibility - the reference
+      // rests with a minority of the mesh on screen and grows it on scroll).
+      const progress = Math.min(1, Math.max(0, (this.growth - node.threshold) / NODE_APPEAR_WIDTH));
       const appear = smoothstep(0, 1, progress);
+      this.appears[i] = appear;
       const radius = (NODE_RADIUS_MIN + (NODE_RADIUS_MAX - NODE_RADIUS_MIN) * entrance) * appear;
 
       this.dummy.position.set(x, y, z);
@@ -434,13 +461,12 @@ export class HiveRenderer {
     // --- links -------------------------------------------------------------
     this.frameCount += 1;
     if (this.frameCount % LINK_RECOMPUTE_FRAMES === 0 || this.linkBuffer.count === 0) {
-      // The link range tightens as the field collapses: the scattered field
-      // links across a few cell spacings, the collapsed honeycomb links only
-      // to its immediate neighbours.
+      // The link reach tightens as the field collapses: the scattered field
+      // links across a few lattice units, the assembled core links only to
+      // its immediate rosette neighbours.
       const linkDistance =
         this.worldScale *
-        (Math.sqrt(3) * LINK_DISTANCE_CELLS +
-          (ASSEMBLY_GAP * 1.7 - Math.sqrt(3) * LINK_DISTANCE_CELLS) * assembly);
+        (LINK_DISTANCE_REST + (LINK_DISTANCE_ASSEMBLED - LINK_DISTANCE_REST) * assembly);
 
       computeLinks(
         this.positions,
@@ -450,19 +476,25 @@ export class HiveRenderer {
       );
 
       const { indices, count } = this.linkBuffer;
+      // A link is drawn only while BOTH of its nodes are revealed: the line
+      // material's opacity is global, so unfiltered pairs would draw the
+      // whole mesh even while its nodes are still hidden.
+      let drawn = 0;
       for (let i = 0; i < count; i += 1) {
         const a = indices[i * 2];
         const b = indices[i * 2 + 1];
         if (a === undefined || b === undefined) continue;
-        this.linePositions[i * 6] = this.positions[a * 3] ?? 0;
-        this.linePositions[i * 6 + 1] = this.positions[a * 3 + 1] ?? 0;
-        this.linePositions[i * 6 + 2] = this.positions[a * 3 + 2] ?? 0;
-        this.linePositions[i * 6 + 3] = this.positions[b * 3] ?? 0;
-        this.linePositions[i * 6 + 4] = this.positions[b * 3 + 1] ?? 0;
-        this.linePositions[i * 6 + 5] = this.positions[b * 3 + 2] ?? 0;
+        if ((this.appears[a] ?? 0) < 0.05 || (this.appears[b] ?? 0) < 0.05) continue;
+        this.linePositions[drawn * 6] = this.positions[a * 3] ?? 0;
+        this.linePositions[drawn * 6 + 1] = this.positions[a * 3 + 1] ?? 0;
+        this.linePositions[drawn * 6 + 2] = this.positions[a * 3 + 2] ?? 0;
+        this.linePositions[drawn * 6 + 3] = this.positions[b * 3] ?? 0;
+        this.linePositions[drawn * 6 + 4] = this.positions[b * 3 + 1] ?? 0;
+        this.linePositions[drawn * 6 + 5] = this.positions[b * 3 + 2] ?? 0;
+        drawn += 1;
       }
 
-      this.lineGeometry.setDrawRange(0, count * 2);
+      this.lineGeometry.setDrawRange(0, drawn * 2);
       const attribute = this.lineGeometry.getAttribute("position") as BufferAttribute;
       attribute.needsUpdate = true;
     }

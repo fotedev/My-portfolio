@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { RINGS_LANDSCAPE, RINGS_PORTRAIT } from "./config";
+import { GROWTH_SHARE, SCROLL_RANGE } from "./config";
 import { HiveRenderer } from "./hive-renderer";
 import { readPalette } from "./palette";
 
-/** Matches the `md` breakpoint in DESIGN.md §14.5. */
-const PORTRAIT_QUERY = "(max-width: 767px)";
-
 /** Matches the global `prefers-reduced-motion` rule in DESIGN.md §6. */
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+
+/** Ease-out cubic, matching the renderer's entrance easing. */
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+}
 
 /**
  * The hero lattice canvas.
@@ -34,13 +36,11 @@ export default function HiveCanvas() {
     if (!canvas || !container) return;
 
     const reducedMotion = window.matchMedia(REDUCED_MOTION_QUERY).matches;
-    const rings = window.matchMedia(PORTRAIT_QUERY).matches ? RINGS_PORTRAIT : RINGS_LANDSCAPE;
 
     let renderer: HiveRenderer;
     try {
       renderer = new HiveRenderer(canvas, {
         reducedMotion,
-        rings,
         palette: readPalette(document.documentElement),
       });
     } catch {
@@ -72,17 +72,20 @@ export default function HiveCanvas() {
         // Show it in full rather than leaving it stuck at the CSS default of
         // zero opacity, where it would render for nothing.
         container.style.opacity = "1";
+        renderer.setGrowth(1);
         renderer.start();
         return;
       }
       const rect = hero.getBoundingClientRect();
 
-      // Convergence: 0 while the hero is in place, 1 once the reader has
-      // scrolled a short way into it. The page itself scrolls normally - this
-      // only reads position. The range is deliberately short (a fifth of the
-      // hero's height) so the form completes while the hero is still on
-      // screen and the reader can actually see it settle.
-      renderer.setAssembly(-rect.top / Math.max(1, rect.height * 0.2));
+      // Scroll story, over the first SCROLL_RANGE of the hero's height:
+      // growth (the mesh grows in from its rest minority, like the reference)
+      // takes the first GROWTH_SHARE, the assembly into the hex core takes
+      // the rest. The page itself scrolls normally - this only reads
+      // position.
+      const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height * SCROLL_RANGE)));
+      renderer.setGrowth(easeOutCubic(progress / GROWTH_SHARE));
+      renderer.setAssembly(Math.min(1, Math.max(0, (progress - GROWTH_SHARE) / (1 - GROWTH_SHARE))));
 
       // Fade out over the last third of the hero's exit.
       const overlap = Math.min(window.innerHeight, rect.bottom) - Math.max(0, rect.top);
