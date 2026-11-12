@@ -145,6 +145,19 @@ Recorded so the provenance of this code is unambiguous:
 - The geometry is deterministic from a seed (`mulberry32`), so renders are reproducible and testable. The reference uses bare `Math.random()` and is not.
 - The implementation is independent: raw three.js, no React Three Fiber.
 
+**2026-11-13 addendum — composition re-tuned to the reference's current look.** The
+reference site has redesigned its landing page since this ADR was written: its live
+effect is now a clustered, irregular plexus of glowing nodes (bright clumps and
+empty voids) rather than the uniform hex-lattice field this layer originally
+shipped with, and the hexagon-clip composition described above is no longer what
+the reference displays. This layer was re-tuned to match the reference's *current*
+composition — clustered gaussian field with ambient scatter, a scroll-driven
+reveal that rests with a minority of the mesh visible, stronger bloom, brighter
+light-theme tokens — while every rule above still holds: the code remains a
+from-scratch re-implementation, no bhived asset is used, and the assembly form
+(the hexagonal rosette core the field folds into late in the scroll range) remains
+this project's own.
+
 ## Consequences
 
 **Positive**

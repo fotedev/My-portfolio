@@ -112,15 +112,16 @@ export function buildRosette(options: RosetteOptions): AssemblyTarget[] {
 /**
  * Maps every node of the field onto a target.
  *
- * The mapping is by radius, not random: the node closest to the centre of the
- * field converges onto the centre of the rosette, the next ring of nodes onto
- * the first rosette ring, and so on. A random mapping makes the collapse
- * look like a shuffle; a radial mapping makes it look like the field is
- * folding inward, which is the intent.
+ * Both arrays are sorted by distance from the centre and zipped: the node
+ * closest to the centre of the field converges onto the centre of the
+ * rosette, the next node onto the next slot, and so on. A random mapping
+ * makes the collapse look like a shuffle; a radial mapping makes it look
+ * like the field is folding inward, which is the intent.
  *
- * When the rosette has the same node count as the field - which it does,
- * because it is a scaled-down copy of the same hexagon - this is an exact
- * one-to-one correspondence and the collapsed form is a crisp honeycomb.
+ * When the rosette has exactly as many slots as the field has nodes - which
+ * it does, because the field's node count is fixed to the rosette's - this
+ * is an exact one-to-one correspondence and the collapsed form is a crisp
+ * honeycomb rather than a clump.
  */
 export function assignTargets(
   nodePositions: ReadonlyArray<{ x: number; y: number }>,
@@ -149,13 +150,15 @@ export function assignTargets(
     }))
     .sort((a, b) => a.radius - b.radius || a.index - b.index);
 
+  // Rosette slots are generated centre-outward, but their radius is not
+  // monotone within a ring (edge midpoints sit inside the vertices), so sort
+  // them explicitly before zipping against the radius-sorted nodes.
+  const slots = [...targets].sort((a, b) => a.radius - b.radius);
+
   const assigned: AssemblyTarget[] = new Array(nodePositions.length);
 
   order.forEach((entry, rank) => {
-    // Nodes are spread across the targets in proportion to their rank, so
-    // many nodes share a slot and the rosette reads as a dense core.
-    const slot = Math.min(targets.length - 1, Math.floor((rank * targets.length) / order.length));
-    const target = targets[slot] ?? first;
+    const target = slots[Math.min(rank, slots.length - 1)] ?? first;
 
     assigned[entry.index] = {
       x: target.x + (random() - 0.5) * jitter,

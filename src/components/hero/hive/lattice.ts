@@ -1,15 +1,20 @@
 /**
- * Hero lattice geometry - the hexagonal field the canvas draws.
+ * Hero lattice geometry - the node field the canvas draws.
  *
  * Pure functions, no three.js: everything here is deterministic from a seed
  * and therefore unit-testable (see lattice.test.ts).
  *
- * The field is a pointy-top hexagonal grid laid out in axial coordinates
- * (q, r). Cells whose hex distance is within `rings` form a large hexagon -
- * a hive - and each cell becomes one instanced node.
+ * The field is a clustered scatter, not a uniform grid: a handful of gaussian
+ * clouds with ambient singles between them. Clumps of dense mesh and
+ * stretches of empty space are what make the layer read as a living network
+ * rather than as flat texture - that contrast is the reference technique's
+ * signature. The node count is fixed to the assembly rosette's slot count,
+ * so the collapse stays one-to-one.
  *
  * ADR-0010.
  */
+
+import { createRandom } from "./random";
 
 /** One node of the lattice. */
 export interface LatticeNode {
@@ -21,9 +26,11 @@ export interface LatticeNode {
   /** Depth jitter, so the field reads as a volume rather than a flat sheet. */
   z: number;
   /**
-   * Entrance threshold. The node stays invisible until the entrance progress
-   * passes this value, so the field fills in progressively. A negative value
-   * means "already present" - those nodes are on screen from the first frame.
+   * Reveal threshold on the scroll-driven growth curve. The node stays
+   * invisible until the growth progress passes this value, so the mesh grows
+   * in as the reader scrolls. A negative value means "already present" -
+   * those nodes are on screen from the first frame, so the hero never opens
+   * completely empty.
    */
   threshold: number;
   /** Per-node drift phase, so the idle motion is not synchronized. */
@@ -35,77 +42,79 @@ export interface LatticeNode {
 }
 
 export interface SwarmOptions {
-  /** Hex distance from the centre to the outermost ring. */
-  rings: number;
-  /** Size of one hexagonal cell in lattice units. */
-  cellSize: number;
-  /** Maximum depth jitter, in lattice units. */
+  /** Total node count. Fixed to the assembly rosette's slot count. */
+  nodeCount: number;
+  /** Number of cluster centres. */
+  clusterCount: number;
+  /** Cluster spread, in lattice units (one standard deviation). */
+  clusterSpread: number;
+  /** Share of nodes placed as ambient scatter outside the clusters. */
+  ambientRatio: number;
+  /** Half-extent of the field, in lattice units. */
+  fieldExtent: number;
+  /** Depth jitter, in lattice units. */
   zJitter: number;
-  /** Fraction of nodes that are visible from the very first frame. */
+  /** Share of nodes visible before any scroll. */
   immediateRatio: number;
   seed: number;
 }
 
-/** Hex distance between the origin and an axial coordinate. */
-export function hexDistance(q: number, r: number): number {
-  return (Math.abs(q) + Math.abs(r) + Math.abs(q + r)) / 2;
-}
-
-/**
- * Every axial coordinate whose hex distance is at most `rings`, in a stable
- * order (rings outer-to-inner, then by column) so the array index of a node
- * does not shift between runs.
- */
-export function hexRingCoordinates(rings: number): Array<{ q: number; r: number }> {
-  const cells: Array<{ q: number; r: number }> = [];
-
-  for (let r = rings; r >= -rings; r -= 1) {
-    // The q range for a given r is bounded so that -q-r also stays in range.
-    const qMin = Math.max(-rings, -r - rings);
-    const qMax = Math.min(rings, -r + rings);
-    for (let q = qMin; q <= qMax; q += 1) {
-      cells.push({ q, r });
-    }
-  }
-
-  return cells;
+/** Standard normal sample via the Box-Muller transform. */
+function gaussian(random: { next(): number }): number {
+  // next() returns [0, 1); log(0) would be -Infinity, so clamp away from zero.
+  const u1 = Math.max(random.next(), Number.EPSILON);
+  const u2 = random.next();
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
 }
 
 /** Builds the node field. */
 export function buildSwarm(options: SwarmOptions): LatticeNode[] {
-  const { rings, cellSize, zJitter, immediateRatio, seed } = options;
+  const {
+    nodeCount,
+    clusterCount,
+    clusterSpread,
+    ambientRatio,
+    fieldExtent,
+    zJitter,
+    immediateRatio,
+    seed,
+  } = options;
 
-  // Imported lazily to keep this module dependency-free for the geometry tests.
-  let state = seed >>> 0;
-  const random = (): number => {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let t = state;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+  const random = createRandom(seed);
 
-  const cells = hexRingCoordinates(rings);
-  const horizontal = Math.sqrt(3) * cellSize;
-  const vertical = 1.5 * cellSize;
+  // Cluster centres sit inside a margin of the field, so no cloud is centred
+  // exactly on the edge and every cluster keeps room to breathe.
+  const centres = Array.from({ length: Math.max(1, clusterCount) }, () => ({
+    x: random.range(-fieldExtent, fieldExtent) * 0.7,
+    y: random.range(-fieldExtent, fieldExtent) * 0.7,
+  }));
 
-  return cells.map((cell, index) => {
-    const x = horizontal * (cell.q + cell.r / 2);
-    const y = vertical * cell.r;
+  return Array.from({ length: nodeCount }, (_, index) => {
+    const clustered = random.next() >= ambientRatio;
+    let x: number;
+    let y: number;
+    if (clustered) {
+      const centre = random.pick(centres);
+      x = centre.x + gaussian(random) * clusterSpread;
+      y = centre.y + gaussian(random) * clusterSpread;
+    } else {
+      x = random.range(-fieldExtent, fieldExtent);
+      y = random.range(-fieldExtent, fieldExtent);
+    }
 
-    // Most nodes wait for the entrance to reach them; a minority are already
-    // there on the first frame, so the field never starts completely empty.
-    const threshold = random() < immediateRatio ? -1 : random() * 0.85;
+    // Most nodes wait for the scroll reveal to reach them; a minority are
+    // already present on the first frame.
+    const threshold = random.next() < immediateRatio ? -1 : random.next() * 0.85;
 
     return {
       index,
       x,
       y,
-      z: (random() - 0.5) * zJitter,
+      z: (random.next() - 0.5) * zJitter,
       threshold,
-      driftPhase: random() * Math.PI * 2,
-      driftSpeed: 0.15 + random() * 0.25,
-      driftAmplitude: 0.6 + random() * 0.8,
+      driftPhase: random.next() * Math.PI * 2,
+      driftSpeed: 0.15 + random.next() * 0.25,
+      driftAmplitude: 0.6 + random.next() * 0.8,
     };
   });
 }
