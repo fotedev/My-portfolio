@@ -115,10 +115,10 @@ test.describe("hero lattice", () => {
   });
 
   test("introduces no accessibility violations of its own", async ({ page }) => {
-    // The page has pre-existing violations unrelated to this feature (the
-    // warning status pill's contrast and the copy-email button's label-in-name
-    // mismatch - both present with the layer disabled too). This asserts the
-    // layer itself adds nothing: no violation may target the canvas.
+    // The page has one pre-existing violation unrelated to this feature (the
+    // warning status pill's contrast - present with the layer disabled too).
+    // This asserts the layer itself adds nothing: no violation may target the
+    // canvas.
     for (const locale of ["/en", "/ar"]) {
       await page.goto(locale);
       await page.waitForTimeout(1200);

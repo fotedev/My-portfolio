@@ -151,7 +151,11 @@ export class HiveRenderer {
   private started = false;
   private frameHandle: number | null = null;
   private frameCount = 0;
-  private lastFramePublish = 0;
+  // Negative infinity, not 0: the throttle below would otherwise swallow the
+  // first publish whenever start() runs within 500 ms of page navigation,
+  // which under reduced motion (no loop to republish) leaves data-hive-frames
+  // permanently unset.
+  private lastFramePublish = Number.NEGATIVE_INFINITY;
   private running = false;
   private disposed = false;
 
