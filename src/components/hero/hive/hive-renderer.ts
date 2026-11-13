@@ -5,6 +5,7 @@ import {
   AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
+  CircleGeometry,
   DynamicDrawUsage,
   InstancedMesh,
   LineBasicMaterial,
@@ -14,21 +15,10 @@ import {
   Object3D,
   PerspectiveCamera,
   Scene,
-  Shape,
-  ShapeGeometry,
   WebGLRenderer,
 } from "three";
 import {
-  assignTargets,
-  buildRosette,
-  rosetteNodeCount,
-  type AssemblyTarget,
-} from "./assembly";
-import {
   AMBIENT_RATIO,
-  ASSEMBLY_GAP,
-  ASSEMBLY_JITTER,
-  ASSEMBLY_RINGS,
   BLOOM_INTENSITY,
   BLOOM_RADIUS,
   BLOOM_SMOOTHING,
@@ -41,16 +31,17 @@ import {
   CLUSTER_COUNT,
   CLUSTER_SPREAD,
   DRIFT_AMPLITUDE,
+  ENERGY_LERP,
   ENTRANCE_MS,
   FIELD_EXTENT,
   HIVE_SEED,
-  IMMEDIATE_RATIO,
-  LINK_DISTANCE_ASSEMBLED,
+  LINK_DISTANCE_MAX,
   LINK_DISTANCE_REST,
   LINK_MAX_PER_NODE,
+  LINK_OPACITY_MIN,
   LINK_RECOMPUTE_FRAMES,
   MAX_PIXEL_RATIO,
-  NODE_APPEAR_WIDTH,
+  NODE_COUNT,
   NODE_RADIUS_MAX,
   NODE_RADIUS_MIN,
   POINTER_LERP,
@@ -62,43 +53,9 @@ import { buildSwarm, swarmBounds, type LatticeNode } from "./lattice";
 import { computeLinks, createLinkBuffer, type LinkBuffer } from "./links";
 import type { HivePalette } from "./palette";
 
-/** Smoothstep, used for the per-node grow-in. */
-function smoothstep(edge0: number, edge1: number, value: number): number {
-  const t = Math.min(1, Math.max(0, (value - edge0) / (edge1 - edge0)));
-  return t * t * (3 - 2 * t);
-}
-
 /** Ease-out cubic, used for the entrance. */
 function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
-}
-
-/**
- * Ease-in-out cubic, used for the convergence.
- *
- * A linear convergence reads as a scramble: the nodes cross each other on
- * their way in and the field looks like it is thrashing. Easing it means the
- * field holds, then tightens, then settles.
- */
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
-
-/** A regular hexagonal outline, used as the instanced node shape. */
-function hexagonShape(radius: number): Shape {
-  const shape = new Shape();
-  for (let i = 0; i < 6; i += 1) {
-    const angle = (Math.PI / 3) * i + Math.PI / 6;
-    const x = Math.cos(angle) * radius;
-    const y = Math.sin(angle) * radius;
-    if (i === 0) {
-      shape.moveTo(x, y);
-    } else {
-      shape.lineTo(x, y);
-    }
-  }
-  shape.closePath();
-  return shape;
 }
 
 export interface HiveRendererOptions {
@@ -111,19 +68,22 @@ export interface HiveRendererState {
   /** Pointer position, normalized to -1..1 on both axes. */
   pointerX: number;
   pointerY: number;
-  /** Scroll-reveal progress, 0 = rest (a minority of nodes), 1 = fully revealed. */
-  growth: number;
-  /** Convergence progress, 0 = scattered field, 1 = fully assembled. */
-  assembly: number;
+  /** Scroll energy, 0 = sparse rest state, 1 = fully energised plexus. */
+  energy: number;
 }
 
 /**
- * The hero lattice renderer.
+ * The hive lattice renderer.
  *
  * Imperative three.js rather than React Three Fiber: this is one fixed
  * background canvas with one pointer input and no scene graph driven by
  * application state, and the reconciler costs ~107 KB gzip for no visual
  * benefit (ADR-0010 §2).
+ *
+ * The field is ambient: every node is present from the first frame and the
+ * mesh drifts continuously. Scroll energy widens the link reach and brightens
+ * the web (the reference's sparse-to-dense progression); the pointer tilts
+ * the whole field slightly.
  */
 export class HiveRenderer {
   private readonly renderer: WebGLRenderer;
@@ -139,10 +99,7 @@ export class HiveRenderer {
   private readonly composer: EffectComposer;
 
   private nodes: LatticeNode[] = [];
-  private targets: AssemblyTarget[] = [];
   private readonly positions: Float32Array;
-  /** Per-node reveal factor (0..1), written during the node pass and read by the link pass. */
-  private readonly appears: Float32Array;
   private readonly linkBuffer: LinkBuffer;
 
   private palette: HivePalette;
@@ -158,8 +115,8 @@ export class HiveRenderer {
   private pointerY = 0;
   private targetPointerX = 0;
   private targetPointerY = 0;
-  private assembly = 0;
-  private growth = 0;
+  private energy = 0;
+  private targetEnergy = 0;
 
   private startedAt = 0;
   private started = false;
@@ -192,14 +149,14 @@ export class HiveRenderer {
 
     const nodeCount = this.nodes.length;
     this.positions = new Float32Array(nodeCount * 3);
-    this.appears = new Float32Array(nodeCount);
     this.linkBuffer = createLinkBuffer(nodeCount, LINK_MAX_PER_NODE);
     // Sized to match the link buffer: two vertices per pair, three floats per
     // vertex.
     this.linePositions = new Float32Array(nodeCount * LINK_MAX_PER_NODE * 4 * 3);
 
     // --- nodes -------------------------------------------------------------
-    const nodeGeometry = new ShapeGeometry(hexagonShape(1));
+    // Small round dots, matching the reference's node scale - not hexagons.
+    const nodeGeometry = new CircleGeometry(1, 12);
     const nodeMaterial = new MeshBasicMaterial({
       color: this.palette.node,
       toneMapped: false,
@@ -251,32 +208,17 @@ export class HiveRenderer {
     this.composer = composer;
   }
 
-  /** Builds the field: the node lattice and the assembly targets. */
+  /** Builds the field: the node lattice. */
   private buildField(): void {
     this.nodes = buildSwarm({
-      nodeCount: rosetteNodeCount(ASSEMBLY_RINGS),
+      nodeCount: NODE_COUNT,
       clusterCount: CLUSTER_COUNT,
       clusterSpread: CLUSTER_SPREAD,
       ambientRatio: AMBIENT_RATIO,
       fieldExtent: FIELD_EXTENT,
       zJitter: Z_JITTER,
-      immediateRatio: IMMEDIATE_RATIO,
       seed: HIVE_SEED,
     });
-
-    const rosette = buildRosette({
-      rings: ASSEMBLY_RINGS,
-      ringGap: ASSEMBLY_GAP,
-      depth: 0.4,
-      seed: HIVE_SEED ^ 0x9e3779b9,
-    });
-
-    this.targets = assignTargets(
-      this.nodes.map((node) => ({ x: node.x, y: node.y })),
-      rosette,
-      ASSEMBLY_JITTER,
-      HIVE_SEED ^ 0x85ebca6b,
-    );
   }
 
   /** Sizes the canvas and refits the field to the viewport. */
@@ -297,7 +239,7 @@ export class HiveRenderer {
     this.camera.lookAt(0, 0, 0);
     this.camera.updateProjectionMatrix();
 
-    // Fit the field to the viewport. The field is a hexagon, so it is always
+    // Fit the field to the viewport. The field is a scatter, so it is always
     // wider than it is tall; on a landscape screen it is fitted by width and
     // overflows vertically, and on a portrait screen it is fitted by height
     // and overflows horizontally. Fitting by the tighter axis means the mesh
@@ -325,6 +267,14 @@ export class HiveRenderer {
     lineMaterial.opacity = palette.linkOpacity;
     lineMaterial.blending = palette.additive ? AdditiveBlending : NormalBlending;
     lineMaterial.needsUpdate = true;
+
+    // Reduced motion has no loop to repaint with the new palette: re-render
+    // the static frame here, or the theme switch would leave a stale image.
+    if (this.reducedMotion && this.started && !this.running) {
+      this.updateField(1, 0);
+      this.renderFrame(0);
+      this.publishFrameCount(performance.now());
+    }
   }
 
   /** Updates the pointer target, in -1..1 on both axes. */
@@ -333,32 +283,26 @@ export class HiveRenderer {
     this.targetPointerY = y;
   }
 
-  /** Updates the convergence progress, 0..1. */
-  setAssembly(progress: number): void {
-    this.assembly = Math.min(1, Math.max(0, progress));
-  }
-
-  /** Updates the scroll-reveal progress, 0 (rest) .. 1 (fully revealed). */
-  setGrowth(progress: number): void {
-    this.growth = Math.min(1, Math.max(0, progress));
+  /** Updates the scroll-energy target, 0 (sparse rest) .. 1 (fully energised). */
+  setEnergy(value: number): void {
+    this.targetEnergy = Math.min(1, Math.max(0, value));
   }
 
   /** Starts the animation loop, or renders a single static frame. */
   start(): void {
     if (this.disposed || this.running) return;
 
-    // The entrance clock is set once, on the first start. Restarting the loop
-    // (because the hero scrolled back into view, say) must not replay the
-    // entrance from the beginning.
+    // The entrance clock is set once, on the first start.
     if (!this.started) {
       this.started = true;
       this.startedAt = performance.now();
     }
 
     if (this.reducedMotion) {
-      // The static frame shows the whole mesh: a mostly empty emblem would
-      // read as a bug, not as reduced motion.
-      this.growth = 1;
+      // The static frame shows the fully energised plexus: a sparse, half
+      // empty mesh would read as a bug, not as reduced motion.
+      this.energy = 1;
+      this.targetEnergy = 1;
       this.updateField(1, 0);
       this.renderFrame(0);
       this.publishFrameCount(performance.now());
@@ -414,41 +358,35 @@ export class HiveRenderer {
   /** Advances the field and writes the instance and line buffers. */
   private updateField(entrance: number, time: number): void {
     const nodes = this.nodes;
-    const targets = this.targets;
-    const assembly = easeInOutCubic(this.assembly);
     const worldScale = this.worldScale;
+
+    // The energy follows its scroll target smoothly, so wheel steps and
+    // scrollbar drags read as one continuous swell.
+    this.energy += (this.targetEnergy - this.energy) * ENERGY_LERP;
 
     for (let i = 0; i < nodes.length; i += 1) {
       const node = nodes[i];
-      const target = targets[i];
-      if (!node || !target) continue;
+      if (!node) continue;
 
-      // Converge from the scattered field toward the assembly form.
-      const baseX = node.x + (target.x - node.x) * assembly;
-      const baseY = node.y + (target.y - node.y) * assembly;
-      const baseZ = node.z + (target.z - node.z) * assembly;
-
-      // Idle drift, damped as the form assembles so the mark holds still.
-      const damping = 1 - assembly * 0.85;
+      // Idle drift: the plexus is a living network, never a still image.
       const driftX =
         DRIFT_AMPLITUDE * 0.5 * Math.cos(time * node.driftSpeed * 0.6 + node.driftPhase);
       const driftY =
         DRIFT_AMPLITUDE * Math.sin(time * node.driftSpeed + node.driftPhase) * node.driftAmplitude;
 
-      const x = (baseX + driftX * damping) * worldScale;
-      const y = (baseY + driftY * damping) * worldScale;
-      const z = baseZ * worldScale;
+      const x = (node.x + driftX) * worldScale;
+      const y = (node.y + driftY) * worldScale;
+      const z = node.z * worldScale;
 
       this.positions[i * 3] = x;
       this.positions[i * 3 + 1] = y;
       this.positions[i * 3 + 2] = z;
-      // Reveal: a node appears once the scroll-driven growth passes its
-      // threshold (the entrance no longer gates visibility - the reference
-      // rests with a minority of the mesh on screen and grows it on scroll).
-      const progress = Math.min(1, Math.max(0, (this.growth - node.threshold) / NODE_APPEAR_WIDTH));
-      const appear = smoothstep(0, 1, progress);
-      this.appears[i] = appear;
-      const radius = (NODE_RADIUS_MIN + (NODE_RADIUS_MAX - NODE_RADIUS_MIN) * entrance) * appear;
+
+      // The per-node drift amplitude doubles as the size variation: the
+      // reference's dots are not uniform, and reusing the existing random
+      // per-node value keeps the field's randomness single-sourced.
+      const radius =
+        (NODE_RADIUS_MIN + (NODE_RADIUS_MAX - NODE_RADIUS_MIN) * entrance) * node.driftAmplitude;
 
       this.dummy.position.set(x, y, z);
       this.dummy.scale.setScalar(radius);
@@ -461,12 +399,12 @@ export class HiveRenderer {
     // --- links -------------------------------------------------------------
     this.frameCount += 1;
     if (this.frameCount % LINK_RECOMPUTE_FRAMES === 0 || this.linkBuffer.count === 0) {
-      // The link reach tightens as the field collapses: the scattered field
-      // links across a few lattice units, the assembled core links only to
-      // its immediate rosette neighbours.
+      // The link reach widens with scroll energy: the rest state is a loose,
+      // faint web; the energised state is the dense triangulated plexus the
+      // reference shows deeper down the page.
       const linkDistance =
         this.worldScale *
-        (LINK_DISTANCE_REST + (LINK_DISTANCE_ASSEMBLED - LINK_DISTANCE_REST) * assembly);
+        (LINK_DISTANCE_REST + (LINK_DISTANCE_MAX - LINK_DISTANCE_REST) * this.energy);
 
       computeLinks(
         this.positions,
@@ -476,15 +414,11 @@ export class HiveRenderer {
       );
 
       const { indices, count } = this.linkBuffer;
-      // A link is drawn only while BOTH of its nodes are revealed: the line
-      // material's opacity is global, so unfiltered pairs would draw the
-      // whole mesh even while its nodes are still hidden.
       let drawn = 0;
       for (let i = 0; i < count; i += 1) {
         const a = indices[i * 2];
         const b = indices[i * 2 + 1];
         if (a === undefined || b === undefined) continue;
-        if ((this.appears[a] ?? 0) < 0.05 || (this.appears[b] ?? 0) < 0.05) continue;
         this.linePositions[drawn * 6] = this.positions[a * 3] ?? 0;
         this.linePositions[drawn * 6 + 1] = this.positions[a * 3 + 1] ?? 0;
         this.linePositions[drawn * 6 + 2] = this.positions[a * 3 + 2] ?? 0;
@@ -497,6 +431,12 @@ export class HiveRenderer {
       this.lineGeometry.setDrawRange(0, drawn * 2);
       const attribute = this.lineGeometry.getAttribute("position") as BufferAttribute;
       attribute.needsUpdate = true;
+
+      // Brightness follows the energy too: the web is faint at rest and at
+      // full strength once energised.
+      const lineMaterial = this.lines.material as LineBasicMaterial;
+      lineMaterial.opacity =
+        this.palette.linkOpacity * (LINK_OPACITY_MIN + (1 - LINK_OPACITY_MIN) * this.energy);
     }
 
     // --- pointer tilt ------------------------------------------------------

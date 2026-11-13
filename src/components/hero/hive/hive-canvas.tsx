@@ -1,24 +1,24 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { GROWTH_SHARE, SCROLL_RANGE } from "./config";
+import { ENERGY_RANGE } from "./config";
 import { HiveRenderer } from "./hive-renderer";
 import { readPalette } from "./palette";
 
 /** Matches the global `prefers-reduced-motion` rule in DESIGN.md §6. */
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
-/** Ease-out cubic, matching the renderer's entrance easing. */
-function easeOutCubic(t: number): number {
-  return 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
-}
-
 /**
- * The hero lattice canvas.
+ * The hive lattice canvas - the fixed, page-wide backdrop (ADR-0010 §9).
  *
  * Decorative only: `aria-hidden`, `pointer-events: none`, and it carries no
- * text. It sits behind the hero content and fades out as the hero leaves the
- * viewport (ADR-0010 §1).
+ * text. It sits at negative z-index, above the page's background token and
+ * below every content element, so transparent sections let it through and
+ * opaque surfaces cover it like any other background.
+ *
+ * Scroll energy: the plexus rests sparse at the top of the page and reaches
+ * full density and brightness over the first ENERGY_RANGE viewport heights of
+ * scroll, matching the reference's progression.
  *
  * The palette is read from CSS custom properties, so a theme switch is picked
  * up by observing the `class` attribute on the document element rather than
@@ -45,14 +45,12 @@ export default function HiveCanvas() {
       });
     } catch {
       // No WebGL context, or the context failed to be created. The canvas is
-      // removed and the hero renders exactly as it does without this layer.
+      // removed and the page renders exactly as it does without this layer.
       canvas.remove();
       return;
     }
 
     rendererRef.current = renderer;
-
-    const hero = document.querySelector<HTMLElement>("[data-hive-hero]");
 
     const resize = (): void => {
       const rect = container.getBoundingClientRect();
@@ -67,36 +65,11 @@ export default function HiveCanvas() {
     };
 
     const onScroll = (): void => {
-      if (!hero) {
-        // No hero element to track (the layer was mounted somewhere else).
-        // Show it in full rather than leaving it stuck at the CSS default of
-        // zero opacity, where it would render for nothing.
-        container.style.opacity = "1";
-        renderer.setGrowth(1);
-        renderer.start();
-        return;
-      }
-      const rect = hero.getBoundingClientRect();
-
-      // Scroll story, over the first SCROLL_RANGE of the hero's height:
-      // growth (the mesh grows in from its rest minority, like the reference)
-      // takes the first GROWTH_SHARE, the assembly into the hex core takes
-      // the rest. The page itself scrolls normally - this only reads
-      // position.
-      const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height * SCROLL_RANGE)));
-      renderer.setGrowth(easeOutCubic(progress / GROWTH_SHARE));
-      renderer.setAssembly(Math.min(1, Math.max(0, (progress - GROWTH_SHARE) / (1 - GROWTH_SHARE))));
-
-      // Fade out over the last third of the hero's exit.
-      const overlap = Math.min(window.innerHeight, rect.bottom) - Math.max(0, rect.top);
-      const visibility = Math.min(1, Math.max(0, overlap / (window.innerHeight * 0.35)));
-      container.style.opacity = String(visibility);
-
-      if (visibility <= 0) {
-        renderer.stop();
-      } else {
-        renderer.start();
-      }
+      // Scroll energy, over the first ENERGY_RANGE viewport heights. The page
+      // itself scrolls normally - this only reads position.
+      const range = window.innerHeight * ENERGY_RANGE;
+      const target = Math.min(1, Math.max(0, window.scrollY / Math.max(1, range)));
+      renderer.setEnergy(target);
     };
 
     const onVisibilityChange = (): void => {
@@ -142,8 +115,8 @@ export default function HiveCanvas() {
   }, []);
 
   return (
-    <div ref={containerRef} className="hero-hive" aria-hidden="true">
-      <canvas ref={canvasRef} className="hero-hive__canvas" />
+    <div ref={containerRef} className="hive-layer" aria-hidden="true" data-hive-layer>
+      <canvas ref={canvasRef} className="hive-layer__canvas" />
     </div>
   );
 }

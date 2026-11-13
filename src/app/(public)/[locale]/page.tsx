@@ -4,7 +4,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CaseStudyCard } from "@/components/case-study-card";
 import { CopyEmailButton } from "@/components/copy-email-button";
 import { CredentialCard } from "@/components/credential-card";
-import { HeroHive } from "@/components/hero/hive";
 import { JsonLd } from "@/components/json-ld";
 import { OssContributionItem } from "@/components/oss-contributions";
 import { StatusPill } from "@/components/status-pill";
@@ -121,13 +120,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         />
       )}
 
-      {/* Hero lattice - the WebGL layer behind the hero (ADR-0010). Decorative,
-          deferred until after first paint, and bound to the hero box. */}
+      {/* The hive backdrop is a fixed page-wide layer mounted in the locale
+          layout (ADR-0010 §9) - nothing hero-scoped is needed here. */}
       <div className="relative z-10">
         {/* Hero - the offer is the thesis (DESIGN §1); wash is the only gradient.
           One orchestrated entrance (rise-in), then the page is still. */}
-        <section className="hero-wash relative border-b border-border-subtle" data-hive-hero>
-          <HeroHive />
+        <section className="hero-wash relative border-b border-border-subtle">
           <div className="container-site relative z-10 py-20 md:py-32">
             {settings && (
               <span className="rise-in inline-block">
@@ -202,9 +200,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
         </section>
 
-        {/* Services — an index of engagements, not a card grid (ADR-0009). */}
+        {/* Services — an index of engagements, not a card grid (ADR-0009).
+            The band is translucent so the fixed hive backdrop reads dimly
+            through it, like the reference's content bands (ADR-0010 §9). */}
         <section
-          className="border-t border-border-subtle bg-surface"
+          className="border-t border-border-subtle surface-veil"
           aria-labelledby="home-services"
         >
           <div className="container-site py-16 md:py-24">
@@ -331,7 +331,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
         {/* Contact strip — the ending carries display weight, on a surface band. */}
         <section
-          className="border-t border-border-subtle bg-surface"
+          className="border-t border-border-subtle surface-veil"
           aria-labelledby="home-contact"
         >
           <div className="container-site py-16 md:py-24">

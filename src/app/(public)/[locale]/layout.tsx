@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer";
 import { MotionProvider } from "@/components/motion";
 import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import { HiveLayer } from "@/components/hero/hive";
 import { getSiteSettings } from "@/lib/content/queries";
 import { fontVariables } from "@/lib/fonts";
 import { routing, toLocale } from "@/lib/i18n/routing";
@@ -76,6 +77,10 @@ export default async function LocaleLayout({
               <a href="#content" className="skip-link">
                 {locale === "ar" ? "تخطَّ إلى المحتوى" : "Skip to content"}
               </a>
+              {/* The fixed, page-wide hive backdrop (ADR-0010 §9). Decorative
+                  and deferred until after first paint; sits at negative
+                  z-index, below every content element. */}
+              <HiveLayer />
               <Navbar />
               <main id="content" className="min-h-dvh">
                 {children}

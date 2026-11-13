@@ -234,29 +234,34 @@ kbd {
 }
 
 /* ============================================================================
-   Hero lattice - the WebGL layer behind the hero (ADR-0010).
+   Hive lattice - the fixed WebGL backdrop behind the whole public site
+   (ADR-0010 §9).
 
-   Decorative only: aria-hidden, pointer-events none, no text. It is bound to
-   the hero box rather than to the viewport, so it never bleeds into the
-   sections below it. The canvas is transparent - the page's own surface
-   tokens are never replaced.
-
-   The opacity transition is capped at 200ms like every other transition on
-   the site (DESIGN §6), and the global reduced-motion rule neutralises it.
+   Decorative only: aria-hidden, pointer-events none, no text. It is a fixed,
+   full-viewport layer at negative z-index: above the page's own background
+   token and below every content element, so transparent sections let it
+   through and opaque surfaces (cards, the header band) cover it exactly like
+   any other background. The canvas is transparent - no page colour is
+   replaced.
    ========================================================================== */
-.hero-hive {
-  position: absolute;
+.hive-layer {
+  position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.hero-hive__canvas {
+.hive-layer__canvas {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* Translucent surface band - lets the fixed hive backdrop read dimly through
+   full-width sections (the reference's content bands behave the same), while
+   keeping text on a near-opaque surface. */
+.surface-veil {
+  background-color: color-mix(in oklab, var(--surface) 88%, transparent);
 }
 
 /* ============================================================================

@@ -1,17 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { assignTargets, buildRosette, ringNodeCount, rosetteNodeCount } from "./assembly";
 import { buildSwarm, swarmBounds, type LatticeNode } from "./lattice";
 import { computeLinks, createLinkBuffer } from "./links";
 import { createRandom } from "./random";
 
 const SWARM = {
-  nodeCount: rosetteNodeCount(3),
+  nodeCount: 64,
   clusterCount: 3,
   clusterSpread: 1,
-  ambientRatio: 0.18,
+  ambientRatio: 0.24,
   fieldExtent: 5,
-  zJitter: 0.15,
-  immediateRatio: 0.18,
+  zJitter: 0.5,
   seed: 0x5eed1234,
 };
 
@@ -51,27 +49,6 @@ describe("buildSwarm", () => {
       expect(Number.isFinite(node.x)).toBe(true);
       expect(Number.isFinite(node.y)).toBe(true);
       expect(Number.isFinite(node.z)).toBe(true);
-      expect(Number.isFinite(node.threshold)).toBe(true);
-    }
-  });
-
-  it("marks roughly the requested share of nodes as already present", () => {
-    const nodes = buildSwarm({ ...SWARM, immediateRatio: 0.25 });
-    const immediate = nodes.filter((node) => node.threshold < 0);
-    // The share is a probability, so it is checked as a band rather than an
-    // exact count.
-    const share = immediate.length / nodes.length;
-    expect(share).toBeGreaterThan(0.15);
-    expect(share).toBeLessThan(0.4);
-  });
-
-  it("keeps the remaining thresholds inside the reveal window", () => {
-    const nodes = buildSwarm(SWARM);
-    const waiting = nodes.filter((node) => node.threshold >= 0);
-    expect(waiting.length).toBeGreaterThan(0);
-    for (const node of waiting) {
-      expect(node.threshold).toBeGreaterThanOrEqual(0);
-      expect(node.threshold).toBeLessThanOrEqual(0.85);
     }
   });
 
@@ -111,106 +88,6 @@ describe("swarmBounds", () => {
     expect(bounds.height).toBeGreaterThan(0);
     expect(bounds.maxX - bounds.minX).toBeCloseTo(bounds.width, 10);
     expect(bounds.maxY - bounds.minY).toBeCloseTo(bounds.height, 10);
-  });
-});
-
-describe("buildRosette", () => {
-  it("counts 6k nodes on ring k", () => {
-    expect(ringNodeCount(1)).toBe(6);
-    expect(ringNodeCount(4)).toBe(24);
-    // A centre point plus the rings.
-    expect(rosetteNodeCount(4)).toBe(1 + 6 + 12 + 18 + 24);
-  });
-
-  it("has the same node count as the field it collapses from", () => {
-    for (const rings of [3, 5, 7]) {
-      expect(rosetteNodeCount(rings)).toBe(1 + 3 * rings * (rings + 1));
-    }
-  });
-
-  it("places each ring on its own hexagon outline", () => {
-    const gap = 2;
-    const targets = buildRosette({ rings: 3, ringGap: gap, depth: 0.6, seed: 1 });
-    const radii = targets.map((target) => target.radius);
-
-    // A hexagon's vertices sit at the circumradius; the points along an edge
-    // are closer in, at the apothem (circumradius * cos 30 degrees).
-    const inner = gap * Math.cos(Math.PI / 6);
-    const centre = radii[0];
-    expect(centre).toBeCloseTo(0, 9);
-
-    const rings = [radii.slice(1, 7), radii.slice(7, 19), radii.slice(19)];
-
-    rings.forEach((ring, index) => {
-      const outer = gap * (index + 1);
-      for (const radius of ring) {
-        expect(radius).toBeGreaterThanOrEqual(inner - 1e-9);
-        expect(radius).toBeLessThanOrEqual(outer + 1e-9);
-      }
-      // Every ring touches its own circumradius at the vertices.
-      expect(Math.max(...ring)).toBeCloseTo(outer, 6);
-    });
-  });
-
-  it("is deterministic for a given seed", () => {
-    const options = { rings: 3, ringGap: 2, depth: 0.6, seed: 7 };
-    expect(buildRosette(options)).toEqual(buildRosette(options));
-  });
-
-  it("returns one target per node of the ring count", () => {
-    const targets = buildRosette({ rings: 4, ringGap: 2, depth: 0.6, seed: 1 });
-    expect(targets).toHaveLength(rosetteNodeCount(4));
-  });
-});
-
-describe("assignTargets", () => {
-  const positions = [
-    { x: 0, y: 0 },
-    { x: 1, y: 0 },
-    { x: -1, y: 0 },
-    { x: 0, y: 2 },
-    { x: 5, y: 5 },
-    { x: -5, y: 5 },
-    { x: 3, y: -4 },
-  ];
-
-  it("returns one target per node", () => {
-    const targets = buildRosette({ rings: 2, ringGap: 2, depth: 0.6, seed: 1 });
-    const assigned = assignTargets(positions, targets, 0.1, 1);
-    expect(assigned).toHaveLength(positions.length);
-  });
-
-  it("sends the innermost node to the innermost target", () => {
-    const targets = buildRosette({ rings: 2, ringGap: 2, depth: 0.6, seed: 1 });
-    const assigned = assignTargets(positions, targets, 0, 1);
-    const centre = assigned[0];
-    expect(centre?.radius).toBeLessThanOrEqual(Math.min(...targets.map((t) => t.radius)));
-  });
-
-  it("is a bijection when the counts match", () => {
-    // The field's node count is fixed to the rosette's slot count in
-    // production; the collapse must then visit every slot exactly once, or
-    // the assembled form clumps instead of reading as a honeycomb.
-    const targets = buildRosette({ rings: 1, ringGap: 2, depth: 0.6, seed: 1 });
-    expect(targets).toHaveLength(positions.length);
-
-    const assigned = assignTargets(positions, targets, 0, 1);
-    const assignedRadii = assigned.map((target) => target.radius).sort((a, b) => a - b);
-    const targetRadii = targets.map((target) => target.radius).sort((a, b) => a - b);
-    expect(assignedRadii).toEqual(targetRadii);
-  });
-
-  it("keeps every assigned target finite", () => {
-    const targets = buildRosette({ rings: 3, ringGap: 2, depth: 0.6, seed: 1 });
-    for (const target of assignTargets(positions, targets, 0.35, 1)) {
-      expect(Number.isFinite(target.x)).toBe(true);
-      expect(Number.isFinite(target.y)).toBe(true);
-    }
-  });
-
-  it("copes with an empty target list", () => {
-    const assigned = assignTargets(positions, [], 0.35, 1);
-    expect(assigned).toHaveLength(positions.length);
   });
 });
 

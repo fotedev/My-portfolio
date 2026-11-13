@@ -1,8 +1,41 @@
 # ADR-0010 — WebGL hero lattice: a scoped exception to the motion and accent contract
 
-**Status:** Accepted 2026-11-11
+**Status:** Accepted 2026-11-11 · **Revised 2026-11-13 (twice — see §8 addendum and Revision 2)**
 **Deciders:** Ahmed Aboalayoun (owner directive: "clone & scrub bhived.ai, clean-room recreate the animation for my website")
-**Scope:** Public hero (`/[locale]`) only — the WebGL canvas layer. Amends `DESIGN.md` §1.5, §2.2, §6, §12 and `docs/QUALITY.md` §8.2, §8.4. All other locked decisions (theming, RTL, typography, accessibility floor, content model) are unchanged.
+**Scope:** Public layout (`(public)/[locale]`) — the WebGL canvas layer, fixed behind the whole public site. Amends `DESIGN.md` §1.5, §2.2, §6, §12 and `docs/QUALITY.md` §8.2, §8.4. All other locked decisions (theming, RTL, typography, accessibility floor, content model) are unchanged.
+
+---
+
+## Revision 2 (2026-11-13): the layer is page-wide
+
+Owner directive after reviewing the live site against the reference: the hero-box
+binding reads badly — the reference's plexus is a fixed, full-viewport backdrop
+behind all content, and confining it to the hero leaves most of the page dead.
+The layer is re-scoped as follows; where the sections below contradict this
+revision, this revision wins:
+
+- **Mount**: moved from the home hero into the public locale layout
+  (`(public)/[locale]/layout.tsx`) — one instance for the whole public site.
+- **Position**: `position: fixed; inset: 0; z-index: -1` — above the page's
+  background token, below every content element. The §1 concern about bleeding
+  behind body copy is resolved the other way: the backdrop is deliberately
+  dimmed decoration, opaque surfaces (cards, header band) cover it, and the two
+  full-width `bg-surface` bands on the home page become translucent
+  `surface-veil` so it reads through them the way the reference's bands do.
+- **Story**: the scroll-gated reveal and the hex-rosette assembly are
+  **retired** — the live reference has no assembly target; its plexus is
+  ambient drift with scroll-linked density. Replaced by scroll **energy**:
+  link reach widens and the web brightens over the first ~1.4 viewport heights
+  of scroll. `assembly.ts` is deleted; every node is present from the first
+  frame.
+- **Node shape**: hexagons → small circles (~2–3 px), matching the reference's
+  dot scale; per-node size variation reuses the drift amplitude.
+- Everything else holds: one amber inside the canvas only, raw three.js, the
+  fallback ladder, the reduced-motion static frame (which now shows the fully
+  energised plexus), `aria-hidden` decoration, the kill switch, and the §8
+  clean-room rules unchanged.
+- The kill-switch variable name (`NEXT_PUBLIC_HERO_HIVE=0`) is unchanged, so no
+  CI or environment change rides along.
 
 ---
 
@@ -37,6 +70,10 @@ ADR-0009 deliberately went the other way: it deleted every scroll-triggered reve
 A single `<canvas>` is mounted inside the hero section, `position: absolute`, `inset: 0`, `pointer-events: none`, `aria-hidden="true"`. It is the only permitted exception to §1.5 and §6. It is decorative: it is invisible to assistive technology, never receives pointer events, and carries no text.
 
 It is **bound to the hero box** rather than to the viewport, and it scrolls with the hero. This is a deliberate divergence from the reference, where the layer is fixed for the whole document; a viewport-fixed layer bleeds through the transparent sections below the hero and ends up sitting behind body copy several screens down, which is exactly the failure the "working document" language (ADR-0009) exists to prevent. Bound to the hero, the layer is present for the length of the hero and never intrudes on anything else.
+
+> **Superseded by Revision 2 (2026-11-13).** The owner reverted this divergence
+> after seeing the live result: the layer is now fixed and page-wide, mounted in
+> the locale layout.
 
 The canvas is transparent — it paints no background — so the page's own surface tokens are never replaced in either theme.
 
@@ -96,6 +133,11 @@ after the hero has left the screen and the reader never sees it settle. Over
 a fifth of the hero's height the core forms while the hero is still on
 screen, which is where the payoff belongs.
 
+> **Superseded by Revision 2 (2026-11-13).** The convergence and the reveal it
+> belonged to are retired entirely — the ambient plexus carries no assembly
+> target. Scroll now drives link reach and brightness (energy), across the
+> whole page.
+
 `prefers-reduced-motion: reduce` renders **one static frame** of the lattice and never starts the loop. This is deliberately stronger than the reference, which swaps the canvas for a flat colour block — a flat block would replace the page background and break the surface tokens. The static frame keeps the composition and costs one render.
 
 ### 5. Fallback ladder
@@ -110,7 +152,9 @@ screen, which is where the payoff belongs.
 
 - `aria-hidden="true"`, `pointer-events: none`, and no text in the layer — it is invisible to the accessibility tree and cannot be focused.
 - The layer never overlaps content in a way that reduces text contrast: the hero copy sits on the page background, and the node radius and link opacity are capped so that the mesh behind the headline stays below the contrast floor.
-- The canvas is `position: absolute` inside the hero, with the hero's own content at `z-index: 10` above it.
+- The canvas is `position: fixed`, viewport-wide, at negative z-index — above
+  the page background, below every content element (Revision 2; the hero's own
+  content no longer needs a z-index relationship with it).
 - `axe-core` must not gain a violation of its own on `/en` or `/ar`, in either theme. The pages carry pre-existing findings unrelated to this layer (the warning status pill's contrast, and the copy-email button's label-in-name); the layer's contribution to the violation set is zero.
 
 ### 7. Budget and measured results
@@ -173,7 +217,7 @@ this project's own.
 - An amber field on the hero, against a "calm, technical, credible" positioning and a §1.1 "credibility over decoration" principle. Accepted deliberately, at owner instruction, and bounded to the canvas.
 - A second motion idiom on a site whose whole identity is "one orchestrated entrance, then the page is still". Accepted deliberately. If the page later reads as busy, the kill switch is the intended remedy — not a rewrite.
 - The effect carries the risk of a hard Lighthouse regression. Mitigated by the kill switch, the after-first-paint mount, the capped device pixel ratio and the off-screen park; verified by measurement (Lighthouse mobile 99), not assumption.
-- The layer is bound to the hero rather than fixed to the viewport, so it scrolls with the hero instead of staying put. This is the one behavioural divergence from the reference and it is deliberate: see §1.
+- ~~The layer is bound to the hero rather than fixed to the viewport, so it scrolls with the hero instead of staying put. This is the one behavioural divergence from the reference and it is deliberate: see §1.~~ **Superseded by Revision 2:** the layer is fixed and page-wide; the accepted trade-off is now that a dimmed plexus reads behind every transparent section of the public site (bounded by the capped link opacity and the opaque cards).
 
 ## Alternatives considered
 
