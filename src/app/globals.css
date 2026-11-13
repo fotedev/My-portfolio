@@ -45,7 +45,7 @@
   --hive-additive: 0;
   --hive-bloom: 0;
   --hive-node-opacity: 0.85;
-  --hive-link-opacity: 0.32;
+  --hive-link-opacity: 0.42;
   color-scheme: light;
 }
 
@@ -80,7 +80,7 @@
   --hive-additive: 1;
   --hive-bloom: 1;
   --hive-node-opacity: 1;
-  --hive-link-opacity: 0.28;
+  --hive-link-opacity: 0.38;
   color-scheme: dark;
 }
 

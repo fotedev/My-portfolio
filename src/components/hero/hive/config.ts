@@ -52,12 +52,12 @@ export const ENTRANCE_MS = 1200;
  * Node radius in world units, at the start and at the end of the entrance.
  *
  * The fitted field spans roughly 23 world units across at 1440 px, so one
- * world unit is about 62 px on a desktop: these radii read as 2-3 px glowing
+ * world unit is about 62 px on a desktop: these radii read as 2-4 px glowing
  * points, matching the reference's node scale. Additive blending and the
  * bloom pass do the rest of the brightening.
  */
-export const NODE_RADIUS_MIN = 0.025;
-export const NODE_RADIUS_MAX = 0.05;
+export const NODE_RADIUS_MIN = 0.036;
+export const NODE_RADIUS_MAX = 0.07;
 
 /**
  * Scroll energy: how far, in viewport heights, the reader must scroll for the
@@ -80,7 +80,7 @@ export const LINK_DISTANCE_MAX = 2.45;
 export const LINK_MAX_PER_NODE = 6;
 
 /** Link opacity multiplier at rest; full energy uses the palette value. */
-export const LINK_OPACITY_MIN = 0.4;
+export const LINK_OPACITY_MIN = 0.7;
 
 /** Frames between link recomputations. */
 export const LINK_RECOMPUTE_FRAMES = 2;
@@ -99,13 +99,14 @@ export const DRIFT_AMPLITUDE = 0.35;
 export const MAX_PIXEL_RATIO = 1.5;
 
 /**
- * Bloom pass, dark theme only. Moderate: the layer now runs behind the whole
- * page, so an over-strong glow would wash the sections it passes behind.
+ * Bloom pass, dark theme only. Strong enough that every dot carries the hot
+ * core + glow halo the reference shows; the owner found the previous settings
+ * washed the web out to near-invisible.
  */
-export const BLOOM_THRESHOLD = 0.5;
+export const BLOOM_THRESHOLD = 0.25;
 export const BLOOM_SMOOTHING = 0.45;
-export const BLOOM_INTENSITY = 1.0;
-export const BLOOM_RADIUS = 0.6;
+export const BLOOM_INTENSITY = 1.85;
+export const BLOOM_RADIUS = 0.8;
 
 /** Seed for the whole field. Fixed so renders are reproducible. */
 export const HIVE_SEED = 0x5eed1234;
