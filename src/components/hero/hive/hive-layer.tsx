@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 /**
- * The hero lattice is a deferred island: the chunk is fetched only once the
+ * The hive lattice is a deferred island: the chunk is fetched only once the
  * page has painted, so it never competes with the LCP element. It is also
  * entirely absent from the server-rendered HTML.
  *
@@ -22,7 +22,7 @@ function scheduleIdle(callback: () => void): () => void {
   return () => window.clearTimeout(handle);
 }
 
-export function HeroHive() {
+export function HiveLayer() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

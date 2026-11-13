@@ -2,10 +2,11 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 /**
- * The hero lattice (ADR-0010): a decorative WebGL layer behind the hero.
+ * The hive lattice (ADR-0010): a decorative WebGL backdrop fixed behind the
+ * whole public site.
  *
  * The layer must never be load-bearing. It is aria-hidden, it cannot receive
- * pointer events, and if WebGL is unavailable the hero renders exactly as it
+ * pointer events, and if WebGL is unavailable the page renders exactly as it
  * did before. These assertions hold the whole feature to that rule.
  */
 
@@ -19,19 +20,31 @@ async function hasWebGL(page: import("@playwright/test").Page): Promise<boolean>
   });
 }
 
-test.describe("hero lattice", () => {
-  test("renders behind the hero, hidden from assistive technology", async ({ page }) => {
+test.describe("hive lattice", () => {
+  test("renders behind the page, hidden from assistive technology", async ({ page }) => {
     await page.goto("/en");
 
-    const layer = page.locator(".hero-hive");
+    const layer = page.locator(".hive-layer");
     await expect(layer).toHaveCount(1);
     await expect(layer).toHaveAttribute("aria-hidden", "true");
 
-    // The layer can never intercept a click meant for the hero content.
+    // The layer can never intercept a click meant for the page content.
     const pointerEvents = await layer.evaluate(
       (element) => getComputedStyle(element).pointerEvents,
     );
     expect(pointerEvents).toBe("none");
+
+    // Fixed and viewport-sized: the backdrop persists behind every section,
+    // not only the hero (ADR-0010 §9).
+    const fixed = await layer.evaluate((element) => getComputedStyle(element).position);
+    expect(fixed).toBe("fixed");
+  });
+
+  test("persists behind non-home routes", async ({ page }) => {
+    // One layer for the whole public layout, mounted once, not per page.
+    await page.goto("/en/projects");
+    await expect(page.locator(".hive-layer")).toHaveCount(1);
+    await expect(page.locator(".hive-layer__canvas")).toHaveCount(1);
   });
 
   test("does not block the hero content", async ({ page }) => {
@@ -60,7 +73,7 @@ test.describe("hero lattice", () => {
     // canvas entirely (ADR-0010 section 5), so its absence is a pass, not a
     // failure. What must never happen is an error either way.
     if (await hasWebGL(page)) {
-      await expect(page.locator(".hero-hive__canvas")).toHaveCount(1);
+      await expect(page.locator(".hive-layer__canvas")).toHaveCount(1);
     }
     expect(errors).toEqual([]);
   });
@@ -72,7 +85,7 @@ test.describe("hero lattice", () => {
 
     if (!(await hasWebGL(page))) return;
 
-    const canvas = page.locator(".hero-hive__canvas");
+    const canvas = page.locator(".hive-layer__canvas");
     await expect(canvas).toHaveCount(1);
 
     // The renderer publishes its frame count on the canvas. Under reduced
@@ -101,7 +114,7 @@ test.describe("hero lattice", () => {
 
     if (!(await hasWebGL(page))) return;
 
-    const canvas = page.locator(".hero-hive__canvas");
+    const canvas = page.locator(".hive-layer__canvas");
     const frames = async (): Promise<number> => {
       const raw = await canvas.getAttribute("data-hive-frames");
       return Number.parseInt(raw ?? "0", 10) || 0;
@@ -129,7 +142,7 @@ test.describe("hero lattice", () => {
 
       const fromTheLayer = results.violations.flatMap((violation) =>
         violation.nodes
-          .filter((node) => node.target.join(" ").includes(".hero-hive"))
+          .filter((node) => node.target.join(" ").includes(".hive-layer"))
           .map((node) => `${violation.id}: ${node.target.join(" ")}`),
       );
 

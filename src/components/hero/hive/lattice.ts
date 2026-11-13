@@ -1,5 +1,5 @@
 /**
- * Hero lattice geometry - the node field the canvas draws.
+ * Hive lattice geometry - the node field the canvas draws.
  *
  * Pure functions, no three.js: everything here is deterministic from a seed
  * and therefore unit-testable (see lattice.test.ts).
@@ -8,8 +8,8 @@
  * clouds with ambient singles between them. Clumps of dense mesh and
  * stretches of empty space are what make the layer read as a living network
  * rather than as flat texture - that contrast is the reference technique's
- * signature. The node count is fixed to the assembly rosette's slot count,
- * so the collapse stays one-to-one.
+ * signature. Every node is present from the first frame; the scroll story is
+ * carried by link reach and brightness (ADR-0010 §9), not by reveal.
  *
  * ADR-0010.
  */
@@ -25,14 +25,6 @@ export interface LatticeNode {
   y: number;
   /** Depth jitter, so the field reads as a volume rather than a flat sheet. */
   z: number;
-  /**
-   * Reveal threshold on the scroll-driven growth curve. The node stays
-   * invisible until the growth progress passes this value, so the mesh grows
-   * in as the reader scrolls. A negative value means "already present" -
-   * those nodes are on screen from the first frame, so the hero never opens
-   * completely empty.
-   */
-  threshold: number;
   /** Per-node drift phase, so the idle motion is not synchronized. */
   driftPhase: number;
   /** Per-node drift speed. */
@@ -42,7 +34,7 @@ export interface LatticeNode {
 }
 
 export interface SwarmOptions {
-  /** Total node count. Fixed to the assembly rosette's slot count. */
+  /** Total node count. */
   nodeCount: number;
   /** Number of cluster centres. */
   clusterCount: number;
@@ -54,8 +46,6 @@ export interface SwarmOptions {
   fieldExtent: number;
   /** Depth jitter, in lattice units. */
   zJitter: number;
-  /** Share of nodes visible before any scroll. */
-  immediateRatio: number;
   seed: number;
 }
 
@@ -69,16 +59,8 @@ function gaussian(random: { next(): number }): number {
 
 /** Builds the node field. */
 export function buildSwarm(options: SwarmOptions): LatticeNode[] {
-  const {
-    nodeCount,
-    clusterCount,
-    clusterSpread,
-    ambientRatio,
-    fieldExtent,
-    zJitter,
-    immediateRatio,
-    seed,
-  } = options;
+  const { nodeCount, clusterCount, clusterSpread, ambientRatio, fieldExtent, zJitter, seed } =
+    options;
 
   const random = createRandom(seed);
 
@@ -102,16 +84,11 @@ export function buildSwarm(options: SwarmOptions): LatticeNode[] {
       y = random.range(-fieldExtent, fieldExtent);
     }
 
-    // Most nodes wait for the scroll reveal to reach them; a minority are
-    // already present on the first frame.
-    const threshold = random.next() < immediateRatio ? -1 : random.next() * 0.85;
-
     return {
       index,
       x,
       y,
       z: (random.next() - 0.5) * zJitter,
-      threshold,
       driftPhase: random.next() * Math.PI * 2,
       driftSpeed: 0.15 + random.next() * 0.25,
       driftAmplitude: 0.6 + random.next() * 0.8,

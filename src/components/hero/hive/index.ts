@@ -1,1 +1,1 @@
-export { HeroHive } from "./hero-hive";
+export { HiveLayer } from "./hive-layer";
