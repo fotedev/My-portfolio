@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { ENERGY_RANGE } from "./config";
 import { HiveRenderer } from "./hive-renderer";
 import { readPalette } from "./palette";
 
@@ -65,11 +64,11 @@ export default function HiveCanvas() {
     };
 
     const onScroll = (): void => {
-      // Scroll energy, over the first ENERGY_RANGE viewport heights. The page
-      // itself scrolls normally - this only reads position.
-      const range = window.innerHeight * ENERGY_RANGE;
-      const target = Math.min(1, Math.max(0, window.scrollY / Math.max(1, range)));
-      renderer.setEnergy(target);
+      // Normalized full-page scroll progress across the 3-act choreography.
+      // The page itself scrolls normally - this only reads scroll position.
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const target = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+      renderer.setScrollProgress(target);
     };
 
     const onVisibilityChange = (): void => {

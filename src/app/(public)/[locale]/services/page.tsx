@@ -68,8 +68,8 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
       <p className="mt-4 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
 
       {/* Deliverables-first index rows (ADR-0009): one engagement per row,
-          what you get on the inline-end column. */}
-      <ul className="mt-12 border-t border-border-subtle">
+          what you get on the inline-end column, over a frosted-glass panel. */}
+      <ul className="mt-12 rounded-xl border border-border-subtle surface-card px-6 md:px-8">
         {services.map((service) => (
           <li
             key={service.key}

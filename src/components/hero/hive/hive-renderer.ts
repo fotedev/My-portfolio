@@ -18,7 +18,17 @@ import {
   WebGLRenderer,
 } from "three";
 import {
+  assignTargets,
+  buildHoneycomb,
+  honeycombNodeCount,
+  type AssemblyTarget,
+} from "./assembly";
+import {
   AMBIENT_RATIO,
+  ASSEMBLY_GAP,
+  ASSEMBLY_INNER_RINGS,
+  ASSEMBLY_RINGS,
+  ASSEMBLY_SPLIT_GAP,
   BLOOM_INTENSITY,
   BLOOM_RADIUS,
   BLOOM_SMOOTHING,
@@ -31,31 +41,49 @@ import {
   CLUSTER_COUNT,
   CLUSTER_SPREAD,
   DRIFT_AMPLITUDE,
-  ENERGY_LERP,
   ENTRANCE_MS,
   FIELD_EXTENT,
   HIVE_SEED,
+  LINK_DISTANCE_ASSEMBLED,
   LINK_DISTANCE_MAX,
   LINK_DISTANCE_REST,
   LINK_MAX_PER_NODE,
+  LINK_OPACITY_ASSEMBLED,
   LINK_OPACITY_MIN,
   LINK_RECOMPUTE_FRAMES,
   MAX_PIXEL_RATIO,
-  NODE_COUNT,
+  NODE_RADIUS_ASSEMBLED,
   NODE_RADIUS_MAX,
   NODE_RADIUS_MIN,
   POINTER_LERP,
   POINTER_TILT_X,
   POINTER_TILT_Y,
+  SCROLL_LERP,
   Z_JITTER,
 } from "./config";
 import { buildSwarm, swarmBounds, type LatticeNode } from "./lattice";
 import { computeLinks, createLinkBuffer, type LinkBuffer } from "./links";
 import type { HivePalette } from "./palette";
 
-/** Ease-out cubic, used for the entrance. */
+/** Linear interpolation between `a` and `b`. */
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+/** Hermite smoothstep clamped to `[0, 1]`. */
+function smoothstep(edge0: number, edge1: number, x: number): number {
+  const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
+/** Ease-out cubic, used for the initial node entrance. */
 function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
+}
+
+/** Ease-in-out cubic, used for the honeycomb convergence. */
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 export interface HiveRendererOptions {
@@ -68,8 +96,8 @@ export interface HiveRendererState {
   /** Pointer position, normalized to -1..1 on both axes. */
   pointerX: number;
   pointerY: number;
-  /** Scroll energy, 0 = sparse rest state, 1 = fully energised plexus. */
-  energy: number;
+  /** Document scroll progress, 0 = top of page, 1 = bottom of page. */
+  scrollProgress: number;
 }
 
 /**
@@ -80,10 +108,11 @@ export interface HiveRendererState {
  * application state, and the reconciler costs ~107 KB gzip for no visual
  * benefit (ADR-0010 §2).
  *
- * The field is ambient: every node is present from the first frame and the
- * mesh drifts continuously. Scroll energy widens the link reach and brightens
- * the web (the reference's sparse-to-dense progression); the pointer tilts
- * the whole field slightly.
+ * Drives a 3-act scroll choreography from a single instanced pointy-topped
+ * hexagon mesh:
+ * - Act I (top): wing-biased peripheral constellation framing hero copy.
+ * - Act II (mid-page): energised plexus behind frosted-glass bands/cards.
+ * - Act III (bottom): tiles expand and converge into a split honeycomb core.
  */
 export class HiveRenderer {
   private readonly renderer: WebGLRenderer;
@@ -97,8 +126,10 @@ export class HiveRenderer {
   private readonly lineGeometry: BufferGeometry;
   private readonly dummy = new Object3D();
   private readonly composer: EffectComposer;
+  private readonly bloom: BloomEffect;
 
   private nodes: LatticeNode[] = [];
+  private targets: AssemblyTarget[] = [];
   private readonly positions: Float32Array;
   private readonly linkBuffer: LinkBuffer;
 
@@ -108,15 +139,19 @@ export class HiveRenderer {
   private width = 1;
   private height = 1;
   private pixelRatio = 1;
-  /** Scale that fits the field to the viewport width. */
+  /** Scale that fits the honeycomb core isotropically into the viewport. */
   private worldScale = 1;
+  private swarmScaleX = 1;
+  private swarmScaleY = 1;
+  private visibleWidth = 10;
+  private visibleHeight = 10;
 
   private pointerX = 0;
   private pointerY = 0;
   private targetPointerX = 0;
   private targetPointerY = 0;
-  private energy = 0;
-  private targetEnergy = 0;
+  private scrollProgress = 0;
+  private targetProgress = 0;
 
   private startedAt = 0;
   private started = false;
@@ -155,8 +190,10 @@ export class HiveRenderer {
     this.linePositions = new Float32Array(nodeCount * LINK_MAX_PER_NODE * 4 * 3);
 
     // --- nodes -------------------------------------------------------------
-    // Small round dots, matching the reference's node scale - not hexagons.
-    const nodeGeometry = new CircleGeometry(1, 12);
+    // Pointy-topped hexagons: 6 segments rotated +30 deg so top/bottom peaks
+    // align vertically while side edges sit parallel to the vertical cleft.
+    const nodeGeometry = new CircleGeometry(1, 6);
+    nodeGeometry.rotateZ(Math.PI / 6);
     const nodeMaterial = new MeshBasicMaterial({
       color: this.palette.node,
       toneMapped: false,
@@ -196,7 +233,7 @@ export class HiveRenderer {
     // time, so it costs nothing but one unused render target.
     const composer = new EffectComposer(this.renderer, { multisampling: 0 });
     composer.addPass(new RenderPass(this.scene, this.camera));
-    const bloom = new BloomEffect({
+    this.bloom = new BloomEffect({
       luminanceThreshold: BLOOM_THRESHOLD,
       luminanceSmoothing: BLOOM_SMOOTHING,
       mipmapBlur: true,
@@ -204,14 +241,21 @@ export class HiveRenderer {
       radius: BLOOM_RADIUS,
       kernelSize: KernelSize.LARGE,
     });
-    composer.addPass(new EffectPass(this.camera, bloom));
+    composer.addPass(new EffectPass(this.camera, this.bloom));
     this.composer = composer;
   }
 
-  /** Builds the field: the node lattice. */
+  /** Builds the scattered wing constellation and its paired honeycomb core. */
   private buildField(): void {
+    const honeycomb = buildHoneycomb({
+      rings: ASSEMBLY_RINGS,
+      innerRings: ASSEMBLY_INNER_RINGS,
+      ringGap: ASSEMBLY_GAP,
+      splitGap: ASSEMBLY_SPLIT_GAP,
+    });
+
     this.nodes = buildSwarm({
-      nodeCount: NODE_COUNT,
+      nodeCount: honeycombNodeCount(ASSEMBLY_RINGS, ASSEMBLY_INNER_RINGS),
       clusterCount: CLUSTER_COUNT,
       clusterSpread: CLUSTER_SPREAD,
       ambientRatio: AMBIENT_RATIO,
@@ -219,6 +263,8 @@ export class HiveRenderer {
       zJitter: Z_JITTER,
       seed: HIVE_SEED,
     });
+
+    this.targets = assignTargets(this.nodes, honeycomb);
   }
 
   /** Sizes the canvas and refits the field to the viewport. */
@@ -239,18 +285,22 @@ export class HiveRenderer {
     this.camera.lookAt(0, 0, 0);
     this.camera.updateProjectionMatrix();
 
-    // Fit the field to the viewport. The field is a scatter, so it is always
-    // wider than it is tall; on a landscape screen it is fitted by width and
-    // overflows vertically, and on a portrait screen it is fitted by height
-    // and overflows horizontally. Fitting by the tighter axis means the mesh
-    // always covers the viewport instead of floating as a band in the middle
-    // of a phone screen.
-    const bounds = swarmBounds(this.nodes);
-    const visibleWidth =
-      2 * this.camera.position.z * Math.tan(((CAMERA_FOV / 2) * Math.PI) / 180) * aspect;
-    const visibleHeight = 2 * this.camera.position.z * Math.tan(((CAMERA_FOV / 2) * Math.PI) / 180);
+    // Fit the scattered plexus across the full viewport dimensions while keeping
+    // the converged honeycomb core isotropically scaled inside safe margins.
+    const swarm = swarmBounds(this.nodes);
+    const honeycomb = swarmBounds(this.targets);
 
-    this.worldScale = Math.max(visibleWidth / bounds.width, visibleHeight / bounds.height);
+    const visibleHeight = 2 * this.camera.position.z * Math.tan(((CAMERA_FOV / 2) * Math.PI) / 180);
+    const visibleWidth = visibleHeight * aspect;
+
+    this.visibleHeight = visibleHeight;
+    this.visibleWidth = visibleWidth;
+    this.swarmScaleX = (visibleWidth * 0.94) / Math.max(1, swarm.width);
+    this.swarmScaleY = (visibleHeight * 0.92) / Math.max(1, swarm.height);
+    this.worldScale = Math.min(
+      visibleWidth / Math.max(1, honeycomb.width * 1.15),
+      visibleHeight / Math.max(1, honeycomb.height * 1.22),
+    );
   }
 
   /** Applies a new palette (used when the theme changes). */
@@ -283,9 +333,9 @@ export class HiveRenderer {
     this.targetPointerY = y;
   }
 
-  /** Updates the scroll-energy target, 0 (sparse rest) .. 1 (fully energised). */
-  setEnergy(value: number): void {
-    this.targetEnergy = Math.min(1, Math.max(0, value));
+  /** Updates the document scroll progress, 0 (top) .. 1 (bottom). */
+  setScrollProgress(progress: number): void {
+    this.targetProgress = Math.min(1, Math.max(0, progress));
   }
 
   /** Starts the animation loop, or renders a single static frame. */
@@ -299,10 +349,9 @@ export class HiveRenderer {
     }
 
     if (this.reducedMotion) {
-      // The static frame shows the fully energised plexus: a sparse, half
-      // empty mesh would read as a bug, not as reduced motion.
-      this.energy = 1;
-      this.targetEnergy = 1;
+      // Static frame honors the current scroll position without starting the
+      // loop, resting as the calm wing-framed constellation at scroll = 0.
+      this.scrollProgress = this.targetProgress;
       this.updateField(1, 0);
       this.renderFrame(0);
       this.publishFrameCount(performance.now());
@@ -324,7 +373,6 @@ export class HiveRenderer {
       const elapsed = now - this.startedAt;
       const entrance = easeOutCubic(Math.min(1, elapsed / ENTRANCE_MS));
 
-      this.frameCount += 1;
       this.updateField(entrance, elapsed / 1000);
       this.renderFrame(delta);
       this.publishFrameCount(now);
@@ -358,35 +406,56 @@ export class HiveRenderer {
   /** Advances the field and writes the instance and line buffers. */
   private updateField(entrance: number, time: number): void {
     const nodes = this.nodes;
+    const targets = this.targets;
     const worldScale = this.worldScale;
 
-    // The energy follows its scroll target smoothly, so wheel steps and
-    // scrollbar drags read as one continuous swell.
-    this.energy += (this.targetEnergy - this.energy) * ENERGY_LERP;
+    this.scrollProgress = this.reducedMotion
+      ? this.targetProgress
+      : this.scrollProgress + (this.targetProgress - this.scrollProgress) * SCROLL_LERP;
+
+    const p = this.scrollProgress;
+    const heroSpread = 1 - smoothstep(0.0, 0.28, p);
+    const energy = smoothstep(0.0, 0.38, p);
+    const tileScale = smoothstep(0.48, 0.84, p);
+    const assembly = easeInOutCubic(smoothstep(0.58, 0.92, p));
+
+    // Idle drift dampens as tiles lock into the honeycomb core.
+    const driftDamping = 1 - assembly * 0.92;
+    const hexTileRadius = NODE_RADIUS_ASSEMBLED * worldScale;
+    const corridorHalfW =
+      this.visibleWidth * (this.visibleWidth < this.visibleHeight ? 0.41 : 0.36) * heroSpread;
+    const corridorHalfH = this.visibleHeight * 0.36 * heroSpread;
 
     for (let i = 0; i < nodes.length; i += 1) {
       const node = nodes[i];
-      if (!node) continue;
+      const target = targets[i];
+      if (!node || !target) continue;
 
-      // Idle drift: the plexus is a living network, never a still image.
       const driftX =
         DRIFT_AMPLITUDE * 0.5 * Math.cos(time * node.driftSpeed * 0.6 + node.driftPhase);
       const driftY =
         DRIFT_AMPLITUDE * Math.sin(time * node.driftSpeed + node.driftPhase) * node.driftAmplitude;
 
-      const x = (node.x + driftX) * worldScale;
-      const y = (node.y + driftY) * worldScale;
-      const z = node.z * worldScale;
+      let swarmX = (node.x + driftX * driftDamping) * this.swarmScaleX;
+      const swarmY = (node.y + driftY * driftDamping) * this.swarmScaleY;
+      if (Math.abs(swarmY) < corridorHalfH && Math.abs(swarmX) < corridorHalfW) {
+        const signX = swarmX < 0 ? -1 : 1;
+        swarmX = signX * (corridorHalfW + Math.abs(swarmX) * 0.2);
+      }
+
+      const coreX = (target.x + driftX * driftDamping * 0.25) * worldScale;
+      const coreY = (target.y + driftY * driftDamping * 0.25) * worldScale;
+      const x = lerp(swarmX, coreX, assembly);
+      const y = lerp(swarmY, coreY, assembly);
+      const z = lerp(node.z, target.z, assembly) * worldScale;
 
       this.positions[i * 3] = x;
       this.positions[i * 3 + 1] = y;
       this.positions[i * 3 + 2] = z;
 
-      // The per-node drift amplitude doubles as the size variation: the
-      // reference's dots are not uniform, and reusing the existing random
-      // per-node value keeps the field's randomness single-sourced.
-      const radius =
+      const plexusRadius =
         (NODE_RADIUS_MIN + (NODE_RADIUS_MAX - NODE_RADIUS_MIN) * entrance) * node.driftAmplitude;
+      const radius = lerp(plexusRadius, hexTileRadius, tileScale);
 
       this.dummy.position.set(x, y, z);
       this.dummy.scale.setScalar(radius);
@@ -399,12 +468,12 @@ export class HiveRenderer {
     // --- links -------------------------------------------------------------
     this.frameCount += 1;
     if (this.frameCount % LINK_RECOMPUTE_FRAMES === 0 || this.linkBuffer.count === 0) {
-      // The link reach widens with scroll energy: the rest state is a loose,
-      // faint web; the energised state is the dense triangulated plexus the
-      // reference shows deeper down the page.
-      const linkDistance =
-        this.worldScale *
-        (LINK_DISTANCE_REST + (LINK_DISTANCE_MAX - LINK_DISTANCE_REST) * this.energy);
+      const meanSwarmScale = (this.swarmScaleX + this.swarmScaleY) * 0.5;
+      const linkDistance = lerp(
+        meanSwarmScale * lerp(LINK_DISTANCE_REST, LINK_DISTANCE_MAX, energy),
+        worldScale * LINK_DISTANCE_ASSEMBLED,
+        assembly,
+      );
 
       computeLinks(
         this.positions,
@@ -431,13 +500,15 @@ export class HiveRenderer {
       this.lineGeometry.setDrawRange(0, drawn * 2);
       const attribute = this.lineGeometry.getAttribute("position") as BufferAttribute;
       attribute.needsUpdate = true;
-
-      // Brightness follows the energy too: the web is faint at rest and at
-      // full strength once energised.
-      const lineMaterial = this.lines.material as LineBasicMaterial;
-      lineMaterial.opacity =
-        this.palette.linkOpacity * (LINK_OPACITY_MIN + (1 - LINK_OPACITY_MIN) * this.energy);
     }
+
+    const lineMaterial = this.lines.material as LineBasicMaterial;
+    lineMaterial.opacity =
+      this.palette.linkOpacity *
+      lerp(LINK_OPACITY_MIN + (1 - LINK_OPACITY_MIN) * energy, LINK_OPACITY_ASSEMBLED, assembly);
+
+    // Dial down bloom as hexagon tiles grow so the mortar gaps stay razor-sharp.
+    this.bloom.intensity = BLOOM_INTENSITY * (1 - tileScale * 0.45);
 
     // --- pointer tilt ------------------------------------------------------
     this.pointerX += (this.targetPointerX - this.pointerX) * POINTER_LERP;

@@ -237,7 +237,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </section>
 
         {/* How I work — a real sequence, set as a numbered process ledger. */}
-        <section className="border-t border-border-subtle" aria-labelledby="home-how">
+        <section
+          className="border-t border-border-subtle surface-veil"
+          aria-labelledby="home-how"
+        >
           <div className="container-site py-16 md:py-24">
             <SectionHeader
               titleId="home-how"
@@ -270,7 +273,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </section>
 
         {/* Open-source & security engineering — the honesty record, as a ledger. */}
-        <section className="border-t border-border-subtle" aria-labelledby="home-oss">
+        <section
+          className="border-t border-border-subtle surface-veil"
+          aria-labelledby="home-oss"
+        >
           <div className="container-site py-16 md:py-24">
             <SectionHeader
               titleId="home-oss"
@@ -317,42 +323,44 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </section>
         )}
 
-        {/* About preview */}
+        {/* About preview — compact frosted panel keeping lower honeycomb visible. */}
         <section className="border-t border-border-subtle" aria-labelledby="home-about">
-          <div className="container-site py-16 md:py-24">
-            <SectionHeader titleId="home-about" title={t("aboutTitle")} />
-            <p className="mt-6 max-w-2xl type-body-lg">{t("aboutPreview")}</p>
-            <Link href="/about" className={`mt-7 inline-flex font-medium ${externalLink}`}>
-              {t("aboutCta")}
-              <ForwardArrow />
-            </Link>
+          <div className="container-site py-20 md:py-28">
+            <div className="mx-auto max-w-2xl rounded-xl border border-border-subtle surface-card p-6 md:p-10">
+              <SectionHeader titleId="home-about" title={t("aboutTitle")} />
+              <p className="mt-6 max-w-2xl type-body-lg">{t("aboutPreview")}</p>
+              <Link href="/about" className={`mt-7 inline-flex font-medium ${externalLink}`}>
+                {t("aboutCta")}
+                <ForwardArrow />
+              </Link>
+            </div>
           </div>
         </section>
 
-        {/* Contact strip — the ending carries display weight, on a surface band. */}
-        <section
-          className="border-t border-border-subtle surface-veil"
-          aria-labelledby="home-contact"
-        >
-          <div className="container-site py-16 md:py-24">
-            <h2 id="home-contact" className="max-w-3xl type-h1">
-              {t("contactTitle")}
-            </h2>
-            <p className="mt-4 max-w-2xl text-muted-foreground">{t("contactBody")}</p>
-            {email && (
-              <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">
-                <a href={`mailto:${email}`} className={btnPrimary}>
-                  {t("contactCta")}
-                </a>
-                <CopyEmailButton
-                  email={email}
-                  label={contactT("copyEmail")}
-                  copiedLabel={contactT("copied")}
-                  hintLabel={contactT("copyHint")}
-                  className="inline-flex min-h-11 items-center font-mono text-sm text-accent underline-offset-4 hover:underline"
-                />
-              </div>
-            )}
+        {/* Contact strip — the ending carries display weight in a frosted panel so
+            the split honeycomb core remains visible around and behind it. */}
+        <section className="border-t border-border-subtle" aria-labelledby="home-contact">
+          <div className="container-site py-20 md:py-28">
+            <div className="mx-auto max-w-2xl rounded-xl border border-border-subtle surface-card p-6 md:p-10">
+              <h2 id="home-contact" className="max-w-3xl type-h1">
+                {t("contactTitle")}
+              </h2>
+              <p className="mt-4 max-w-2xl text-muted-foreground">{t("contactBody")}</p>
+              {email && (
+                <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">
+                  <a href={`mailto:${email}`} className={btnPrimary}>
+                    {t("contactCta")}
+                  </a>
+                  <CopyEmailButton
+                    email={email}
+                    label={contactT("copyEmail")}
+                    copiedLabel={contactT("copied")}
+                    hintLabel={contactT("copyHint")}
+                    className="inline-flex min-h-11 items-center font-mono text-sm text-accent underline-offset-4 hover:underline"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </section>
       </div>

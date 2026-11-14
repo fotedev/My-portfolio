@@ -16,7 +16,7 @@ export type CredentialCardLabels = {
  */
 export function CredentialCard({ credential, labels }: { credential: Credential; labels: CredentialCardLabels }) {
   return (
-    <article className="grid gap-6 rounded-xl border border-border-subtle bg-surface p-6 md:grid-cols-[1fr_auto] md:gap-10 md:p-8">
+    <article className="grid gap-6 rounded-xl border border-border-subtle surface-card p-6 md:grid-cols-[1fr_auto] md:gap-10 md:p-8">
       <div>
         <h3 className="type-h3">
           <bdi>{credential.title}</bdi>
