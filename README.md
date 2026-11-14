@@ -1,5 +1,12 @@
 # fotedev.me — Portfolio & Admin CMS
 
+![Code license](https://img.shields.io/badge/code%20license-AGPL--3.0--only-blue)
+![Next.js](https://img.shields.io/badge/Next.js-App%20Router-000000?logo=next.js)
+![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20RLS-3ECF8E?logo=supabase&logoColor=white)
+![Deploy](https://img.shields.io/badge/deploy-Vercel-000000?logo=vercel)
+
+**Live: [fotedev.me](https://fotedev.me)** · English + العربية
+
 Open-source, bilingual (English / Arabic) freelance portfolio with a structured admin dashboard, built for **Ahmed Aboalayoun (`fotedev`)** — Full-Stack AI Engineer.
 
 **Stack (one line):** Next.js (App Router) + TypeScript + Tailwind CSS · Supabase (Postgres + RLS + Auth + Storage + Edge Functions) · Vercel · Cloudflare Turnstile · three.js + postprocessing (deferred hero layer, ADR-0010).
