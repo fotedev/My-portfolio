@@ -58,7 +58,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <JsonLd data={personJsonLd({ sameAs: settings?.socials.map((s) => s.url) ?? [], locale })} />
 
       <div className="container-site py-16 md:py-24">
-        <div className="container-reading">
+        <div className="container-reading rounded-xl border border-border-subtle surface-card p-6 md:p-8">
           <h1 className="type-h1">{t("title")}</h1>
           <p className="mt-6 type-body-lg">{t("intro1")}</p>
           <p className="mt-4 type-body">{t("intro2")}</p>
@@ -88,7 +88,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </section>
         </div>
 
-        <section className="mt-14" aria-labelledby="about-oss">
+        <section
+          className="mt-14 rounded-xl border border-border-subtle surface-card p-6 md:p-8"
+          aria-labelledby="about-oss"
+        >
           <div className="container-reading">
             <h2 id="about-oss" className="type-h2">
               {t("ossTitle")}

@@ -32,7 +32,7 @@ export function CaseStudyCard({
 }) {
   return (
     <article
-      className={`flex h-full flex-col rounded-xl border border-border-subtle bg-surface transition-colors duration-150 hover:border-accent/45 ${
+      className={`flex h-full flex-col rounded-xl border border-border-subtle surface-card transition-colors duration-150 hover:border-accent/45 ${
         featured ? "p-6 md:p-8" : "p-6"
       }`}
     >

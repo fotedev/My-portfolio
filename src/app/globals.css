@@ -40,12 +40,12 @@
   /* Hero lattice (ADR-0010 §3) — the canvas layer's own material. The amber is
      the single exception to the one-accent-family rule, and it exists only
      inside the WebGL canvas. Never used by a DOM element. */
-  --hive-node: #c2410c;
-  --hive-link: #ea580c;
+  --hive-node: #ea580c;
+  --hive-link: #d97706;
   --hive-additive: 0;
   --hive-bloom: 0;
-  --hive-node-opacity: 0.85;
-  --hive-link-opacity: 0.55;
+  --hive-node-opacity: 0.78;
+  --hive-link-opacity: 0.2;
   color-scheme: light;
 }
 
@@ -75,12 +75,12 @@
   --code-background: #0d1424;
   --selection-bg: rgba(34, 211, 238, 0.25);
   --hero-wash: linear-gradient(135deg, rgba(34, 211, 238, 0.06), rgba(59, 130, 246, 0.06));
-  --hive-node: #ff6b35;
-  --hive-link: #ffa057;
+  --hive-node: #ff6224;
+  --hive-link: #ff853d;
   --hive-additive: 1;
   --hive-bloom: 1;
-  --hive-node-opacity: 1;
-  --hive-link-opacity: 0.6;
+  --hive-node-opacity: 0.94;
+  --hive-link-opacity: 0.34;
   color-scheme: dark;
 }
 
@@ -257,11 +257,33 @@ kbd {
   height: 100%;
 }
 
-/* Translucent surface band - lets the fixed hive backdrop read dimly through
-   full-width sections (the reference's content bands behave the same), while
-   keeping text on a near-opaque surface. */
+/* Translucent frosted-glass surface band - turns the fixed WebGL hive
+   constellation/plexus behind dense text ledgers into a soft warm bokeh
+   (ADR-0010 Revision 3), preserving crisp WCAG AA legibility in both themes. */
 .surface-veil {
-  background-color: color-mix(in oklab, var(--surface) 88%, transparent);
+  background-color: color-mix(in oklab, var(--surface) 82%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(110%);
+  backdrop-filter: blur(18px) saturate(110%);
+}
+
+.dark .surface-veil {
+  background-color: color-mix(in oklab, var(--surface) 74%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(120%);
+  backdrop-filter: blur(22px) saturate(120%);
+}
+
+/* Frosted-glass panel for cards and lower-page callout blocks so text reads
+   cleanly over the plexus without hiding the lower honeycomb core. */
+.surface-card {
+  background-color: color-mix(in oklab, var(--surface) 78%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.dark .surface-card {
+  background-color: color-mix(in oklab, var(--surface) 68%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(115%);
+  backdrop-filter: blur(20px) saturate(115%);
 }
 
 /* ============================================================================

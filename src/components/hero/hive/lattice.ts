@@ -4,14 +4,11 @@
  * Pure functions, no three.js: everything here is deterministic from a seed
  * and therefore unit-testable (see lattice.test.ts).
  *
- * The field is a clustered scatter, not a uniform grid: a handful of gaussian
- * clouds with ambient singles between them. Clumps of dense mesh and
- * stretches of empty space are what make the layer read as a living network
- * rather than as flat texture - that contrast is the reference technique's
- * signature. Every node is present from the first frame; the scroll story is
- * carried by link reach and brightness (ADR-0010 §9), not by reveal.
- *
- * ADR-0010.
+ * The field is a wing-biased peripheral constellation: gaussian clusters and
+ * ambient scatter sit primarily along the left and right flanks so the central
+ * reading corridor behind hero copy stays calm and legible at rest, while
+ * matching the left/right hemisphere balance of the split honeycomb core
+ * (ADR-0010).
  */
 
 import { createRandom } from "./random";
@@ -57,31 +54,59 @@ function gaussian(random: { next(): number }): number {
   return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
 }
 
-/** Builds the node field. */
+/** Builds the wing-biased node field. */
 export function buildSwarm(options: SwarmOptions): LatticeNode[] {
   const { nodeCount, clusterCount, clusterSpread, ambientRatio, fieldExtent, zJitter, seed } =
     options;
 
   const random = createRandom(seed);
 
-  // Cluster centres sit inside a margin of the field, so no cloud is centred
-  // exactly on the edge and every cluster keeps room to breathe.
-  const centres = Array.from({ length: Math.max(1, clusterCount) }, () => ({
-    x: random.range(-fieldExtent, fieldExtent) * 0.7,
-    y: random.range(-fieldExtent, fieldExtent) * 0.7,
-  }));
+  // Place cluster centres symmetrically along the left and right flanks so the
+  // constellation frames the central reading column rather than crowding it.
+  const leftCentres: Array<{ x: number; y: number }> = [];
+  const rightCentres: Array<{ x: number; y: number }> = [];
+  const totalClusters = Math.max(2, clusterCount);
+
+  for (let c = 0; c < totalClusters; c += 1) {
+    const isLeft = c % 2 === 0;
+    const sign = isLeft ? -1 : 1;
+    const centre = {
+      x: sign * fieldExtent * (0.42 + random.next() * 0.44),
+      y: random.range(-fieldExtent * 0.78, fieldExtent * 0.78),
+    };
+    if (isLeft) {
+      leftCentres.push(centre);
+    } else {
+      rightCentres.push(centre);
+    }
+  }
 
   return Array.from({ length: nodeCount }, (_, index) => {
+    const isLeft = index < nodeCount / 2;
+    const hemisphereSign = isLeft ? -1 : 1;
+    const wingCentres = isLeft ? leftCentres : rightCentres;
     const clustered = random.next() >= ambientRatio;
+
     let x: number;
     let y: number;
     if (clustered) {
-      const centre = random.pick(centres);
+      const centre = random.pick(wingCentres);
       x = centre.x + gaussian(random) * clusterSpread;
       y = centre.y + gaussian(random) * clusterSpread;
     } else {
-      x = random.range(-fieldExtent, fieldExtent);
-      y = random.range(-fieldExtent, fieldExtent);
+      x = hemisphereSign * random.range(0.35, fieldExtent);
+      y = random.range(-fieldExtent * 0.88, fieldExtent * 0.88);
+    }
+
+    // Keep each node within its assigned hemisphere so wing counts stay
+    // balanced 1-to-1 with the left/right honeycomb hemispheres.
+    if (x * hemisphereSign <= 0) {
+      x = hemisphereSign * Math.max(0.35, Math.abs(x));
+    }
+
+    // Smooth central reading-corridor clearance behind the hero headline/copy.
+    if (Math.abs(x) < 1.9 && Math.abs(y) < 2.2) {
+      x = hemisphereSign * (1.9 + Math.abs(x) * 0.35);
     }
 
     return {
@@ -97,7 +122,7 @@ export function buildSwarm(options: SwarmOptions): LatticeNode[] {
 }
 
 /** The lattice's bounding box, in lattice units. */
-export function swarmBounds(nodes: LatticeNode[]): {
+export function swarmBounds(nodes: ReadonlyArray<{ x: number; y: number }>): {
   width: number;
   height: number;
   minX: number;

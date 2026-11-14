@@ -4,12 +4,13 @@
  * Everything the renderer needs is derived from these, so the effect can be
  * re-tuned without touching the render loop.
  *
- * Composition note (2026-11-13, revision 2): per the owner's directive the
- * layer is now a fixed, page-wide backdrop matching the live reference — a
- * clustered, irregular plexus of small glowing dots that rests sparse at the
- * top of the page and energises (denser reach, brighter links) as the reader
- * scrolls. The scroll-gated reveal and the hex-rosette assembly are retired;
- * what remains is ambient drift, scroll energy and pointer parallax.
+ * 3-act scroll choreography:
+ * - Act I (top / hero): wing-biased peripheral constellation with a calm central
+ *   reading corridor behind the hero headline.
+ * - Act II (mid-page): energised triangulated plexus framed behind frosted-glass
+ *   surface veils and cards.
+ * - Act III (lower page): nodes scale into pointy-topped hexagon tiles and
+ *   converge into a split two-hemisphere hexagonal honeycomb core.
  */
 
 /** Vertical field of view, in degrees. */
@@ -18,72 +19,63 @@ export const CAMERA_FOV = 55;
 /**
  * Camera distance from the lattice plane, per orientation.
  *
- * The field is fitted to the viewport by its tighter axis, so on a portrait
- * screen it fills the height and overflows the width. Pulling the camera in
- * for portrait keeps the nodes large enough to read on a phone.
+ * The field is fitted to the viewport so both the scattered field and the
+ * converged honeycomb core sit comfortably on screen.
  */
 export const CAMERA_Z_LANDSCAPE = 14;
 export const CAMERA_Z_PORTRAIT = 13;
 export const CAMERA_NEAR = 0.1;
 export const CAMERA_FAR = 120;
 
-/** Total node count of the field. */
-export const NODE_COUNT = 260;
+/** Honeycomb assembly geometry (outer rings, hollow inner chamber, spacing). */
+export const ASSEMBLY_RINGS = 9;
+export const ASSEMBLY_INNER_RINGS = 2;
+export const ASSEMBLY_GAP = 0.36;
+export const ASSEMBLY_SPLIT_GAP = 0.14;
 
-/** Number of cluster centres the field is built around. */
+/** Number of cluster centres the field is built around (split across wings). */
 export const CLUSTER_COUNT = 8;
 
 /** Spread of each cluster's cloud, in lattice units (one sigma). */
-export const CLUSTER_SPREAD = 1.3;
+export const CLUSTER_SPREAD = 1.15;
 
 /** Share of nodes that float outside any cluster as ambient scatter. */
-export const AMBIENT_RATIO = 0.24;
+export const AMBIENT_RATIO = 0.22;
 
 /** Half-extent of the field (cluster centres and ambient scatter), in lattice units. */
-export const FIELD_EXTENT = 5.5;
+export const FIELD_EXTENT = 5.6;
 
 /** Depth jitter, in lattice units, so the field reads as a volume. */
-export const Z_JITTER = 0.5;
+export const Z_JITTER = 0.45;
 
 /** Duration of the entrance grow-in, in milliseconds. */
 export const ENTRANCE_MS = 1200;
 
 /**
- * Node radius in world units, at the start and at the end of the entrance.
- *
- * The fitted field spans roughly 23 world units across at 1440 px, so one
- * world unit is about 62 px on a desktop: these radii read as 2-4 px glowing
- * points, matching the reference's node scale. Additive blending and the
- * bloom pass do the rest of the brightening.
+ * Node radius in world units at rest (start/end of entrance) and in the
+ * converged honeycomb state (in lattice units scaled by worldScale).
  */
-export const NODE_RADIUS_MIN = 0.036;
-export const NODE_RADIUS_MAX = 0.07;
+export const NODE_RADIUS_MIN = 0.032;
+export const NODE_RADIUS_MAX = 0.056;
+export const NODE_RADIUS_ASSEMBLED = 0.27;
 
-/**
- * Scroll energy: how far, in viewport heights, the reader must scroll for the
- * plexus to reach full reach and brightness. The reference rests sparse at
- * the top of the page and is dense further down.
- */
-export const ENERGY_RANGE = 1.4;
+/** Link reach, in lattice units, across the 3-act scroll story. */
+export const LINK_DISTANCE_REST = 1.65;
+export const LINK_DISTANCE_MAX = 2.35;
+export const LINK_DISTANCE_ASSEMBLED = 0.72;
 
-/** How quickly the layer's energy follows the scroll target (per frame). */
-export const ENERGY_LERP = 0.06;
+/** Maximum links kept per node. */
+export const LINK_MAX_PER_NODE = 5;
 
-/**
- * Link reach, in lattice units. At rest the plexus is loose and faint; at
- * full energy the reach widens and the web thickens.
- */
-export const LINK_DISTANCE_REST = 1.25;
-export const LINK_DISTANCE_MAX = 2.45;
-
-/** Maximum links kept per node. The reference's dense regions run ~6. */
-export const LINK_MAX_PER_NODE = 6;
-
-/** Link opacity multiplier at rest; full energy uses the palette value. */
-export const LINK_OPACITY_MIN = 0.85;
+/** Link opacity multipliers at rest and in the assembled honeycomb state. */
+export const LINK_OPACITY_MIN = 0.65;
+export const LINK_OPACITY_ASSEMBLED = 0.42;
 
 /** Frames between link recomputations. */
 export const LINK_RECOMPUTE_FRAMES = 2;
+
+/** How quickly the layer's scroll progress follows the target (per frame). */
+export const SCROLL_LERP = 0.07;
 
 /** Peak pointer tilt, in radians. */
 export const POINTER_TILT_X = 0.1;
@@ -99,14 +91,13 @@ export const DRIFT_AMPLITUDE = 0.35;
 export const MAX_PIXEL_RATIO = 1.5;
 
 /**
- * Bloom pass, dark theme only. Threshold low enough that the 1 px lines are
- * caught by the glow too — line brightness is what makes the web read solid
- * instead of transparent (owner feedback, two iterations).
+ * Bloom pass, dark theme only. Balanced so the plexus glows warmly without
+ * washing out the dark mortar gaps between hexagon tiles when converged.
  */
-export const BLOOM_THRESHOLD = 0.15;
+export const BLOOM_THRESHOLD = 0.38;
 export const BLOOM_SMOOTHING = 0.45;
-export const BLOOM_INTENSITY = 2.2;
-export const BLOOM_RADIUS = 0.8;
+export const BLOOM_INTENSITY = 1.15;
+export const BLOOM_RADIUS = 0.6;
 
 /** Seed for the whole field. Fixed so renders are reproducible. */
 export const HIVE_SEED = 0x5eed1234;

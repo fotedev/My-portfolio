@@ -36,7 +36,7 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
   const email = settings?.contactEmail;
 
   return (
-    <footer className="border-t border-border-subtle">
+    <footer className="border-t border-border-subtle surface-veil">
       <div className="container-site grid gap-10 py-12 md:grid-cols-3">
         <div>
           <p className="font-mono font-medium text-foreground">fotedev</p>

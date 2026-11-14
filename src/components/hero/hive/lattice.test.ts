@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { assignTargets, buildHoneycomb, hexDistance, honeycombNodeCount } from "./assembly";
 import { buildSwarm, swarmBounds, type LatticeNode } from "./lattice";
 import { computeLinks, createLinkBuffer } from "./links";
 import { createRandom } from "./random";
@@ -77,6 +78,17 @@ describe("buildSwarm", () => {
     const median = medianNearestNeighbour(nodes);
     const meanSpacing = (SWARM.fieldExtent * 2) / Math.sqrt(nodes.length);
     expect(median).toBeLessThan(meanSpacing * 0.5);
+  });
+
+  it("splits even node counts evenly across wings and keeps the central reading corridor clear", () => {
+    const nodes = buildSwarm(SWARM);
+    const leftCount = nodes.filter((node) => node.x < 0).length;
+    const rightCount = nodes.filter((node) => node.x > 0).length;
+    expect(leftCount).toBe(SWARM.nodeCount / 2);
+    expect(rightCount).toBe(SWARM.nodeCount / 2);
+
+    const insideCorridor = nodes.filter((node) => Math.abs(node.x) < 1.85 && Math.abs(node.y) < 2.15);
+    expect(insideCorridor).toHaveLength(0);
   });
 });
 
@@ -252,5 +264,59 @@ describe("createRandom", () => {
 
   it("throws when picking from an empty array", () => {
     expect(() => createRandom(1).pick([])).toThrow();
+  });
+});
+
+describe("buildHoneycomb & assignTargets", () => {
+  const HONEYCOMB = {
+    rings: 9,
+    innerRings: 2,
+    ringGap: 0.36,
+    splitGap: 0.14,
+  };
+
+  it("computes axial hex distances accurately", () => {
+    expect(hexDistance(0, 0)).toBe(0);
+    expect(hexDistance(2, 0)).toBe(2);
+    expect(hexDistance(-1, 2)).toBe(2);
+  });
+
+  it("matches the split hollow honeycomb cell count and builds both hemispheres evenly", () => {
+    const count = honeycombNodeCount(HONEYCOMB.rings, HONEYCOMB.innerRings);
+    expect(count).toBe(246);
+
+    const targets = buildHoneycomb(HONEYCOMB);
+    expect(targets).toHaveLength(count);
+
+    const left = targets.filter((t) => t.x < 0);
+    const right = targets.filter((t) => t.x > 0);
+    expect(left).toHaveLength(123);
+    expect(right).toHaveLength(123);
+
+    // Every cell respects both the central vertical cleft and the inner hollow chamber.
+    for (const target of targets) {
+      expect(Math.abs(target.x)).toBeGreaterThan(HONEYCOMB.splitGap);
+      expect(Math.hypot(target.x, target.y)).toBeGreaterThan(1.0);
+    }
+  });
+
+  it("maps swarm nodes deterministically 1-to-1 without crossing hemispheres", () => {
+    const targets = buildHoneycomb(HONEYCOMB);
+    const swarm = buildSwarm({
+      ...SWARM,
+      nodeCount: targets.length,
+    });
+
+    const assignedA = assignTargets(swarm, targets);
+    const assignedB = assignTargets(swarm, targets);
+    expect(assignedA).toEqual(assignedB);
+    expect(assignedA).toHaveLength(targets.length);
+
+    const keyOf = (t: { x: number; y: number }): string => `${t.x.toFixed(6)},${t.y.toFixed(6)}`;
+    expect(assignedA.map(keyOf).sort()).toEqual(targets.map(keyOf).sort());
+
+    for (let i = 0; i < swarm.length; i += 1) {
+      expect(Math.sign(assignedA[i]!.x)).toBe(Math.sign(swarm[i]!.x));
+    }
   });
 });
