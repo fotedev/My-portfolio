@@ -80,7 +80,7 @@ export const LINK_DISTANCE_MAX = 2.45;
 export const LINK_MAX_PER_NODE = 6;
 
 /** Link opacity multiplier at rest; full energy uses the palette value. */
-export const LINK_OPACITY_MIN = 0.7;
+export const LINK_OPACITY_MIN = 0.85;
 
 /** Frames between link recomputations. */
 export const LINK_RECOMPUTE_FRAMES = 2;
@@ -99,13 +99,13 @@ export const DRIFT_AMPLITUDE = 0.35;
 export const MAX_PIXEL_RATIO = 1.5;
 
 /**
- * Bloom pass, dark theme only. Strong enough that every dot carries the hot
- * core + glow halo the reference shows; the owner found the previous settings
- * washed the web out to near-invisible.
+ * Bloom pass, dark theme only. Threshold low enough that the 1 px lines are
+ * caught by the glow too — line brightness is what makes the web read solid
+ * instead of transparent (owner feedback, two iterations).
  */
-export const BLOOM_THRESHOLD = 0.25;
+export const BLOOM_THRESHOLD = 0.15;
 export const BLOOM_SMOOTHING = 0.45;
-export const BLOOM_INTENSITY = 1.85;
+export const BLOOM_INTENSITY = 2.2;
 export const BLOOM_RADIUS = 0.8;
 
 /** Seed for the whole field. Fixed so renders are reproducible. */
