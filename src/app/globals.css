@@ -45,7 +45,7 @@
   --hive-additive: 0;
   --hive-bloom: 0;
   --hive-node-opacity: 0.85;
-  --hive-link-opacity: 0.42;
+  --hive-link-opacity: 0.55;
   color-scheme: light;
 }
 
@@ -76,11 +76,11 @@
   --selection-bg: rgba(34, 211, 238, 0.25);
   --hero-wash: linear-gradient(135deg, rgba(34, 211, 238, 0.06), rgba(59, 130, 246, 0.06));
   --hive-node: #ff6b35;
-  --hive-link: #ff8c42;
+  --hive-link: #ffa057;
   --hive-additive: 1;
   --hive-bloom: 1;
   --hive-node-opacity: 1;
-  --hive-link-opacity: 0.38;
+  --hive-link-opacity: 0.6;
   color-scheme: dark;
 }
 
