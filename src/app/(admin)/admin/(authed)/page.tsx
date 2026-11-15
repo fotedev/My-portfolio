@@ -85,7 +85,7 @@ export default async function AdminDashboardPage() {
     <section>
       <h1 className="text-2xl font-semibold">Dashboard</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Edits here go live after publish — public pages revalidate on demand (prompt-6 §4).
+        Edits here go live after publish — public pages revalidate on demand.
       </p>
 
       <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

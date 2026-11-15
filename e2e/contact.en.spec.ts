@@ -41,9 +41,10 @@ test.describe("contact EN", () => {
     await page
       .getByRole("textbox", { name: "Message" })
       .fill("This is an automated CI end-to-end test inquiry; it can be archived.");
-    // Turnstile test sitekey auto-passes; wait for the token callback.
+    // Real Turnstile widget (GATE 6): headless solves take longer than the
+    // test key's instant pass — allow up to 45 s for the token callback.
     // Deterministic: wait for the Turnstile token callback (single-use token).
-    await page.waitForSelector('form[data-turnstile-ready="true"]', { timeout: 15_000 });
+    await page.waitForSelector('form[data-turnstile-ready="true"]', { timeout: 45_000 });
     await page.getByRole("button", { name: "Send inquiry" }).click();
 
     await expect(page.getByText("Stored — I'll get back to you")).toBeVisible({ timeout: 20_000 });
@@ -85,7 +86,7 @@ test.describe("contact EN", () => {
     await page.getByLabel("What do you need?").selectOption("web-apps");
     await page.getByRole("textbox", { name: "Message" }).fill("Testing that the fallback survives a dead endpoint.");
     // Deterministic: wait for the Turnstile token callback (single-use token).
-    await page.waitForSelector('form[data-turnstile-ready="true"]', { timeout: 15_000 });
+    await page.waitForSelector('form[data-turnstile-ready="true"]', { timeout: 45_000 });
     await page.getByRole("button", { name: "Send inquiry" }).click();
 
     await expect(page.getByText("was not stored")).toBeVisible({ timeout: 20_000 });
@@ -113,7 +114,7 @@ test.describe("contact EN", () => {
         .getByRole("textbox", { name: "Message" })
         .fill("Rate limit probe submission from the CI end-to-end suite.");
       // Deterministic: wait for the Turnstile token callback (single-use token).
-    await page.waitForSelector('form[data-turnstile-ready="true"]', { timeout: 15_000 });
+    await page.waitForSelector('form[data-turnstile-ready="true"]', { timeout: 45_000 });
       await page.getByRole("button", { name: "Send inquiry" }).click();
       rateLimited = await page
         .getByText("Too many attempts right now")
