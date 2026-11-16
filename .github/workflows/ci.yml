@@ -90,8 +90,12 @@ jobs:
           # every submit and the success/429 specs fail deterministically.
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: 0x4AAAAAAGBJqAEkyEtOrK25
 
+      # Headed under xvfb: Cloudflare rejects headless Chromium for real
+      # widgets (token-only probe 2026-11-17 — headless never yields a token,
+      # headed passes in <1s), so the E2E suite must run headed on a virtual
+      # display to exercise the real Turnstile pipeline end-to-end.
       - name: Playwright tests
-        run: pnpm exec playwright test
+        run: xvfb-run --auto-servernum pnpm exec playwright test --headed
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://zfhfeiqdsugjqliufhke.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
