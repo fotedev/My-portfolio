@@ -42,7 +42,7 @@ privacy × en/ar).
 |---|---|
 | Copyable email fallback visible (en/ar) | ✓ (`fote.engineer@gmail.com`) |
 | Submit button (en "Send inquiry" / ar "أرسل الاستفسار") | ✓ |
-| Turnstile widget ready (`form[data-turnstile-ready]`, token obtained) | ✓ both locales (test-key state at run time — the real-key swap is staged in PR #35 `5a48852`; production re-verified after merge) |
+| Turnstile widget ready (`form[data-turnstile-ready]`, token obtained) | ✓ both locales (test-key era at run time; the real-key swap landed the same day — see the pending-cells table) |
 
 ## Admin (read-only round trip)
 
@@ -59,5 +59,5 @@ Note: admin dashboard copy contained a stray planning reference ("prompt-6 §4")
 
 | Cell | Status |
 |---|---|
-| Real Turnstile keys (widget + secret swap + siteverify-negative 403 probe) | Stage 2 — **code staged in PR #35 (`5a48852`)**: single-mount widget + 45 s token waits landed on branch; production swap + probe pending merge & env provisioning (Vercel sitekey env + Edge Function secret) |
+| Real Turnstile keys (widget + secret swap + siteverify-negative 403 probe) | Stage 2 — **real keys LIVE since 2026-11-14** (Vercel sitekey env + Edge Function secret; siteverify-negative 403 probe passed against the real secret; real sitekey re-verified in the rendered widget 2026-11-16). Remaining: Managed → Non-Interactive mode flip (headless/CI-safe solves) + post-flip re-verification incl. one real submission; the widget single-mount fix + 45 s token waits ride PR #35 `5a48852` |
 | Real inquiry → Resend email → inbox → archive | Stage 3 — pending; the last cell before the RUN_LOG launch row |
