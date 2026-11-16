@@ -42,3 +42,6 @@ playwright-report/
 
 # Local Netlify folder
 .netlify
+
+# Factory evidence - local-only audit artifacts, never committed
+.factory/evidence/
