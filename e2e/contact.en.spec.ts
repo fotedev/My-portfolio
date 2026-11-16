@@ -14,7 +14,7 @@ test.describe("contact EN", () => {
 
   test("shows inline validation errors without firing a request", async ({ page }) => {
     let requestFired = false;
-    await page.route("**/functions/v1/submit-inquiry", (route) => {
+    await page.route("**/functions/v1/submit-inquiry*", (route) => {
       requestFired = true;
       return route.abort();
     });
@@ -54,7 +54,7 @@ test.describe("contact EN", () => {
 
   test("honeypot stays invisible to humans and blocks the request silently", async ({ page }) => {
     let requestFired = false;
-    await page.route("**/functions/v1/submit-inquiry", (route) => {
+    await page.route("**/functions/v1/submit-inquiry*", (route) => {
       requestFired = true;
       return route.abort();
     });
@@ -79,7 +79,7 @@ test.describe("contact EN", () => {
   test("degraded mode: unreachable function still leaves the email card interactive", async ({
     page,
   }) => {
-    await page.route("**/functions/v1/submit-inquiry", (route) => route.abort());
+    await page.route("**/functions/v1/submit-inquiry*", (route) => route.abort());
     await page.goto("/en/contact");
     await page.getByRole("textbox", { name: "Name" }).fill("Degraded Test");
     await page.getByRole("textbox", { name: "Email" }).fill("degraded@example.com");

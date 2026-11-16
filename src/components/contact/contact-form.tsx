@@ -30,6 +30,11 @@ const EMPTY: FormValues = {
 };
 
 function endpoint(): string {
+  // CI/E2E override (see supabase/functions/submit-inquiry-ci): CI builds point
+  // at the test-secret function because Cloudflare never issues real-widget
+  // tokens to CI/headless browsers. Unset in prod → the prod function.
+  const override = process.env.NEXT_PUBLIC_INQUIRY_ENDPOINT;
+  if (override) return override;
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   return `${base}/functions/v1/submit-inquiry`;
 }

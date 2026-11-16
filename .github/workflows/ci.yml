@@ -83,19 +83,17 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://zfhfeiqdsugjqliufhke.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://fotedev.me
-          # Public widget sitekey (ships in the client bundle — not a secret).
-          # E2E submissions must carry real-sitekey tokens: the deployed Edge
-          # Function holds the real TURNSTILE_SECRET_KEY and siteverify is
-          # fail-closed BEFORE the rate limiter, so a test-sitekey build 403s
-          # every submit and the success/429 specs fail deterministically.
-          NEXT_PUBLIC_TURNSTILE_SITE_KEY: 0x4AAAAAAGBJqAEkyEtOrK25
+          # CI Turnstile test pair: Cloudflare never issues real-widget tokens
+          # to CI/headless browsers (probed 2026-11-17 — headless AND xvfb-headed
+          # both fail; only residential headed browsers get tokens), so E2E
+          # targets submit-inquiry-ci (a function copy holding the CF test
+          # secret) with the always-pass test sitekey. Prod keeps the real pair.
+          # See supabase/functions/submit-inquiry-ci/index.ts.
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+          NEXT_PUBLIC_INQUIRY_ENDPOINT: https://zfhfeiqdsugjqliufhke.supabase.co/functions/v1/submit-inquiry-ci
 
-      # Headed under xvfb: Cloudflare rejects headless Chromium for real
-      # widgets (token-only probe 2026-11-17 — headless never yields a token,
-      # headed passes in <1s), so the E2E suite must run headed on a virtual
-      # display to exercise the real Turnstile pipeline end-to-end.
       - name: Playwright tests
-        run: xvfb-run --auto-servernum pnpm exec playwright test --headed
+        run: pnpm exec playwright test
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://zfhfeiqdsugjqliufhke.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
