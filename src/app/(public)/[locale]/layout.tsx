@@ -77,7 +77,7 @@ export default async function LocaleLayout({
               <a href="#content" className="skip-link">
                 {locale === "ar" ? "تخطَّ إلى المحتوى" : "Skip to content"}
               </a>
-              {/* The fixed, page-wide hive backdrop (ADR-0010 §9). Decorative
+              {/* The fixed, page-wide hive backdrop (ADR-0010, Revision 2). Decorative
                   and deferred until after first paint; sits at negative
                   z-index, below every content element. */}
               <HiveLayer />

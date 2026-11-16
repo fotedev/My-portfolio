@@ -42,7 +42,7 @@ privacy × en/ar).
 |---|---|
 | Copyable email fallback visible (en/ar) | ✓ (`fote.engineer@gmail.com`) |
 | Submit button (en "Send inquiry" / ar "أرسل الاستفسار") | ✓ |
-| Turnstile widget ready (`form[data-turnstile-ready]`, token obtained) | ✓ both locales (test key state) |
+| Turnstile widget ready (`form[data-turnstile-ready]`, token obtained) | ✓ both locales (test-key state at run time — the real-key swap is staged in PR #35 `5a48852`; production re-verified after merge) |
 
 ## Admin (read-only round trip)
 
@@ -52,12 +52,12 @@ privacy × en/ar).
 | `/admin/inquiries` renders | ✓ (100 loaded, newest first) |
 | Sign out | ✓ → back at `/admin/login` |
 
-Note: admin dashboard copy contains a stray planning reference ("prompt-6 §4") — cosmetic leak to
-clean in the GATE 6 docs PR.
+Note: admin dashboard copy contained a stray planning reference ("prompt-6 §4") — **fixed in `5a48852`**
+(dashboard copy cleaned; re-verify in the post-merge Stage 2 pass).
 
 ## Pending cells (owner-input gated)
 
 | Cell | Status |
 |---|---|
-| Real Turnstile keys (widget + secret swap + siteverify-negative 403 probe) | Stage 2 — awaiting Ahmed's keys |
-| Real inquiry → Resend email → inbox → archive | Stage 3 — awaiting Resend API key + domain Verified |
+| Real Turnstile keys (widget + secret swap + siteverify-negative 403 probe) | Stage 2 — **code staged in PR #35 (`5a48852`)**: single-mount widget + 45 s token waits landed on branch; production swap + probe pending merge & env provisioning (Vercel sitekey env + Edge Function secret) |
+| Real inquiry → Resend email → inbox → archive | Stage 3 — pending; the last cell before the RUN_LOG launch row |

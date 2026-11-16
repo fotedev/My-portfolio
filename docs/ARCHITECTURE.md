@@ -1,6 +1,6 @@
 # ARCHITECTURE — System Architecture (`fotedev.me`)
 
-**Status:** Spec for Milestones 1–6. This document is the architecture contract for the implementation milestones; the schema it references is defined in `docs/CONTENT-MODEL.md`.
+**Status:** Architecture contract for Milestones 1–6 (+ the M7 hero-lattice addendum, ADR-0010). Implementation is past M6 — production live at `https://fotedev.me` (2026-11-10), GATE 6 closeout in flight (PR #35); the schema it references is defined in `docs/CONTENT-MODEL.md`.
 **Sources of truth:** `prompt-0.md` §2 (locked decisions), `prompt-1.md` §5.3 (content requirements), `docs/CONTENT-MODEL.md` (tables + RLS intent), `docs/decisions/ADR-*` (decision records once created).
 **Hard rule:** Nothing here re-litigates a locked decision. Where this document and `prompt-0.md` §2 disagree, `prompt-0.md` §2 wins and this document must be corrected.
 
@@ -226,12 +226,12 @@ The system must run on free tiers indefinitely, or fail visibly rather than sile
 
 | Budget | Driver | Planning posture |
 |---|---|---|
-| **Function invocations** | `submit-inquiry` (1 per submission attempt, including rejected ones) + revalidation-time serverless work | Rejections (honeypot, rate limit, validation fail) still count as invocations — budget at worst-case submission volume, not accepted volume. Value cap: `TO CAPTURE IN M1 (record with source URL + date)`. |
-| **Storage** | `public-assets` objects + Supabase Postgres row storage | Enforced additionally by app-level upload limits (images ≤ 2 MB, PDFs ≤ 10 MB) so we stay well inside the platform cap. Caps: `TO CAPTURE IN M1 (record with source URL + date)`. |
-| **Egress / bandwidth** | Vercel bandwidth (public pages) + Supabase egress (revalidation reads, Storage object fetches) | Public traffic is CDN-served; Supabase egress is only revalidation reads and Storage pulls. Caps: `TO CAPTURE IN M1 (record with source URL + date)` for both Vercel and Supabase. |
+| **Function invocations** | `submit-inquiry` (1 per submission attempt, including rejected ones) + revalidation-time serverless work | Rejections (honeypot, rate limit, validation fail) still count as invocations — budget at worst-case submission volume, not accepted volume. Cap: **500,000 / month included** (Supabase pricing, 2026-11-06 — `docs/OPERATIONS.md` §6). |
+| **Storage** | `public-assets` objects + Supabase Postgres row storage | Enforced additionally by app-level upload limits (images ≤ 2 MB, PDFs ≤ 10 MB) so we stay well inside the platform cap. Caps: **1 GB file storage / 500 MB DB / 50 MB platform upload max** (Supabase pricing, 2026-11-06 — OPERATIONS §6). |
+| **Egress / bandwidth** | Vercel bandwidth (public pages) + Supabase egress (revalidation reads, Storage object fetches) | Public traffic is CDN-served; Supabase egress is only revalidation reads and Storage pulls. Caps: Supabase **5 GB egress + 5 GB cached egress**; Vercel Hobby **fair-use allotments** (no flat figure published) — OPERATIONS §6, 2026-11-06. |
 | **Database rows** | `inquiries` + `rate_limit_counters` | Bounded by retention (§7.3) and fixed-window counter purge (>2 days old); row counts stay small and predictable. |
-| **Email sends** | 1 notification per accepted inquiry | Provider chosen in M4 after a current pricing check; its free-tier sending cap: `TO CAPTURE IN M4 (record with source URL + date)`. |
-| **Turnstile** | 1 widget challenge per form view; 1 siteverify per submission | Free-tier request limits: `TO CAPTURE IN M1 (record with source URL + date)`. |
+| **Email sends** | 1 notification per accepted inquiry | Resend chosen in M4 (ADR-0008); free-tier cap: **3,000 emails/month, 100/day** (resend.com/pricing, 2026-11-07 — OPERATIONS §6). |
+| **Turnstile** | 1 widget challenge per form view; 1 siteverify per submission | **Unlimited challenges** on the Free plan; ≤ 20 widgets, ≤ 10 hostnames/widget (Cloudflare Turnstile plans, 2026-11-06 — OPERATIONS §6). |
 
 ### 7.3 Data retention
 
@@ -244,13 +244,13 @@ The system must run on free tiers indefinitely, or fail visibly rather than sile
 
 | Cap | Value | Action |
 |---|---|---|
-| Supabase database size | `TO CAPTURE IN M1 (record with source URL + date)` | Monthly checklist check |
-| Supabase storage size | `TO CAPTURE IN M1 (record with source URL + date)` | Monthly checklist check |
-| Supabase egress | `TO CAPTURE IN M1 (record with source URL + date)` | Monthly checklist check |
-| Supabase Edge Function invocations | `TO CAPTURE IN M1 (record with source URL + date)` | Monthly checklist check |
-| Vercel bandwidth / ISR & function invocations / Edge requests | `TO CAPTURE IN M1 (record with source URL + date)` | Monthly checklist check; M6 additionally verifies plan **terms**, not just numbers |
-| Turnstile free-tier limits | `TO CAPTURE IN M1 (record with source URL + date)` | Monthly checklist check |
-| Email provider sending limits | `TO CAPTURE IN M4 (record with source URL + date)` | Chosen with provider selection in M4 |
+| Supabase database size | **500 MB** (Supabase pricing, 2026-11-06 — OPERATIONS §6) | Monthly checklist check |
+| Supabase storage size | **1 GB** (Supabase pricing, 2026-11-06 — OPERATIONS §6) | Monthly checklist check |
+| Supabase egress | **5 GB egress + 5 GB cached egress** (Supabase pricing, 2026-11-06 — OPERATIONS §6) | Monthly checklist check |
+| Supabase Edge Function invocations | **500,000 / month included** (Supabase pricing, 2026-11-06 — OPERATIONS §6) | Monthly checklist check |
+| Vercel bandwidth / ISR & function invocations / Edge requests | Hobby **fair-use allotments** (no flat figure published — vercel.com/docs/limits/fair-use-guidelines, 2026-11-06 — OPERATIONS §6) | Monthly checklist check; M6 additionally verifies plan **terms**, not just numbers |
+| Turnstile free-tier limits | **Unlimited challenges**; ≤ 20 widgets; ≤ 10 hostnames/widget (Cloudflare Turnstile plans, 2026-11-06 — OPERATIONS §6) | Monthly checklist check |
+| Email provider sending limits | Resend Free **3,000 emails/month, 100/day** (resend.com/pricing, 2026-11-07 — OPERATIONS §6) | Monthly checklist check |
 
 ### 7.5 Behavior when quotas/limits are reached
 
@@ -287,6 +287,7 @@ The invariant, from the locked decisions and R12 in `docs/CONTENT-MODEL.md`: **w
 
 - **Vercel is the preferred host** (locked): ISR + on-demand revalidation, Edge network, Vercel Analytics + Speed Insights, zero-config Next.js.
 - **M6 gate (hard requirement):** before launch, M6 must verify that the **current** Vercel plan terms permit this intended use. The Hobby plan is restricted to **non-commercial** use; this site exists to generate freelance inquiries, which is a commercial purpose. If the terms do not permit it: **STOP and report options** (upgrade / Netlify / Cloudflare Pages) — do not deploy "to see". This check is against the plan terms live at M6 time, not remembered text.
+- **Outcome (recorded):** the gate executed 2026-11-08 — Hobby terms do **not** permit this use (verdict FAIL, ADR-0002). The owner accepted the residual risk and kept Vercel Hobby (ADR-0002 §Reversal, 2026-11-10); the Netlify Free trial (2026-11-09–10) passed functionally but was reverted same-day (mandatory "Powered by Netlify" badge). `docs/OPERATIONS.md` §11.4 is the standing contingency runbook.
 - **Fallback hosts (documented, not implemented in v1):** **Netlify** and **Cloudflare Pages** free tiers permit commercial use. Architecture impact if used: Next.js on-demand revalidation is supported via their Next.js runtimes/adapters (Netlify: on-demand builders/revalidation support; Cloudflare: `@cloudflare/next-on-pages` — verify ISR parity at migration time, it is a known soft spot). The CSP/headers approach (§8) and the Supabase/Turnstile/Edge Function topology are host-agnostic and unchanged. Migration cost is limited to hosting config + revalidation parity testing; the contact path (Edge Functions) is unaffected.
 - **DNS:** `fotedev.me` points at the chosen host; domain setup is M6 work.
 
@@ -301,42 +302,50 @@ One runtime dependency was added after the stack was locked: **three.js** (with 
 ```
 src/
 ├── app/
-│   ├── [locale]/                  # public, i18n-routed, statically generated
-│   │   ├── layout.tsx             # locale shell: lang/dir, theme init (zero-FOUC), header/footer
+│   ├── (public)/[locale]/         # public, i18n-routed, statically generated (route group)
+│   │   ├── layout.tsx             # locale shell: lang/dir, theme init (zero-FOUC), header/footer,
+│   │   │                          #   + ONE page-wide <HiveLayer /> mount (ADR-0010 rev 2)
 │   │   ├── page.tsx               # Home — hero, selected work, services teaser, credibility
 │   │   ├── projects/
 │   │   │   ├── page.tsx           # Projects index (generateStaticParams + tags)
 │   │   │   └── [slug]/page.tsx    # Case study
 │   │   ├── services/page.tsx
-│   │   ├── about/page.tsx         # About + credentials (OMP certificate)
-│   │   └── contact/page.tsx       # Contact form (client island: Turnstile + honeypot)
-│   ├── admin/                     # English-only UI, noindex, auth-gated (outside [locale])
+│   │   ├── about/page.tsx         # About + credentials (OMP certificate) + OSS record
+│   │   ├── contact/page.tsx       # Contact form (client island: Turnstile + honeypot)
+│   │   └── og-image/…             # generated OG images (opengraph-image.tsx, M6)
+│   ├── (admin)/admin/             # English-only UI, noindex, auth-gated (outside [locale])
 │   │   ├── layout.tsx             # session guard + noindex meta
 │   │   ├── login/page.tsx
 │   │   ├── page.tsx               # dashboard (inquiries inbox entry)
 │   │   ├── projects/ · services/ · credentials/ · contributions/ · inquiries/ · media/ · settings/
 │   │   └── actions.ts             # server actions: CRUD, publish gate, revalidation calls
-│   └── api/                       # thin BFF only if a route is required;
-│                                   # primary server logic = server actions + Edge Functions
+│   └── (root files)               # globals.css · manifest.ts · robots.ts · sitemap.ts · icons
 ├── components/
 │   ├── ui/                        # shadcn/ui primitives (theme-token driven)
-│   ├── layout/                    # header, footer, nav, locale switcher, theme toggle
-│   ├── sections/                  # hero, work grid, services, credibility, about preview
-│   ├── forms/                     # contact form, Turnstile wrapper, inline-error fields
-│   ├── motion/                    # Framer Motion wrappers (reduced-motion aware, ≤200ms)
-│   └── hero/hive/                 # hero lattice (ADR-0010): deferred three.js canvas,
-│                                  #   aria-hidden, bound to the hero box, kill-switched
-│                                  #   by NEXT_PUBLIC_HERO_HIVE=0
+│   ├── public/ · admin/ · contact/· hero/   # layout + sections + forms live in
+│   │                              #   public/ (header/footer/sections) and contact/
+│   │                              #   (contact-form.tsx, turnstile-widget.tsx)
+│   └── hero/hive/                 # hero lattice (ADR-0010 rev 3): page-wide FIXED three.js
+│                                  #   backdrop, aria-hidden, mounted once in the public locale
+│                                  #   layout (not hero-bound), kill-switched by
+│                                  #   NEXT_PUBLIC_HERO_HIVE=0; files: hive-layer.tsx /
+│                                  #   hive-canvas.tsx / hive-renderer.ts / lattice.ts /
+│                                  #   links.ts / assembly.ts / config.ts / palette.ts
 ├── lib/
 │   ├── supabase/                  # browser client (anon) · server client (anon) ·
 │   │                              # admin client (service role — server-only import)
-│   ├── cache/tags.ts              # revalidation tag registry (§5.2 map)
-│   ├── validation/                # shared Zod schemas (client/server/Edge parity)
+│   ├── admin/revalidate.ts        # revalidation tag registry (§5.2 map)
+│   ├── validations/               # shared Zod schemas (client/server/Edge parity)
 │   ├── i18n/                      # next-intl routing + request config, EN-fallback logic
-│   ├── seo/                       # metadata builders, JSON-LD, sitemap helpers
-│   └── email/                     # M4 provider adapter (best-effort send, timeout-bounded)
+│   ├── seo.ts                     # metadata builders, JSON-LD, sitemap helpers
+│   ├── contact/                   # rate-limit decision logic mirrored for unit tests
+│   └── og/                        # OG image rendering helpers
 ├── messages/                      # en.json · ar.json (native-quality AR, not flipped EN)
-└── middleware.ts                  # next-intl locale routing (EN default, /en /ar paths)
+└── proxy.ts                       # Next 16 root proxy (ex-middleware): locale routing,
+                                   #   canonical-host noindex, /admin auth gating
+```
+
+*(Preview updated 2026-11-16 to match the shipped tree: route groups `(public)`/`(admin)`, the page-wide hive layer mount, `proxy.ts`, and the real `lib/` module names — `validations/`, `seo.ts`, `admin/revalidate.ts`, `contact/`, `og/`. The email-sending adapter lives inline in the Edge Function (`supabase/functions/submit-inquiry`), not in `lib/`.)*
 
 supabase/                          # not src/ — owned by M1/M4
 ├── migrations/0001_initial_schema.sql
@@ -359,14 +368,14 @@ Layout rules:
 | Item | Status |
 |---|---|
 | ADR-0001 stack (Next.js + Supabase) | Locked — `docs/decisions/ADR-0001-stack-next-supabase.md` |
-| ADR-0002 hosting (Vercel, terms check) | Locked — `docs/decisions/ADR-0002-hosting-vercel-with-terms-check.md`; M6 executes the check |
+| ADR-0002 hosting (Vercel, terms check) | Locked — `docs/decisions/ADR-0002-hosting-vercel-with-terms-check.md`; **check executed 2026-11-08 — verdict FAIL → Hobby risk accepted (§Reversal, 2026-11-10)** |
 | ADR-0003 license (AGPL-3.0-only + ARR assets) | Locked — `docs/decisions/ADR-0003-license-agpl-plus-all-rights-reserved.md` |
 | ADR-0004 email-first contact, no booking | Locked — `docs/decisions/ADR-0004-email-first-contact-no-booking.md` |
 | ADR-0005 single admin, no page builder | Locked — `docs/decisions/ADR-0005-single-admin-no-page-builder.md` |
 | ADR-0009 design enhancement pass (working-document layout) | Accepted — `docs/decisions/ADR-0009-design-enhancement-pass.md` |
 | ADR-0010 hero WebGL lattice (bounded exception to the motion/accent contract) | Accepted — `docs/decisions/ADR-0010-webgl-hero-hive-lattice.md`; amends `DESIGN.md` §1.5/§2.2/§6/§12 and `docs/QUALITY.md` §8 |
-| Admin identity mechanism (`admin_users` vs `auth.uid()`) | ADR-0007 in M1 |
-| Email provider | Chosen in M4 after current pricing check |
-| Quota numbers | `TO CAPTURE IN M1` / `TO CAPTURE IN M4` with source URL + date (§7.4) |
-| Publish latency measurement | M5, recorded in `.factory/RUN_LOG.md` |
-| Vercel plan-terms verification | M6 — hard gate before launch |
+| Admin identity mechanism (`admin_users` vs `auth.uid()`) | Resolved — `admin_users` table per ADR-0007, delivered and verified in M1 |
+| Email provider | Resolved — Resend (ADR-0008, chosen in M4) |
+| Quota numbers | Captured — `docs/OPERATIONS.md` §6 (source URLs + dates, 2026-11-06/07); §7.2/§7.4 cells filled from it |
+| Publish latency measurement | Measured — production p50 ≈ 3.76 s, max 3.81 s (`docs/OPERATIONS.md` §12.1) |
+| Vercel plan-terms verification | Executed — verdict FAIL; Hobby risk accepted by owner (ADR-0002 §Reversal, 2026-11-10) |

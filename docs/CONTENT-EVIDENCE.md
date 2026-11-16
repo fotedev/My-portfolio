@@ -6,6 +6,23 @@ All rows verified live on **2026-11-06**.
 
 **Re-verified 2026-11-07 (M3 publish pass):** OSS statuses unchanged (#114809 merged 2026-09-18; #106626 + #122144 open, updated 2026-10-17; minimax #141 closed not_planned 2026-10-19). `fotedev/ghost` re-confirmed: public, **28 stars**, Apache-2.0, pushed 2026-11-07. `fotedev/Masar-x-next` re-confirmed: public, homepage `https://masarx.vercel.app/`, pushed 2026-11-07. **khalat published as a case study per owner directive (2026-11-07): repository is private (GitHub API 404, verified 2026-11-06), so all case-study statements are owner-attested in this conversation; the UI renders a "Private production repo" badge and `repo_url` stays NULL — no public-source claim is made. `fotedev/context` stays unpublished (undocumented repo; owner directive: keep as draft — no row created).**
 
+## Re-verification pass — 2026-11-16 (pre-launch / M6, live GitHub API checks)
+
+| Claim | Live state 2026-11-16 | Verdict |
+|---|---|---|
+| hermes-agent #114809 | `merged=true`, merged 2026-09-18T16:41:03Z by teknium1; title verbatim unchanged | ✅ row accurate |
+| hermes-agent #106626 | **STATE CHANGED — closed, not merged** (PR updated 2026-11-13; close event actor `fotedev`, no merge commit) | ⚠️ row stale — action item below |
+| hermes-agent #122144 | open (last activity 2026-11-07T19:19:31Z) | ✅ row accurate |
+| minimax-code #141 | closed `not_planned` 2026-10-19T08:26:16Z; no fix PR referenced | ✅ row accurate — stays **acknowledged**, never "fixed" |
+| `fotedev/ghost` | public, Apache-2.0, **29 stars** (up from 28), pushed 2026-11-15T04:06:33Z | ✅ row accurate (star count refreshed) |
+| `fotedev/Masar-x-next` | public, homepage `https://masarx.vercel.app/`, pushed 2026-11-15T00:39:28Z | ✅ row accurate |
+| khalat private handling | unchanged — repo private, `repo_url` NULL, all statements owner-attested | ✅ |
+| Certificate | no change — date / credential ID / verify-URL remain **TO VERIFY** | ✅ |
+
+**Cross-check vs the expanded evidence source:** the owner's own contributions record (`C:\programming\opensource\My-Contributions`, deep-swept 2026-11-14 against the GitHub API) documents 25 third-party PRs (8 merged), the JetBrains/swot merge (#41592, 2026-11-12), dev-resources default-branch commits, SigmaHQ/signature-base/YARA PavinLoader detection rules, ezoo-download PR #63, the future-agi race-condition report, and the cli/cli discussion reply. **The site currently publishes only the four seeded `contributions` rows** (hermes ×3 + minimax #141) — none of the additional items appear in site copy (`messages/en.json` + `supabase/seed.sql` checked 2026-11-16), so no new evidence rows are required for what is published today. If any of those additional contributions are added to the site later, each needs its own row here **first** (rule at the top of this file).
+
+**⚠️ Action item (pre-launch, small code change — surfaced to Ahmed at GATE 6 closeout):** #106626's status changed after the seed was written, and a one-word seed fix is not possible: the `contribution_status` enum is `merged|open|acknowledged` (no `closed` value), and the About UI (`oss-contributions.tsx` + `about/page.tsx` `statusOf`) renders any non-merged/non-acknowledged status as "Open PR". Until the fix ships, the About page shows "Open PR" for a PR that closed unmerged on 2026-11-13 — exactly the mislabeling the top-of-file rule forbids. Required fix: (a) migration `0004` — `ALTER TYPE public.contribution_status ADD VALUE 'closed';`; (b) an `oss.closed` label in `messages/en.json` + `messages/ar.json`, the `statusOf` mapping, and a neutral badge color; (c) update the seed row and the production DB row (`status='closed'`, `verification_date='2026-11-16'`) and reword both locale summaries to "closed unmerged by the author on 2026-11-13 — not merged" (never "merged").
+
 ## Verified profile links (seed source: profile README `fotedev/fotedev`)
 
 | Item | Value | Source |

@@ -3,7 +3,7 @@
 Operational runbook for the `fotedev` portfolio (`fotedev/My-portfolio`, live at `https://fotedev.me`).
 Owner/operator: Ahmed Aboalayoun (single admin, see `docs/decisions/ADR-0005-single-admin-no-page-builder.md`).
 
-Status: **M1 complete (schema + RLS proven + seeded).** Supabase Free-plan limits were captured live from vendor pages on **2026-11-06** (§6).
+Status: **GATE 6 closeout in flight (2026-11-16).** M0–M5 merged; production live at `https://fotedev.me` (cutover 2026-11-10, deployed from `ccc4df6`); real-Turnstile swap staged in PR #35 (production still on test keys); Supabase Free-plan limits captured live from vendor pages on **2026-11-06** (§6); Vercel Hobby terms risk accepted by the owner (ADR-0002 §Reversal, 2026-11-10).
 
 ## 0. Supabase project record
 
@@ -94,9 +94,9 @@ Supabase schema note: schema changes are forward-compatible (migrations only, no
 Run on the 1st of each month (calendar reminder). Record results as one line in `.factory/RUN_LOG.md`.
 
 1. **Vercel (primary host):** dashboard → Usage — build minutes, bandwidth, function usage, analytics events. **Free-tier limits recorded in §6 with source URL + date.** Hosting is Vercel Hobby with the terms risk explicitly accepted by the owner (ADR-0002 §Reversal, 2026-11-10) — the §11.4 runbook is the standing contingency.
-2. **Supabase:** dashboard → Usage/Reports — database size, storage used, egress, Edge Function invocations, Auth MAUs. **Free-tier limits: TO CAPTURE IN M1 (record with source URL + date: Supabase pricing page).**
-3. **Turnstile / Cloudflare:** widget request volume; **limits: TO CAPTURE IN M1 (record with source URL + date: Cloudflare Turnstile docs).**
-4. **Email provider (Resend, ADR-0008):** emails sent this month vs 3,000/mo free tier (100/day); until the M6 key is set this stays 0 (degraded mode — notify is log-only).
+2. **Supabase:** dashboard → Usage/Reports — database size, storage used, egress, Edge Function invocations, Auth MAUs. **Free-tier limits: recorded in §6 (source URLs + dates inline).**
+3. **Turnstile / Cloudflare:** widget request volume; **limits: recorded in §6 (Free plan = unlimited challenges; captured 2026-11-06).**
+4. **Email provider (Resend, ADR-0008):** emails sent this month vs 3,000/mo free tier (100/day); GATE 6 status (2026-11-16): the real-key Stage 3 is pending at closeout — degraded log-only notify remains the operative mode until the real app-path send passes (ADR-0008 addendum).
 5. **Inquiries growth:** row count vs the daily global cap (50/day expected ceiling ≈ ~1,500/month worst case ≈ ~1.5 MB/inquiries table). If growth is anomalous, check rate-limit counters for abuse.
 6. **Trend vs. thresholds:** any metric > 60% of its free-tier cap → open a GitHub issue titled `[OPS] Quota headroom <metric>` with the numbers and the source URL/date of the cap.
 7. **Backups:** latest Supabase backup timestamp sane; monthly export (§4) done.
@@ -126,7 +126,7 @@ Captured from the vendors' own pages — **source URL + capture date** written i
 | Free plan (credit system) | Netlify | *(Trial reverted 2026-11-10 — mandatory "Powered by Netlify" badge on live pages, hide toggle paid-only; see ADR-0002 §Reversal.)* 300 credits/month; production deploy 15 credits; bandwidth 20 credits/GB. | https://www.netlify.com/pricing | 2026-11-08 |
 | Commercial use on Free | Netlify | *(Trial reverted 2026-11-10.)* Explicitly permitted — "you can deploy commercial projects, no credit card required and no fees. Ever."; ToS/AUP restrict unlawful use and reselling only. | https://www.netlify.com/pricing · https://www.netlify.com/legal/terms-of-use | 2026-11-08 |
 | Turnstile plan | Cloudflare Free | **Unlimited challenges (traffic or verification requests)**; up to 20 widgets; 10 hostnames/widget; 7-day analytics | https://developers.cloudflare.com/turnstile/plans/ | 2026-11-06 |
-| Email sends | Resend (ADR-0008) | Free: **3,000 emails/month, 100/day** — currently in degraded mode (no key set; notify = log-only until M6) | https://resend.com/pricing | 2026-11-07 |
+| Email sends | Resend (ADR-0008) | Free: **3,000 emails/month, 100/day** — status at 2026-11-16: degraded log-only until the real-key Stage 3 send is verified at GATE 6 closeout (see ADR-0008 addendum) | https://resend.com/pricing | 2026-11-07 |
 
 **Pausing mitigation (Supabase):** the free project pauses after 1 week of inactivity. Mitigations: (a) public pages are static/ISR-cached, so a paused DB never takes the site down; (b) a scheduled GitHub Action keep-alive ping (any read query, e.g. `select 1`) runs weekly — wired in M2/M5 CI tooling; (c) admin activity during content edits also counts as activity.
 
@@ -169,9 +169,9 @@ The admin account is created once in M1. MFA-ready; enabling MFA before launch i
 
 ## 10. Operational records
 
-- **Launch record (filled at M6):** deployed SHA `—` · deployment URL `—` · domain `fotedev.me` · date/time `—` · Lighthouse medians (P/A/BP/SEO) `—` · smoke matrix `—` · rollback = previous production deployment (§3).
+- **Launch record (filled at M6; snapshot 2026-11-16):** deployed SHA `ccc4df6` · deployment URL `https://fotedev.me` · domain `fotedev.me` (cutover 2026-11-10) · Lighthouse medians (P/A/BP/SEO) `—` pending GATE 6 closeout (measure on Vercel — localhost runs are invalid on Next 16 `next start`) · smoke matrix **43/43** (2026-11-14, `.factory/evidence/m6/smoke-matrix.md`; owner-gated cells pending) · rollback = previous production deployment (§3).
 - **Expiries & calendar reminders:**
-  - Domain `fotedev.me`: 1-year registration — expiry date **TO RECORD IN M6** (DNS engineer A). Reminder at −60 days.
+  - Domain `fotedev.me`: 1-year registration — registrar expiry date still **TO RECORD** from the Namecheap account at GATE 6 closeout (DNS cutover completed 2026-11-10). Reminder at −60 days.
   - Professional email: exists for 1 month at start — must NOT be a launch dependency (ADR-0004); if it lapses, `CONTACT_EMAIL` is switched from `/admin` to the fallback address within minutes.
   - Vercel plan terms check: re-verified at M6 (ADR-0002); re-check annually or when Vercel announces plan changes.
 - **Incident log:** incidents are appended to `.factory/RUN_LOG.md` (issue/SHA, symptom, action, resolution time). This file holds the runbooks, not the history.
@@ -184,7 +184,7 @@ Symptom: submissions fail, `/contact` shows the failure state.
 
 1. **First, confirm the fallback is intact:** the direct email card (copy button + `mailto:`) is always rendered on `/contact` and on every failure state — visitors are never blocked from reaching Ahmed. This is the design contract (ADR-0004); no hotfix is needed to restore reachability.
 2. Diagnose: check Supabase Edge Function logs (`supabase functions list` / dashboard logs) and whether Turnstile `siteverify` returns errors; check `rate_limit_counters` for a corrupted/global-capped window.
-3. Fix forward: correct the function/env, redeploy the function (`supabase functions deploy submit-inquiry`), re-probe with test Turnstile keys (200/403/429 paths).
+3. Fix forward: correct the function/env, redeploy the function (`supabase functions deploy submit-inquiry`), re-probe the pipeline (200/403/429 paths). Key state matters: while test keys are operative, the test sitekey/secret prove the paths; after the GATE 6 real-key swap (PR #35) the siteverify-negative 403 probe must run against the **real** secret (the test secret always-passes and would insert a row).
 4. If the outage spans hours: consider temporarily raising visibility — e.g. make the direct email card more prominent via `/admin` settings copy — but do not deploy untested changes.
 5. Log the incident (§10). Losses during the outage: inquiries not received — mitigated by the fallback; mention the outage window when replying to late emails if relevant.
 
@@ -247,3 +247,5 @@ Local p50 ≈ 0.23 s; **production p50 ≈ 3.76 s, max 3.81 s** (includes client
 ### 12.4 CI/E2E footprint on the live DB
 
 The Playwright suite (CI + local) writes real rows to the production Supabase project: contact specs create test inquiries (subject pattern `CI E2E|RateLimit|Degraded Test|اختبار آلي`) and the admin specs archive/purge them; the publish spec creates a `ci-e2e-<runid>` draft project and unpublishes + deletes it. The global daily rate-limit counter burns ~5–8/day from CI runs (cap 50/day, resets 00:00 UTC) — acceptable; if CI frequency rises, raise the global cap or gate the suite behind a schedule.
+
+**Ops rule (recorded after the 2026-11-13 outage — RUN_LOG):** each full E2E run burns ~8 of the 50/day global attempts — space full-suite runs ≥10 minutes apart and at most ~1 full suite per UTC day, or budget ~8 attempts per run. Diagnostic shortcut: three consecutive failures of the same spec mean the rate window tripped, not a code regression.
