@@ -83,6 +83,12 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://zfhfeiqdsugjqliufhke.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://fotedev.me
+          # Public widget sitekey (ships in the client bundle — not a secret).
+          # E2E submissions must carry real-sitekey tokens: the deployed Edge
+          # Function holds the real TURNSTILE_SECRET_KEY and siteverify is
+          # fail-closed BEFORE the rate limiter, so a test-sitekey build 403s
+          # every submit and the success/429 specs fail deterministically.
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: 0x4AAAAAAGBJqAEkyEtOrK25
 
       - name: Playwright tests
         run: pnpm exec playwright test
