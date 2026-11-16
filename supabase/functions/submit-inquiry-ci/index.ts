@@ -1,17 +1,29 @@
 // deno-lint-ignore-file no-explicit-any
 // Supabase Edge Function: submit-inquiry-ci — CI/E2E ONLY, never wired to prod.
 //
-// A verbatim copy of submit-inquiry with ONE intentional divergence: siteverify
-// reads TURNSTILE_SECRET_KEY_CI (Cloudflare's published always-pass test
-// secret) so E2E runs exercise the FULL pipeline — siteverify included —
-// despite Cloudflare refusing to issue real-widget tokens to CI/headless
-// browsers (probed 2026-11-17: headless and xvfb-headed both fail; only
-// residential headed browsers get tokens). CI points here via the
-// NEXT_PUBLIC_INQUIRY_ENDPOINT override in ci.yml. Prod submit-inquiry keeps
-// the real secret and strict action/hostname checks. Fail-closed if unset.
+// A near-verbatim copy of submit-inquiry with THREE intentional divergences:
+// 1. siteverify reads TURNSTILE_SECRET_KEY_CI (Cloudflare's published
+//    always-pass test secret) so E2E runs exercise the FULL pipeline —
+//    siteverify included — despite Cloudflare refusing to issue real-widget
+//    tokens to CI/headless browsers (probed 2026-11-17: headless, xvfb-headed,
+//    and even a plain headed chromium.launch all fail; CF rejects automation
+//    fingerprints outright).
+// 2. A fail-closed shared-secret gate (x-ci-token header vs E2E_INQUIRY_CI_TOKEN
+//    project secret) — without it this endpoint would be a public Turnstile
+//    bypass (the test secret accepts any token; the repo is public so the URL
+//    is discoverable). The gate sits BEFORE validation, rate limiting, insert
+//    and notify.
+// 3. notifyViaResend is a log-only stub — this function must never send email,
+//    even once Resend Stage 3 populates EMAIL_PROVIDER_API_KEY at project
+//    level (secrets are shared by every function in the project).
+// CI points here via the NEXT_PUBLIC_INQUIRY_ENDPOINT override in ci.yml; the
+// x-ci-token value reaches Playwright via context extraHTTPHeaders (never a
+// NEXT_PUBLIC_ var — it must not ship in the client bundle). Prod
+// submit-inquiry keeps the real secret, strict action/hostname checks, real
+// notify, and NO gate.
 //
 // KEEP IN SYNC: any change to supabase/functions/submit-inquiry must be
-// mirrored here (except the secret source below).
+// mirrored here (except divergences 1–3).
 //
 // Pipeline: validate (Zod) → honeypot (200-but-drop) → Turnstile siteverify
 // (fail-closed) → persistent rate limit (M1 RPC, fail-closed) → service-role
@@ -71,7 +83,9 @@ function corsFor(origin: string | null): Record<string, string> | null {
   return {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    // x-ci-token must be listed: the E2E browser's cross-origin submit fetch
+    // carries it, so the preflight OPTIONS must allow it.
+    "Access-Control-Allow-Headers": "Content-Type, x-ci-token",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };
@@ -207,52 +221,11 @@ function limitSpecs(netHash: string, email: string): LimitSpec[] {
   ];
 }
 
-/** Separate, fail-tolerant notification (prompt-5 §4.4). Never blocks or
- * fails the response; never reported to the visitor. */
-function notifyViaResend(inquiryId: string, inquiry: InquiryInput): void {
-  const apiKey = Deno.env.get("EMAIL_PROVIDER_API_KEY");
-  const from = Deno.env.get("EMAIL_FROM");
-  if (!apiKey || !from) {
-    console.log(`notify skipped (degraded mode): inquiry ${inquiryId} stored unread`);
-    return;
-  }
-  const send = (async () => {
-    try {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        signal: AbortSignal.timeout(10_000),
-        body: JSON.stringify({
-          from,
-          to: [Deno.env.get("OWNER_EMAIL") ?? "fote.engineer@gmail.com"],
-          reply_to: inquiry.email,
-          subject: `New inquiry (${inquiry.serviceInterest}) — ref ${inquiryId.slice(0, 8)}`,
-          text: [
-            `Name: ${inquiry.name}`,
-            `Email: ${inquiry.email}`,
-            `Service: ${inquiry.serviceInterest}`,
-            `Budget: ${inquiry.budgetRange ?? "n/a"}`,
-            `Timeline: ${inquiry.timeline ?? "n/a"}`,
-            "",
-            inquiry.message,
-            "",
-            `Ref: ${inquiryId}`,
-          ].join("\n"),
-        }),
-      });
-      if (!res.ok) {
-        console.error(`notify HTTP ${res.status} for inquiry ${inquiryId}`);
-      }
-    } catch (err) {
-      console.error(`notify failed for inquiry ${inquiryId}:`, err);
-    }
-  })();
-  // Background the send where the runtime supports it; otherwise it runs
-  // unawaited (failure is logged, never surfaced).
-  const runtime = (globalThis as any).EdgeRuntime;
-  if (runtime?.waitUntil) {
-    runtime.waitUntil(send);
-  }
+/** Notify is DISABLED in the CI copy (divergence 3): this function must never
+ * send email, even once Resend Stage 3 populates EMAIL_PROVIDER_API_KEY at
+ * project level. The prod copy keeps the real implementation. */
+function notifyViaResend(inquiryId: string): void {
+  console.log(`notify disabled (CI copy): inquiry ${inquiryId} stored unread`);
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
@@ -269,6 +242,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
   if (!cors) {
     return denyCors; // same-origin only
+  }
+
+  // CI-only shared-secret gate (fail-closed) — the barrier that keeps the
+  // test-secret siteverify unreachable from outside. Missing/mismatched
+  // header → 403 before validation, rate limiting, insert or notify.
+  const ciToken = Deno.env.get("E2E_INQUIRY_CI_TOKEN");
+  if (!ciToken || req.headers.get("x-ci-token") !== ciToken) {
+    return json({ ok: false, reason: "forbidden" }, 403, cors);
   }
 
   const contentType = req.headers.get("content-type") ?? "";
@@ -359,9 +340,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
     return json({ ok: false, reason: "storage_error" }, 500, cors);
   }
 
-  // 4) Notify separately — failures are logged, never surfaced.
+  // 4) Notify — disabled in the CI copy (see notifyViaResend).
   const inquiryId = (data as { id: string }).id;
-  notifyViaResend(inquiryId, inquiry);
+  notifyViaResend(inquiryId);
 
   return json({ ok: true, id: inquiryId }, 200, cors);
 });

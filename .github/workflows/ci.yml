@@ -88,6 +88,8 @@ jobs:
           # both fail; only residential headed browsers get tokens), so E2E
           # targets submit-inquiry-ci (a function copy holding the CF test
           # secret) with the always-pass test sitekey. Prod keeps the real pair.
+          # The CI endpoint is gated on x-ci-token (E2E_INQUIRY_CI_TOKEN, wired
+          # in the Playwright step below) — it is NOT a public Turnstile bypass.
           # See supabase/functions/submit-inquiry-ci/index.ts.
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
           NEXT_PUBLIC_INQUIRY_ENDPOINT: https://zfhfeiqdsugjqliufhke.supabase.co/functions/v1/submit-inquiry-ci
@@ -98,6 +100,10 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://zfhfeiqdsugjqliufhke.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://fotedev.me
+          # Shared-secret gate for submit-inquiry-ci (sent as x-ci-token via
+          # extraHTTPHeaders). The gated test endpoint is NOT a public
+          # Turnstile bypass. Never moved into the Build env.
+          E2E_INQUIRY_CI_TOKEN: ${{ secrets.E2E_INQUIRY_CI_TOKEN }}
           # Optional: enables the /admin/inquiries assertions when present.
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
 
