@@ -9,7 +9,7 @@ This repository is built by a deterministic software-factory process: one owner 
 |---|---|---|
 | Lint + typecheck + unit tests + build on every PR | `.github/workflows/ci.yml` | **M2** (created when the app scaffold exists) |
 | Branch protection on `main`: PR required, no force-push, no deletion | GitHub branch ruleset | **M0** (status-check requirement attaches at M2 when CI exists) |
-| Lighthouse mobile ≥ 90 (all four categories) | Lighthouse CI | **M6** |
+| Lighthouse mobile ≥ 90 (all four categories) | Manual production-host lab medians recorded in `.factory/RUN_LOG.md` — no Lighthouse CI job is wired (see `docs/SEO-I18N.md` §9.3) | **M6** |
 
 ### Process gates (convention — enforced by this protocol and the run log)
 | Gate | Rule |

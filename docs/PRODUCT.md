@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Draft v0.1 — for GATE 1 review |
+| **Status** | Approved at GATE 1 (M1 started 2026-11-07); §8 lineup rows synced to implementation reality 2026-11-16 |
 | **Date** | 2026-11-06 |
 | **Scope** | Positioning, audience, conversion model, services, page funnel, process framing, success metrics, and non-goals for `fotedev.me` |
 | **Sources** | `prompt-0.md` §2 (locked decisions), `prompt-1.md` §5.2 (content requirements), `docs/CONTENT-EVIDENCE.md` (verified facts; all rows dated 2026-11-06) |
@@ -185,7 +185,7 @@ Verified state as of 2026-11-06 (`docs/CONTENT-EVIDENCE.md`):
 | `fotedev/Masar-x-next` (Masar X) | **Strong — proposed case study #1** | Anchor case study: bilingual AR/EN AI study platform; pnpm monorepo (Next.js web + Electron desktop + Expo mobile) on one Supabase backend; semantic PDF search / vector indexing; live at `https://masarx.vercel.app`; active as of 2026-11-05. Awaiting Ahmed's GATE 1 approval. |
 | `fotedev/ghost` | Strong with framing caveat | Publishable only if Ahmed accepts the caveat: framed strictly as privacy / dev-hygiene engineering; its own README/SECURITY.md warn it may violate vendor ToS — never framed as a "hacking" tool. |
 | `fotedev/context` | Weak | Real but undocumented (no root README, no demo). Publishable only after a README pass; otherwise excluded from v1. |
-| `fotedev/khalat` | **Blocked — not publicly available** | GitHub API returns 404; closest match `fotedev/ELKHLAT` is private. **It must not appear in positioning, copy, or case-study planning.** Options belong to Ahmed (make public / drop / describe without public source — the last weakens the evidence rule); default is drop. |
+| `fotedev/khalat` | **Blocked — not publicly available** | GitHub API returns 404; closest match `fotedev/ELKHLAT` is private. **It must not appear in positioning, copy, or case-study planning.** Options belong to Ahmed (make public / drop / describe without public source — the last weakens the evidence rule); default is drop. **[2026-11-16 note]** Superseded by the owner's 2026-11-07 decision (recorded in `docs/CONTENT-EVIDENCE.md`): khalat was published as a case study under the private-repo handling — repository stays private (`repo_url` NULL), the UI renders a "Private production repo" badge, every statement is owner-attested with zero public-source claims; live at `/projects/khalat` (smoke-verified 2026-11-14). The positioning/copy policy above is unchanged — no public-source claim is ever made for khalat. |
 | Old `fotedev/My_portfolio` | Skip | Self-referential; not a case study. |
 | Profile rows ("Interactive SaaS & UI Platform", "AI Pipelines & Agentic Tooling") | Not publishable | They link to the GitHub profile, not distinct repos — content leads only. |
 

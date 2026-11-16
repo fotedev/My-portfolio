@@ -14,8 +14,10 @@ test.describe("contact AR", () => {
     await page
       .getByRole("textbox", { name: "الرسالة" })
       .fill("رسالة اختبار آلي لبيان عمل النموذج بالعربية؛ يمكن أرشفتها بعد التحقق.");
+    // Real Turnstile widget (GATE 6): headless token solves are slower than
+    // the test key's instant pass — allow up to 45 s for the callback.
     // Deterministic: wait for the Turnstile token callback (single-use token).
-    await page.waitForSelector('form[data-turnstile-ready="true"]', { timeout: 15_000 });
+    await page.waitForSelector('form[data-turnstile-ready="true"]', { timeout: 45_000 });
     await page.getByRole("button", { name: "أرسل الاستفسار" }).click();
 
     await expect(page.getByText("تم الحفظ — سأعود إليك")).toBeVisible({ timeout: 20_000 });

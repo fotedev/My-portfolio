@@ -265,7 +265,7 @@ Persistent fixed-window counters backing the contact rate limit. Service-role on
 | `credentials` / `_translations` | `SELECT` where base `status = 'published'` | read | full |
 | `contributions` / `_translations` | `SELECT` where base `is_published = true` | read | full |
 | `media_assets` | `SELECT` where `is_private = false` | read | full |
-| `inquiries` | **nothing** — `SELECT` denied/empty; `INSERT` **denied** (anonymous inserts are a locked-decision violation) | `INSERT` only (after Turnstile verify + rate limit) | `SELECT`, `UPDATE` (status transitions) |
+| `inquiries` | **nothing** — `SELECT` denied/empty; `INSERT` **denied** (anonymous inserts are a locked-decision violation) | `INSERT` only (after Turnstile verify + rate limit) | `SELECT`, `UPDATE` (status transitions), `DELETE` (policy `inquiries_admin_delete`, migration `0003` — delete-on-request purge, delivered in M5) |
 | `rate_limit_counters` | **nothing** | read/execute via the `SECURITY DEFINER` function | no direct need (write access may be admin-only for debugging) |
 | `slug_redirects` | `SELECT` (used server-side to resolve 301s) | read | full |
 | `posts` / `_translations` (deferred) | RLS enabled, no anon policies | none | full (schema-only, zero usage) |
@@ -273,6 +273,8 @@ Persistent fixed-window counters backing the contact rate limit. Service-role on
 **Reconciliation notes for the Schema Architect (M1):**
 1. `prompt-2.md` §4.4 groups services under "`status='published'`"; this model uses `is_active` as the services publish gate (per the locked requirement "icon, sort_order, is_active"). The anon predicate for services is `is_active = true`.
 2. `contributions` uses `is_published` instead of `content_status` because its `status` column already means merged|open|acknowledged.
+
+**Migrations applied beyond `0001` (as of 2026-11-16):** `0002` — M3 content publish pass (draft → translations → publish, `enforce_publish_gate` respected); `0003` — `inquiries_admin_delete` RLS policy for the admin delete-on-request purge (M5; applied via the Management API and policy-verified — see RUN_LOG).
 3. Translations inherit visibility from their base row (policies check the base `status`/`is_active`/`is_published`), so a translation can never leak a draft.
 4. Verification matrix (M1 must produce SQL proof): anon SELECT published project → 1 row; anon SELECT draft → 0 rows; anon INSERT inquiry → denied; admin full access; rate-limit function allows up to limit then blocks and resets; anon cannot read `rate_limit_counters`.
 

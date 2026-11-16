@@ -138,7 +138,7 @@ A page published with the explicit EN-only flag: no `ar` alternate anywhere (hea
 - Title template: EN `%s | Ahmed Aboalayoun`; AR `%s | أحمد أبو العيون` (initial copy — confirm at GATE 2; the Arabic personal name is not PDF-verified, per `docs/CONTENT-MODEL.md` §2.1). Home uses `title.absolute` (no template suffix).
 - Meta description: per-locale, human-written, ≤ ~160 characters, derived from the page's localized content (hero copy, project summary). Descriptions are never machine-flipped between locales.
 - `og:site_name`: `fotedev`. `og:type`: `website` for all v1 pages. `og:url`: same as canonical. `og:locale`: `en_US` / `ar_EG`.
-- OG images: two static brand images, `1200×630`, one per locale with correctly rendered text: `/og/og-default-en.png` and `/og/og-default-ar.png`. Referenced by **absolute URL**. Per-project OG images are a backlog enhancement, not a launch requirement.
+- OG images: generated at `1200×630` per locale (implemented in M6 hardening: the `[locale]/og-image` route + `opengraph-image.tsx` render localized OG images — **no `/public/og/` assets exist**). Referenced by **absolute URL**. Per-project OG images are a backlog enhancement, not a launch requirement.
 - Twitter cards: `twitter:card = summary_large_image` on home, projects index, and project detail; `summary` is acceptable on about/contact/privacy. `twitter:site`/`twitter:creator` are set **only** if a verified handle exists in site settings — do not invent handles.
 - No metadata on noindex routes (§7).
 
@@ -146,13 +146,13 @@ A page published with the explicit EN-only flag: no `ar` alternate anywhere (hea
 
 | Page | EN path | AR path | Title (EN) | Title (AR, initial) | Description source | Canonical | OG image | JSON-LD | Indexable |
 |---|---|---|---|---|---|---|---|---|---|
-| Home | `/en` | `/ar` | `Ahmed Aboalayoun — Full-Stack AI Engineer` (absolute) | AR equivalent (absolute) | Hero/offer copy (`site_settings` hero per locale) | self | `og-default-{en,ar}.png` | `Person` + `ProfessionalService` | Yes |
-| Projects index | `/en/projects` | `/ar/projects` | `Projects — Ahmed Aboalayoun` | `المشاريع — ...` (initial) | Static per-locale string in the locale files | self | `og-default-{en,ar}.png` | — | Yes |
-| Project detail | `/en/projects/[slug]` | `/ar/projects/[slug]` | `{Project title} — Ahmed Aboalayoun` | Localized project title | `project_translations.summary` per locale | self | `og-default-{en,ar}.png` (per-project OG = backlog) | — | Yes (published only) |
-| Services | `/en/services` | `/ar/services` | `Services — Ahmed Aboalayoun` | `الخدمات — ...` (initial) | Static per-locale string in the locale files | self | `og-default-{en,ar}.png` | — | Yes |
-| About | `/en/about` | `/ar/about` | `About — Ahmed Aboalayoun` | `نبذة عني — ...` (initial) | About intro copy per locale | self | `og-default-{en,ar}.png` | `Person` (with credential) | Yes |
-| Contact | `/en/contact` | `/ar/contact` | `Contact — Ahmed Aboalayoun` | `تواصل — ...` (initial) | Contact intro copy per locale | self | `og-default-{en,ar}.png` | `ProfessionalService` | Yes |
-| Privacy | `/en/privacy` | `/ar/privacy` | `Privacy Policy — Ahmed Aboalayoun` | `سياسة الخصوصية — ...` (initial) | Legal copy per locale | self | `og-default-{en,ar}.png` | — | Yes |
+| Home | `/en` | `/ar` | `Ahmed Aboalayoun — Full-Stack AI Engineer` (absolute) | AR equivalent (absolute) | Hero/offer copy (`site_settings` hero per locale) | self | `[locale]/og-image` (generated) | `Person` + `ProfessionalService` | Yes |
+| Projects index | `/en/projects` | `/ar/projects` | `Projects — Ahmed Aboalayoun` | `المشاريع — ...` (initial) | Static per-locale string in the locale files | self | `[locale]/og-image` (generated) | — | Yes |
+| Project detail | `/en/projects/[slug]` | `/ar/projects/[slug]` | `{Project title} — Ahmed Aboalayoun` | Localized project title | `project_translations.summary` per locale | self | `[locale]/og-image` (generated; per-project OG = backlog) | — | Yes (published only) |
+| Services | `/en/services` | `/ar/services` | `Services — Ahmed Aboalayoun` | `الخدمات — ...` (initial) | Static per-locale string in the locale files | self | `[locale]/og-image` (generated) | — | Yes |
+| About | `/en/about` | `/ar/about` | `About — Ahmed Aboalayoun` | `نبذة عني — ...` (initial) | About intro copy per locale | self | `[locale]/og-image` (generated) | `Person` (with credential) | Yes |
+| Contact | `/en/contact` | `/ar/contact` | `Contact — Ahmed Aboalayoun` | `تواصل — ...` (initial) | Contact intro copy per locale | self | `[locale]/og-image` (generated) | `ProfessionalService` | Yes |
+| Privacy | `/en/privacy` | `/ar/privacy` | `Privacy Policy — Ahmed Aboalayoun` | `سياسة الخصوصية — ...` (initial) | Legal copy per locale | self | `[locale]/og-image` (generated) | — | Yes |
 
 Excluded from all of the above (see §7): `/admin/*`, `/api/*`, preview deployments, draft previews, 404 pages.
 
@@ -275,7 +275,7 @@ The locked decision is **Lighthouse ≥ 90 on mobile**. It is measured, recorded
 ### 9.3 Enforcement timeline
 
 - **M3 onward:** manual Lighthouse runs as an advisory signal on new public pages.
-- **M6:** Lighthouse CI configured in the pipeline (per `docs/ROADMAP.md`); the ≥ 90 gate is blocking for launch. Final production-host scores are recorded in the RUN_LOG and shown at GATE 2.
+- **M6 (as executed):** no Lighthouse CI job exists in `ci.yml` — Lighthouse is enforced by manual lab medians on the **production host** (Next 16 `next start` serves uncompressed responses, so localhost Lighthouse is invalid as a gate) and recorded in `.factory/RUN_LOG.md`; regression control is the paired old-vs-new Vercel measurement (72/73 → 67/70 across the hero-lattice work). The ≥ 90 launch gate is evaluated from those recorded production medians at GATE 6 closeout.
 
 ---
 
@@ -284,7 +284,7 @@ The locked decision is **Lighthouse ≥ 90 on mobile**. It is measured, recorded
 **There is no SEO skill in the local catalog (`C:\Users\FOTE\.agents\skills`).** Per the locked decision ("There is no SEO skill — do it manually") and the factory rules (skills advise, CI enforces):
 
 - SEO work is executed **manually against this document**; the checklist in §13 is the process control.
-- The **Lighthouse CI gate in M6** is the automated enforcement.
+- The **Lighthouse lab-median gate in M6** is the enforcement — manual production-host runs recorded in the RUN_LOG; no Lighthouse CI job is wired (see §9.3).
 - Do not wait for, search for, or invent an SEO skill. If a relevant skill appears in the catalog later, it is advisory only and never replaces this spec or the gate.
 
 ---
@@ -295,7 +295,7 @@ The locked decision is **Lighthouse ≥ 90 on mobile**. It is measured, recorded
 |---|---|
 | `/en` `/ar` routing, `/` → `/en` | `next-intl` middleware, `localePrefix: 'always'`, root redirect |
 | Localized metadata + alternates | `generateMetadata({ params: { locale } })` per route; `alternates: { canonical, languages: { en, ar, 'x-default' } }` |
-| OG / Twitter cards | Metadata `openGraph` / `twitter` objects; static OG images in `/public/og/` |
+| OG / Twitter cards | Metadata `openGraph` / `twitter` objects; OG images generated by the `[locale]/og-image` route + `opengraph-image.tsx` (no `/public/og/`) |
 | `sitemap.xml` with hreflang | `app/sitemap.ts` with `alternates.languages` + `lastModified` |
 | `robots.txt` | `app/robots.ts` |
 | Admin noindex | Middleware header + admin layout meta |

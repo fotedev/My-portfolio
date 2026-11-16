@@ -74,6 +74,19 @@ export function TurnstileWidget({
   const [failed, setFailed] = useState(false);
   const sitekey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || TEST_SITEKEY;
 
+  // Latest-callback refs: the mount effect below must run ONCE per sitekey.
+  // The parent passes inline handlers (`onExpire={() => setToken(null)}`), so
+  // their identities change on every form re-render (every keystroke of the
+  // controlled fields) — with them in the dependency array the widget was
+  // removed and re-created mid-challenge on each render, and a REAL widget's
+  // multi-second challenge never completed (the test key hid this: it passed
+  // instantly). The callbacks now ride refs; the widget mounts once and
+  // survives re-renders. (GATE 6 real-key swap finding.)
+  const handlersRef = useRef({ onToken, onExpire, onError });
+  useEffect(() => {
+    handlersRef.current = { onToken, onExpire, onError };
+  });
+
   // Mount/unmount the widget once the API script is ready.
   useEffect(() => {
     let cancelled = false;
@@ -86,11 +99,11 @@ export function TurnstileWidget({
           sitekey,
           action: "contact",
           theme: "auto",
-          callback: onToken,
-          "expired-callback": onExpire,
+          callback: (token) => handlersRef.current.onToken(token),
+          "expired-callback": () => handlersRef.current.onExpire?.(),
           "error-callback": () => {
             setFailed(true);
-            onError?.();
+            handlersRef.current.onError?.();
             return true;
           },
         });
@@ -98,7 +111,7 @@ export function TurnstileWidget({
       .catch(() => {
         if (!cancelled) {
           setFailed(true);
-          onError?.();
+          handlersRef.current.onError?.();
         }
       });
     return () => {
@@ -108,7 +121,7 @@ export function TurnstileWidget({
         widgetIdRef.current = null;
       }
     };
-  }, [sitekey, onToken, onExpire, onError]);
+  }, [sitekey]);
 
   // Fresh token after each attempt (tokens are single-use).
   useEffect(() => {

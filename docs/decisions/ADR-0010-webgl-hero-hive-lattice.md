@@ -245,3 +245,9 @@ this project's own.
 - Branch `feat/hive-lattice-hero`, based on the M2.1 design pass.
 - Milestone issue under the `milestone` label; DESIGN.md and QUALITY.md amendments travel with this ADR in the same change, per the rule ADR-0009 set for itself.
 - Evidence (captures in both themes and locales, first-load JS measurement, Lighthouse runs) recorded under `.factory/evidence/`.
+
+## Addendum — 2026-11-16 (post-Revision-3 measurements)
+
+- **Deferred chunk:** 150.1 KB gzip at first landing → **154.0 KB** after the fidelity pass (`2081399`, PR #26); still inside the 200 KB deferred-chunk budget. `docs/QUALITY.md` §8.4 carries the refreshed figures.
+- **Lighthouse absolute scores are runbook-dependent:** the "99" quoted above came from a localhost runbook that Next 16 makes invalid (`next start` serves uncompressed responses). The governing measurement is the paired old-vs-new comparison on identical (Vercel) serving: **72/73 → 67/70 — no regression** (RUN_LOG, 2026-11-13). Performance gates for this ADR are production-host medians only.
+- **Scope notes superseded by Revisions 2–3:** the layer is page-wide (one `position: fixed` mount in `(public)/[locale]/layout.tsx`, not hero-bound, not home-route-only — so the "one route" phrasing in Consequences predates Revision 2), and Revision 3 (PR #34, 2026-11-14) re-introduced the honeycomb assembly as the Act III scroll convergence.
