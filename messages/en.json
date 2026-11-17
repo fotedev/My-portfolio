@@ -182,6 +182,7 @@
   "oss": {
     "merged": "Merged",
     "open": "Open PR",
+    "closed": "Closed (not merged)",
     "acknowledged": "Acknowledged disclosure",
     "verifiedOn": "Verified on {date}",
     "viewOnGithub": "View on GitHub",
