@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Footer } from "@/components/footer";
@@ -89,6 +91,11 @@ export default async function LocaleLayout({
             </MotionProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
+        {/* Vercel Analytics + Speed Insights (ADR-0002 hosting rationale; the
+            GATE 6 baseline clock runs from the launch deploy). Both render
+            nothing outside Vercel deployments. */}
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
