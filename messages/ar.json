@@ -182,6 +182,7 @@
   "oss": {
     "merged": "مدموج",
     "open": "طلب دمج مفتوح",
+    "closed": "مغلق (غير مدموج)",
     "acknowledged": "إفصاح مُقرّ به",
     "verifiedOn": "تم التحقق في {date}",
     "viewOnGithub": "عرض على GitHub",

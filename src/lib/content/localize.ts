@@ -24,6 +24,9 @@ export function statusPillKind(status: string): PillKind {
       return "success";
     case "acknowledged":
       return "warning";
+    case "closed":
+      // Closed-unmerged: neutral — never dressed up as merged (CONTENT-MODEL §6).
+      return "neutral";
     default:
       // "open" and anything unknown render neutral — never dressed up.
       return "neutral";

@@ -107,6 +107,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                   statusOf: (status) => {
                     if (status === "merged") return ossT("merged");
                     if (status === "acknowledged") return ossT("acknowledged");
+                    if (status === "closed") return ossT("closed");
                     return ossT("open");
                   },
                   verifiedOn: (date) => ossT("verifiedOn", { date }),
