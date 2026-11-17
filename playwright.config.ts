@@ -21,6 +21,14 @@ export default defineConfig({
   use: {
     baseURL: externalBaseUrl ?? "http://localhost:3000",
     trace: "retain-on-failure",
+    // CI-only shared-secret gate for submit-inquiry-ci (fail-closed function
+    // side): the header rides every context request, including the
+    // cross-origin submit fetch. Supplied via env, never a NEXT_PUBLIC_ var —
+    // it must not ship in the client bundle. Local E2E runs need
+    // E2E_INQUIRY_CI_TOKEN in the environment (set in .env.local).
+    ...(process.env.E2E_INQUIRY_CI_TOKEN
+      ? { extraHTTPHeaders: { "x-ci-token": process.env.E2E_INQUIRY_CI_TOKEN } }
+      : {}),
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   ...(externalBaseUrl
