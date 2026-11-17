@@ -92,10 +92,18 @@ export default async function LocaleLayout({
           </NextIntlClientProvider>
         </ThemeProvider>
         {/* Vercel Analytics + Speed Insights (ADR-0002 hosting rationale; the
-            GATE 6 baseline clock runs from the launch deploy). Both render
-            nothing outside Vercel deployments. */}
-        <SpeedInsights />
-        <Analytics />
+            GATE 6 baseline clock runs from the launch deploy). Mounted ONLY on
+            Vercel deployments (NEXT_PUBLIC_VERCEL_ENV is Vercel-injected at
+            build time): off-Vercel the components still attempt telemetry
+            script loads that fail hard (ERR_SSL_PROTOCOL_ERROR on the local
+            `next start` webServer) and would pollute the console — the
+            hero-hive console-cleanliness spec guards this. */}
+        {process.env.NEXT_PUBLIC_VERCEL_ENV ? (
+          <>
+            <SpeedInsights />
+            <Analytics />
+          </>
+        ) : null}
       </body>
     </html>
   );
