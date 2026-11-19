@@ -3,7 +3,7 @@
 Operational runbook for the `fotedev` portfolio (`fotedev/My-portfolio`, live at `https://fotedev.me`).
 Owner/operator: Ahmed Aboalayoun (single admin, see `docs/decisions/ADR-0005-single-admin-no-page-builder.md`).
 
-Status: **GATE 6 closeout in flight (2026-11-16).** M0–M5 merged; production live at `https://fotedev.me` (cutover 2026-11-10, deployed from `ccc4df6`); real-Turnstile swap staged in PR #35 (production still on test keys); Supabase Free-plan limits captured live from vendor pages on **2026-11-06** (§6); Vercel Hobby terms risk accepted by the owner (ADR-0002 §Reversal, 2026-11-10).
+Status: **GATE 6 closeout in flight (2026-11-20).** M0–M5 merged; production live at `https://fotedev.me` (cutover 2026-11-10, deployed from `5ec4c57`); real Turnstile keys + single-mount widget live in Non-Interactive mode (PR #35, `d046361`); Supabase Free-plan limits captured live from vendor pages on **2026-11-06** (§6); Vercel Hobby terms risk accepted by the owner (ADR-0002 §Reversal, 2026-11-10).
 
 ## 0. Supabase project record
 
@@ -96,7 +96,7 @@ Run on the 1st of each month (calendar reminder). Record results as one line in 
 1. **Vercel (primary host):** dashboard → Usage — build minutes, bandwidth, function usage, analytics events. **Free-tier limits recorded in §6 with source URL + date.** Hosting is Vercel Hobby with the terms risk explicitly accepted by the owner (ADR-0002 §Reversal, 2026-11-10) — the §11.4 runbook is the standing contingency.
 2. **Supabase:** dashboard → Usage/Reports — database size, storage used, egress, Edge Function invocations, Auth MAUs. **Free-tier limits: recorded in §6 (source URLs + dates inline).**
 3. **Turnstile / Cloudflare:** widget request volume; **limits: recorded in §6 (Free plan = unlimited challenges; captured 2026-11-06).**
-4. **Email provider (Resend, ADR-0008):** emails sent this month vs 3,000/mo free tier (100/day); GATE 6 status (2026-11-16): the real-key Stage 3 is pending at closeout — degraded log-only notify remains the operative mode until the real app-path send passes (ADR-0008 addendum).
+4. **Email provider (Resend, ADR-0008):** emails sent this month vs 3,000/mo free tier (100/day); GATE 6 status (2026-11-20): the real-key Stage 3 is pending — the Resend API key is not yet in `.env.local`/function secrets, so degraded log-only notify remains the operative mode until the real app-path send passes (ADR-0008 addendum).
 5. **Inquiries growth:** row count vs the daily global cap (50/day expected ceiling ≈ ~1,500/month worst case ≈ ~1.5 MB/inquiries table). If growth is anomalous, check rate-limit counters for abuse.
 6. **Trend vs. thresholds:** any metric > 60% of its free-tier cap → open a GitHub issue titled `[OPS] Quota headroom <metric>` with the numbers and the source URL/date of the cap.
 7. **Backups:** latest Supabase backup timestamp sane; monthly export (§4) done.
@@ -126,7 +126,7 @@ Captured from the vendors' own pages — **source URL + capture date** written i
 | Free plan (credit system) | Netlify | *(Trial reverted 2026-11-10 — mandatory "Powered by Netlify" badge on live pages, hide toggle paid-only; see ADR-0002 §Reversal.)* 300 credits/month; production deploy 15 credits; bandwidth 20 credits/GB. | https://www.netlify.com/pricing | 2026-11-08 |
 | Commercial use on Free | Netlify | *(Trial reverted 2026-11-10.)* Explicitly permitted — "you can deploy commercial projects, no credit card required and no fees. Ever."; ToS/AUP restrict unlawful use and reselling only. | https://www.netlify.com/pricing · https://www.netlify.com/legal/terms-of-use | 2026-11-08 |
 | Turnstile plan | Cloudflare Free | **Unlimited challenges (traffic or verification requests)**; up to 20 widgets; 10 hostnames/widget; 7-day analytics | https://developers.cloudflare.com/turnstile/plans/ | 2026-11-06 |
-| Email sends | Resend (ADR-0008) | Free: **3,000 emails/month, 100/day** — status at 2026-11-16: degraded log-only until the real-key Stage 3 send is verified at GATE 6 closeout (see ADR-0008 addendum) | https://resend.com/pricing | 2026-11-07 |
+| Email sends | Resend (ADR-0008) | Free: **3,000 emails/month, 100/day** — status at 2026-11-20: degraded log-only; the Resend API key is pending (not yet in function secrets), Stage 3 send verification outstanding (see ADR-0008 addendum) | https://resend.com/pricing | 2026-11-07 |
 
 **Pausing mitigation (Supabase):** the free project pauses after 1 week of inactivity. Mitigations: (a) public pages are static/ISR-cached, so a paused DB never takes the site down; (b) a scheduled GitHub Action keep-alive ping (any read query, e.g. `select 1`) runs weekly — wired in M2/M5 CI tooling; (c) admin activity during content edits also counts as activity.
 
@@ -169,7 +169,7 @@ The admin account is created once in M1. MFA-ready; enabling MFA before launch i
 
 ## 10. Operational records
 
-- **Launch record (filled at M6; snapshot 2026-11-16):** deployed SHA `ccc4df6` · deployment URL `https://fotedev.me` · domain `fotedev.me` (cutover 2026-11-10) · Lighthouse medians (P/A/BP/SEO) `—` pending GATE 6 closeout (measure on Vercel — localhost runs are invalid on Next 16 `next start`) · smoke matrix **43/43** (2026-11-14, `.factory/evidence/m6/smoke-matrix.md`; owner-gated cells pending) · rollback = previous production deployment (§3).
+- **Launch record (filled at M6; snapshot 2026-11-20):** deployed SHA `5ec4c57` · deployment URL `https://fotedev.me` · domain `fotedev.me` (cutover 2026-11-10) · Lighthouse ×3 mobile medians (P/A/BP/SEO) **76 / 100 / 100 / 100**, LCP 3.26 s, TBT 580 ms, CLS 0 (2026-11-19, Lighthouse 12 mobile emulation against the production URL — Vercel-target rule; **Perf recorded as the ADR-0010-bounded cost of the M7 hero per Ahmed's 2026-11-20 decision**, kill switch `NEXT_PUBLIC_HERO_HIVE=0`) · smoke matrix **43/43** (2026-11-14, `.factory/evidence/m6/smoke-matrix.md`) · rollback = previous production deployment (§3).
 - **Expiries & calendar reminders:**
   - Domain `fotedev.me`: 1-year registration — registrar expiry date still **TO RECORD** from the Namecheap account at GATE 6 closeout (DNS cutover completed 2026-11-10). Reminder at −60 days.
   - Professional email: exists for 1 month at start — must NOT be a launch dependency (ADR-0004); if it lapses, `CONTACT_EMAIL` is switched from `/admin` to the fallback address within minutes.
