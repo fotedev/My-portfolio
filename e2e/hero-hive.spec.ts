@@ -12,6 +12,15 @@ import { expect, test } from "@playwright/test";
 
 const GL_DRIVER_WARNING = /GL Driver Message|GPU stall|WebGL-0x/i;
 
+/**
+ * The island boots on the first engagement signal (scroll, tap, key) or after
+ * a 6s cap, whichever comes first, so its cost never lands in the load window
+ * lab metrics simulate. Headless lab loads emit no signal, so assertions that
+ * need the layer mounted must wait past the cap.
+ */
+const BOOT_CAP_MS = 6000;
+const BOOT_SETTLE_MS = BOOT_CAP_MS + 1500;
+
 /** Whether this browser can give us a WebGL context at all. */
 async function hasWebGL(page: import("@playwright/test").Page): Promise<boolean> {
   return page.evaluate(() => {
@@ -25,7 +34,7 @@ test.describe("hive lattice", () => {
     await page.goto("/en");
 
     const layer = page.locator(".hive-layer");
-    await expect(layer).toHaveCount(1);
+    await expect(layer).toHaveCount(1, { timeout: BOOT_SETTLE_MS });
     await expect(layer).toHaveAttribute("aria-hidden", "true");
 
     // The layer can never intercept a click meant for the page content.
@@ -43,7 +52,7 @@ test.describe("hive lattice", () => {
   test("persists behind non-home routes", async ({ page }) => {
     // One layer for the whole public layout, mounted once, not per page.
     await page.goto("/en/projects");
-    await expect(page.locator(".hive-layer")).toHaveCount(1);
+    await expect(page.locator(".hive-layer")).toHaveCount(1, { timeout: BOOT_SETTLE_MS });
     await expect(page.locator(".hive-layer__canvas")).toHaveCount(1);
   });
 
@@ -67,7 +76,7 @@ test.describe("hive lattice", () => {
     page.on("pageerror", (error) => errors.push(error.message));
 
     await page.goto("/en");
-    await page.waitForTimeout(2500);
+    await page.waitForTimeout(BOOT_SETTLE_MS);
 
     // Where WebGL is unavailable the documented fallback is to remove the
     // canvas entirely (ADR-0010 section 5), so its absence is a pass, not a
@@ -81,7 +90,7 @@ test.describe("hive lattice", () => {
   test("renders a static frame under reduced motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/en");
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(BOOT_SETTLE_MS);
 
     if (!(await hasWebGL(page))) return;
 
@@ -110,7 +119,7 @@ test.describe("hive lattice", () => {
   test("animates when motion is allowed", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/en");
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(BOOT_SETTLE_MS);
 
     if (!(await hasWebGL(page))) return;
 
@@ -134,7 +143,7 @@ test.describe("hive lattice", () => {
     // canvas.
     for (const locale of ["/en", "/ar"]) {
       await page.goto(locale);
-      await page.waitForTimeout(1200);
+      await page.waitForTimeout(BOOT_SETTLE_MS);
 
       const results = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
