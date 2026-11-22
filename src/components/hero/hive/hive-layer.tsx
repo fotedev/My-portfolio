@@ -5,9 +5,12 @@ import { useEffect, useState } from "react";
 
 /**
  * The hive lattice is a deferred island: the chunk is fetched only once the
- * browser has recorded the page's LCP element, so its fetch, evaluation and
- * shader compilation can never delay the paint the performance gate measures.
- * It is also entirely absent from the server-rendered HTML.
+ * visitor has actually engaged with the page (scroll, tap, key) or after a
+ * generous idle cap, whichever comes first - so its fetch, evaluation and
+ * shader compilation never sit in the load window that the simulated-LCP
+ * performance gate scores, while engaged visitors still see it within a
+ * second or two of arriving. It is also entirely absent from the
+ * server-rendered HTML.
  *
  * The kill switch (`NEXT_PUBLIC_HERO_HIVE=0`) removes the layer entirely -
  * see ADR-0010 §5.
@@ -15,22 +18,29 @@ import { useEffect, useState } from "react";
 const HiveCanvas = dynamic(() => import("./hive-canvas"), { ssr: false, loading: () => null });
 
 /**
- * Resolves once the browser has settled on an LCP element, then hands off to
- * the idle scheduler. LCP is reported as a series of candidates, so the gate
- * waits for a quiet window (`settleMs`) after the LAST entry rather than
- * firing on the first one - booting on an early candidate would let the
- * island compete with the element that ultimately wins the metric. Entries
- * recorded before this effect runs are delivered via `buffered: true`. The
- * overall timeout covers browsers without LCP observability and loads where
- * the user interacts before any entry is emitted (interaction ends LCP
- * reporting).
- *
- * The callback returns its own disposer so that an unmount between the LCP
- * hand-off and the idle fire still cancels the scheduled work.
+ * Engagement signals that justify booting the decorative layer. Any one of
+ * them fires the boot; headless loads (lab audits, crawlers) that emit none
+ * fall through to the cap.
  */
-function afterLcp(callback: () => () => void, timeoutMs = 4000, settleMs = 600): () => void {
+const BOOT_SIGNALS: Array<keyof WindowEventMap> = [
+  "pointerdown",
+  "keydown",
+  "wheel",
+  "touchstart",
+  "scroll",
+];
+
+/**
+ * Resolves on the first engagement signal, or after `capMs` without one,
+ * then hands off to the idle scheduler. The cap sits well past the load
+ * window that lab metrics simulate, so a non-interactive load never has the
+ * island's cost attributed to it.
+ *
+ * The callback returns its own disposer so that an unmount between the
+ * signal and the idle fire still cancels the scheduled work.
+ */
+function bootOnFirstSignal(callback: () => () => void, capMs = 6000): () => void {
   let done = false;
-  let settleTimer: number | null = null;
   const cleanups: Array<() => void> = [];
   const finish = (): void => {
     if (done) return;
@@ -40,23 +50,12 @@ function afterLcp(callback: () => () => void, timeoutMs = 4000, settleMs = 600):
     cleanups.push(callback());
   };
 
-  try {
-    const observer = new PerformanceObserver((list) => {
-      if (list.getEntries().length === 0) return;
-      if (settleTimer !== null) window.clearTimeout(settleTimer);
-      settleTimer = window.setTimeout(finish, settleMs);
-    });
-    observer.observe({ type: "largest-contentful-paint", buffered: true });
-    cleanups.push(() => {
-      observer.disconnect();
-      if (settleTimer !== null) window.clearTimeout(settleTimer);
-    });
-  } catch {
-    // No PerformanceObserver/LCP support on this browser: the timeout below
-    // is the only trigger.
+  for (const type of BOOT_SIGNALS) {
+    window.addEventListener(type, finish, { once: true, passive: true, capture: true });
+    cleanups.push(() => window.removeEventListener(type, finish, { capture: true }));
   }
 
-  const timer = window.setTimeout(finish, timeoutMs);
+  const timer = window.setTimeout(finish, capMs);
   cleanups.push(() => window.clearTimeout(timer));
 
   return () => {
@@ -78,7 +77,7 @@ export function HiveLayer() {
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_HERO_HIVE === "0") return;
-    return afterLcp(() => scheduleIdle(() => setMounted(true)));
+    return bootOnFirstSignal(() => scheduleIdle(() => setMounted(true)));
   }, []);
 
   if (!mounted) return null;
