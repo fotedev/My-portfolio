@@ -76,6 +76,24 @@ Source: `ahmed-aboalyoun-certificate.pdf` (local, 1 page, bilingual AR/EN). Extr
 
 **Publication rule for the certificate:** show program name + recipient + issuer logo credits; date/ID/verify-URL stay `TO VERIFY` until Ahmed supplies them (or QR is resolved). Do not state an issue date on the site until verified.
 
+## Certificate 2 — ITI / Mahara-Tech AI4E (source of truth: the PDF itself)
+
+Source: `certificates/Attendance Certificate.pdf` → committed as `public/certificates/iti-ai4e-certificate.pdf` (local, 1 page, English). Extracted verbatim 2026-11-28:
+
+| Field | Value |
+|---|---|
+| Header | "Certificate of Completion" — "ITI Platform Mahara-Tech Certifies that" |
+| Program | **AI For Everyone (AI4E)** |
+| Recipient | **AHMED ABOALAYOUN** (Latin script, as printed) |
+| Issuer marks | Header logos: **Information Technology Institute (ITI)** + **Ministry of Communications and Information Technology** (Egypt); footer wordmarks: **MaharaTech — Information Technology Institute Platform** and **Artificial Intelligence Academy** |
+| Course duration | **1 Hour 30 Minutes** (printed) |
+| Completion date | **November 19, 2026** (printed) |
+| Verification code | **ITSM7Eb451** (printed) |
+| Verification URL | none printed — code verifiable on the Mahara-Tech platform; `proof_url` points at maharatech.gov.eg (platform of issuance, not printed on the PDF — cite as platform link) |
+| Visual | Certificate of Completion header, orange AI4E highlight, seal-and-ribbon motif, AI-circuit brain graphic, TCPDF footer (platform-generated) |
+
+**Publication note:** unlike the OMP certificate, date + verification code are **printed on the PDF** — both may be shown on the site verbatim. PDF is repo-served via `public/certificates/` (the documented M1 fallback path); `asset_media_id` stays null until a Storage upload replaces it.
+
 ## Re-verification policy
 
 - OSS statuses re-checked at seed time (M1) and before launch (M6).
